@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:guidely/widgets/user_image_picker_widget.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -43,6 +44,20 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      _authMode == AuthMode.signup
+                          ? Column(
+                              children: [
+                                const UserImagePickerWidget(),
+                                const SizedBox(height: 10),
+                                Text(
+                                  'Photo Profile',
+                                  style: poppinsFont.copyWith(
+                                    color: MainColors.textHint,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Container(),
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'Email',
