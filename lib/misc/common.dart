@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+final poppinsFont = TextStyle(
+  fontFamily: GoogleFonts.poppins().fontFamily,
+);
 
 class MainColors {
   static const Color primary = Color(0xff202020);
