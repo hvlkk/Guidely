@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "287462012524",
+    "project_id": "guidely-e789f",
+    "storage_bucket": "guidely-e789f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287462012524:android:1ebe65de1e8b2ddddf8a49",
+        "android_client_info": {
+          "package_name": "com.example.guidely"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKQj67ZoqcZ-UPXO1cnmGdYQ9wpKAoltI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
