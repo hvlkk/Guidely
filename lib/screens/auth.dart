@@ -13,7 +13,16 @@ class AuthScreen extends StatefulWidget {
 enum AuthMode { login, signup }
 
 class _AuthScreenState extends State<AuthScreen> {
+  final _formKey = GlobalKey<FormState>();
   AuthMode _authMode = AuthMode.login;
+
+  void _submit() {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+    // TODO: Implement authentication logic here
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +50,7 @@ class _AuthScreenState extends State<AuthScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Form(
+                  key: _formKey,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -63,16 +73,50 @@ class _AuthScreenState extends State<AuthScreen> {
                           labelText: 'Email',
                           labelStyle: poppinsFont,
                         ),
+                        validator: (value) {
+                          if (value == null ||
+                              value.isEmpty ||
+                              !value.contains('@')) {
+                            return 'Please enter a valid email address.';
+                          }
+                          return null;
+                        },
                       ),
+                      _authMode == AuthMode.signup
+                          ? TextFormField(
+                              decoration: InputDecoration(
+                                labelText: 'Username',
+                                labelStyle: poppinsFont,
+                              ),
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.length < 3) {
+                                  return 'Username must be at least 3 characters long.';
+                                }
+                                return null;
+                              },
+                            )
+                          : Container(),
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'Password',
                           labelStyle: poppinsFont,
                         ),
+                        enableSuggestions: true,
+                        obscureText: true,
+                        validator: (value) {
+                          if (value == null ||
+                              value.isEmpty ||
+                              value.length < 6) {
+                            return 'Password must be at least 6 characters long.';
+                          }
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: _submit,
                         style: ButtonStyle(
                           backgroundColor:
                               MaterialStateProperty.all(ButtonColors.primary),
