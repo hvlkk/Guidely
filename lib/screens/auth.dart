@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:guidely/widgets/user_image_picker_widget.dart';
+import 'package:guidely/models/user.dart' as TourUser;
 import 'package:guidely/misc/common.dart';
 
 final _firebase = FirebaseAuth.instance;
@@ -68,16 +69,21 @@ class _AuthScreenState extends State<AuthScreen> {
         await storageRef.putFile(_userImageFile!);
         final imageURL = await storageRef.getDownloadURL();
 
+        // Save the user data to Firestore
+        final newUser = TourUser.User(
+          uid: userCredentials.user!.uid,
+          username: _enteredUsername,
+          email: _enteredEmail,
+          imageUrl: imageURL,
+        );
+        print("before set");
         await FirebaseFirestore.instance
             .collection('users')
-            .doc(userCredentials.user!.uid)
-            .set(
-          {
-            'username': _enteredUsername,
-            'email': _enteredEmail,
-            'image_url': imageURL,
-          },
-        );
+            .doc(newUser.uid)
+            .set({
+          newUser.uid: newUser.toMap(),
+        });
+        print('finito suave swave sito');
       }
     } on FirebaseAuthException catch (error) {
       // ignore: use_build_context_synchronously
@@ -144,6 +150,12 @@ class _AuthScreenState extends State<AuthScreen> {
                           decoration: InputDecoration(
                             labelText: 'Email',
                             labelStyle: poppinsFont,
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: MainColors.accent,
+                              ), // Change color to whatever you want
+                              // Change color to whatever you want
+                            ),
                           ),
                           validator: (value) {
                             if (value == null ||
@@ -160,6 +172,12 @@ class _AuthScreenState extends State<AuthScreen> {
                                 decoration: InputDecoration(
                                   labelText: 'Username',
                                   labelStyle: poppinsFont,
+                                  focusedBorder: const UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: MainColors.accent,
+                                    ), // Change color to whatever you want
+                                    // Change color to whatever you want
+                                  ),
                                 ),
                                 validator: (value) {
                                   if (value == null ||
@@ -177,6 +195,12 @@ class _AuthScreenState extends State<AuthScreen> {
                           decoration: InputDecoration(
                             labelText: 'Password',
                             labelStyle: poppinsFont,
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: MainColors.accent,
+                              ), // Change color to whatever you want
+                              // Change color to whatever you want
+                            ),
                           ),
                           enableSuggestions: true,
                           obscureText: true,
