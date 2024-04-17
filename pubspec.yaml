@@ -7,8 +7,10 @@ environment:
   sdk: ">=3.3.2 <4.0.0"
 
 dependencies:
+  cloud_firestore: ^4.17.0
   firebase_auth: ^4.19.1
   firebase_core: ^2.29.0
+  firebase_storage: ^11.7.2
   flutter:
     sdk: flutter
   flutter_svg: ^2.0.10+1

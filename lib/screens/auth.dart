@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -24,12 +28,23 @@ class _AuthScreenState extends State<AuthScreen> {
   var _enteredEmail = '';
   var _enteredUsername = '';
   var _enteredPassword = '';
+  File? _userImageFile;
 
-  void _submit() {
+  void _submit() async {
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       return;
     }
+
+    if (_userImageFile == null && _authMode == AuthMode.signup) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please pick an image.'),
+        ),
+      );
+      return;
+    }
+
     _formKey.currentState!.save();
     try {
       if (_authMode == AuthMode.login) {
@@ -39,15 +54,36 @@ class _AuthScreenState extends State<AuthScreen> {
         );
       } else if (_authMode == AuthMode.signup) {
         // Signup
-        _firebase.createUserWithEmailAndPassword(
+        final userCredentials = await _firebase.createUserWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword,
         );
+
+        // Upload the image to Firebase Storage
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('user_images')
+            .child('${userCredentials.user!.uid}.jpg');
+
+        await storageRef.putFile(_userImageFile!);
+        final imageURL = await storageRef.getDownloadURL();
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredentials.user!.uid)
+            .set(
+          {
+            'username': _enteredUsername,
+            'email': _enteredEmail,
+            'image_url': imageURL,
+          },
+        );
       }
-    } on FirebaseAuthException {
+    } on FirebaseAuthException catch (error) {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An error occurred. Please check your credentials.'),
+        SnackBar(
+          content: Text(error.message!),
         ),
       );
     }
@@ -89,7 +125,11 @@ class _AuthScreenState extends State<AuthScreen> {
                         _authMode == AuthMode.signup
                             ? Column(
                                 children: [
-                                  const UserImagePickerWidget(),
+                                  UserImagePickerWidget(
+                                    onImagePicked: (pickedImage) {
+                                      _userImageFile = pickedImage;
+                                    },
+                                  ),
                                   const SizedBox(height: 10),
                                   Text(
                                     'Photo Profile',
