@@ -30,7 +30,7 @@ class MainApp extends StatelessWidget {
                 child: CircularProgressIndicator(),
               );
             }
-            if (snapshot.hasData) {
+            if (snapshot.hasData && snapshot.data != null) {
               return const ToursHomeScreen();
             }
             return const AuthScreen();

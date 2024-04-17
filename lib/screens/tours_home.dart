@@ -6,70 +6,80 @@ import 'package:guidely/misc/common.dart';
 class ToursHomeScreen extends StatelessWidget {
   const ToursHomeScreen({Key? key});
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> _getUser() async {
-    final user = FirebaseAuth.instance.currentUser;
-    return await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user?.uid)
-        .get();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      future: _getUser(),
+    final user = FirebaseAuth.instance.currentUser;
+    final userStream = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .snapshots();
+
+    // return a stream builder that listens to the user's data, when available
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: userStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
-        final userData = snapshot.data;
-        final finalJsonData = userData!.data()?.entries;
-        final username = finalJsonData?.first.value['username'];
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              'Guidely',
-              style: TextStyle(
-                  fontFamily: poppinsFont.fontFamily,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold),
+
+        if (snapshot.hasData) {
+          final userData = snapshot.data!;
+          final finalJsonData = userData.data()?.entries;
+
+          final username = finalJsonData?.first.value['username'];
+          final imageUrl = finalJsonData?.first.value['imageUrl'];
+
+          if (finalJsonData == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Guidely',
+                style: TextStyle(
+                    fontFamily: poppinsFont.fontFamily,
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.logout),
+                  onPressed: () {
+                    FirebaseAuth.instance.signOut();
+                  },
+                )
+              ],
             ),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                },
-              )
-            ],
-          ),
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(15),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundImage: NetworkImage(
-                        finalJsonData?.first.value['imageUrl'],
-                      ),
+            body: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 25,
+                          backgroundImage: NetworkImage(imageUrl),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Welcome, $username!',
+                          style: TextStyle(
+                            fontFamily: poppinsFont.fontFamily,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Welcome, $username!',
-                      style: TextStyle(
-                        fontFamily: poppinsFont.fontFamily,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-        );
+                  )
+                ],
+              ),
+            ),
+          );
+        }
+        return Container(); // Return an empty container if snapshot has no data
       },
     );
   }

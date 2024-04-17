@@ -8,7 +8,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:guidely/widgets/user_image_picker_widget.dart';
-import 'package:guidely/models/user.dart' as TourUser;
+import 'package:guidely/models/user.dart'
+    as TourUser; // Renamed to avoid conflict with FirebaseAuth
 import 'package:guidely/misc/common.dart';
 
 final _firebase = FirebaseAuth.instance;
@@ -54,13 +55,11 @@ class _AuthScreenState extends State<AuthScreen> {
           password: _enteredPassword,
         );
       } else if (_authMode == AuthMode.signup) {
-        // Signup
         final userCredentials = await _firebase.createUserWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword,
         );
 
-        // Upload the image to Firebase Storage
         final storageRef = FirebaseStorage.instance
             .ref()
             .child('user_images')
@@ -69,24 +68,22 @@ class _AuthScreenState extends State<AuthScreen> {
         await storageRef.putFile(_userImageFile!);
         final imageURL = await storageRef.getDownloadURL();
 
-        // Save the user data to Firestore
         final newUser = TourUser.User(
           uid: userCredentials.user!.uid,
           username: _enteredUsername,
           email: _enteredEmail,
           imageUrl: imageURL,
         );
-        print("before set");
         await FirebaseFirestore.instance
             .collection('users')
             .doc(newUser.uid)
-            .set({
-          newUser.uid: newUser.toMap(),
-        });
-        print('finito suave swave sito');
+            .set(
+          {
+            newUser.uid: newUser.toMap(),
+          },
+        );
       }
     } on FirebaseAuthException catch (error) {
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.message!),
@@ -175,8 +172,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                   focusedBorder: const UnderlineInputBorder(
                                     borderSide: BorderSide(
                                       color: MainColors.accent,
-                                    ), // Change color to whatever you want
-                                    // Change color to whatever you want
+                                    ),
                                   ),
                                 ),
                                 validator: (value) {
