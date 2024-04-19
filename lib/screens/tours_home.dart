@@ -3,7 +3,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/screens/notifications.dart';
 import 'package:guidely/screens/profile.dart';
@@ -69,7 +68,7 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
               ],
             ),
             body: SingleChildScrollView(
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Padding(
@@ -88,28 +87,41 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
                             fontSize: 20,
                           ),
                         ),
+                        const Spacer(),
+                        GestureDetector(
+                          child: const Icon(Icons.notifications, size: 30),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (ctx) {
+                                  return const NotificationsScreen();
+                                },
+                              ),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ),
-                  const Spacer(
-                    flex: 1,
-                  ),
-                  GestureDetector(
-                    child: const Icon(Icons.notifications, size: 30),
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (ctx) {
-                          return const NotificationsScreen();
-                        },
-                      ));
-                    },
+                  const SizedBox(width: 15),
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search for tours',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           );
         }
-        return Container(); // Return an empty container if snapshot has no data
+        return Container();
       },
     );
   }
