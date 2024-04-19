@@ -1,22 +1,36 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/screens/profile.dart';
+import 'package:guidely/screens/tours.dart';
 
-class ToursHomeScreen extends StatelessWidget {
-  const ToursHomeScreen({Key? key});
+class ToursHomeScreen extends StatefulWidget {
+  const ToursHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  _ToursHomeScreenState createState() => _ToursHomeScreenState();
+}
+
+class _ToursHomeScreenState extends State<ToursHomeScreen> {
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _userStream;
+
+  @override
+  void initState() {
+    super.initState();
     final user = FirebaseAuth.instance.currentUser;
-    final userStream = FirebaseFirestore.instance
+    _userStream = FirebaseFirestore.instance
         .collection('users')
         .doc(user?.uid)
         .snapshots();
+  }
 
-    // return a stream builder that listens to the user's data, when available
+  @override
+  Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: userStream,
+      stream: _userStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -38,9 +52,10 @@ class ToursHomeScreen extends StatelessWidget {
               title: Text(
                 'Guidely',
                 style: TextStyle(
-                    fontFamily: poppinsFont.fontFamily,
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold),
+                  fontFamily: poppinsFont.fontFamily,
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               actions: [
                 IconButton(
@@ -84,3 +99,10 @@ class ToursHomeScreen extends StatelessWidget {
     );
   }
 }
+
+// Define your screens list outside of ToursHomeScreen
+final screens = [
+  const ToursScreen(),
+  const ToursHomeScreen(),
+  const ProfileScreen(),
+];
