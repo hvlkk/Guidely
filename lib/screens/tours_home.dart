@@ -3,7 +3,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/screens/notifications.dart';
 import 'package:guidely/screens/profile.dart';
 import 'package:guidely/screens/tours.dart';
 
@@ -67,7 +69,7 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
               ],
             ),
             body: SingleChildScrollView(
-              child: Column(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Padding(
@@ -88,7 +90,20 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
                         ),
                       ],
                     ),
-                  )
+                  ),
+                  const Spacer(
+                    flex: 1,
+                  ),
+                  GestureDetector(
+                    child: const Icon(Icons.notifications, size: 30),
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (ctx) {
+                          return const NotificationsScreen();
+                        },
+                      ));
+                    },
+                  ),
                 ],
               ),
             ),
