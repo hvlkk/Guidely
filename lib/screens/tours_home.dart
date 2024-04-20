@@ -13,6 +13,8 @@ class ToursHomeScreen extends StatefulWidget {
   _ToursHomeScreenState createState() => _ToursHomeScreenState();
 }
 
+// needs refactoring to use Riverpod
+
 class _ToursHomeScreenState extends State<ToursHomeScreen> {
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _userStream;
 
