@@ -5,8 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/screens/notifications.dart';
-import 'package:guidely/screens/profile.dart';
-import 'package:guidely/screens/tours.dart';
 
 class ToursHomeScreen extends StatefulWidget {
   const ToursHomeScreen({super.key});
@@ -126,10 +124,3 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
     );
   }
 }
-
-// Define your screens list outside of ToursHomeScreen
-final screens = [
-  const ToursScreen(),
-  const ToursHomeScreen(),
-  const ProfileScreen(),
-];

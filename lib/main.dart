@@ -63,9 +63,11 @@ class _MainAppState extends State<MainApp> {
                 ProfileScreen(),
               ],
               onDestinationSelected: (index) {
-                setState(() {
-                  _index = NavigationIndex.values[index];
-                });
+                setState(
+                  () {
+                    _index = NavigationIndex.values[index];
+                  },
+                );
               },
             );
           }
