@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
-import 'package:guidely/screens/notifications.dart';
+import 'package:guidely/screens/util/notifications.dart';
 
 class ToursHomeScreen extends StatefulWidget {
   const ToursHomeScreen({super.key});

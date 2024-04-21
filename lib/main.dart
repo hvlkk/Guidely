@@ -3,13 +3,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guidely/screens/auth.dart';
+import 'package:guidely/screens/main/auth.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:guidely/screens/custom_navigator.dart';
-import 'package:guidely/screens/profile.dart';
-import 'package:guidely/screens/tours.dart';
-import 'package:guidely/screens/tours_home.dart';
+import 'package:guidely/widgets/custom_navigator.dart';
+import 'package:guidely/screens/main/profile.dart';
+import 'package:guidely/screens/main/tours.dart';
+import 'package:guidely/screens/main/tours_home.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -76,7 +76,7 @@ class _MainAppState extends State<MainApp> {
               },
             );
           }
-          return const AuthScreen();
+          return const AuthScreen(); // if the user is not authenticated, redirect to the auth screen
         },
       ),
     );

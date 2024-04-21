@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:guidely/widgets/user_image_picker_widget.dart';
 import 'package:guidely/models/user.dart'
+    // ignore: library_prefixes
     as TourUser; // Renamed to avoid conflict with FirebaseAuth
 import 'package:guidely/misc/common.dart';
 

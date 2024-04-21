@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
-import 'package:guidely/screens/tour_guide_registration/tour_guide_registration_screen_second.dart';
-import 'package:guidely/screens/tour_guide_registration/tour_registration_template.dart';
+import 'package:guidely/screens/util/tour_guide_registration/tour_guide_registration_screen_second.dart';
+import 'package:guidely/screens/util/tour_guide_registration/tour_registration_template.dart';
 
 class TourGuideRegistrationScreen extends StatelessWidget {
   TourGuideRegistrationScreen({super.key});
