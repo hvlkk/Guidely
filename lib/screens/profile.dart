@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/screens/tour_guide_registration/tour_guide_registration.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -58,7 +59,15 @@ class ProfileScreen extends ConsumerWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: MainColors.background,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (ctx) {
+                            return TourGuideRegistrationScreen();
+                          },
+                        ),
+                      );
+                    },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
