@@ -48,10 +48,9 @@ class TourGuideRegistrationScreenSecond extends ConsumerWidget {
       );
     }
     // TODO: this needs to return the user to the home screen
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const MainApp(),
-      ),
+    Navigator.of(context).popUntil(
+      // pop until we reach the screen that is the first screen in the stack
+      (route) => route.isFirst,
     );
   }
 
