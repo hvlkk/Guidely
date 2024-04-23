@@ -64,7 +64,10 @@ class TourGuideRegistrationScreen extends StatelessWidget {
               onPressed: () {
                 _submit(context);
               },
-              child: const Text('Next'),
+              child: const Text(
+                'Next',
+                style: TextStyle(color: Colors.black),
+              ),
             ),
           ],
         ),
