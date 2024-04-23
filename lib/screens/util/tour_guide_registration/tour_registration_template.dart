@@ -17,24 +17,29 @@ class RegistrationScreenTemplate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          title,
-          style: poppinsFont.copyWith(
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(
+            FocusNode()); // use to dismiss the keyboard when the user taps outside the text field
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            title,
+            style: poppinsFont.copyWith(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
-      body: Center(
-        child: Padding(
+        body: ListView(
+          shrinkWrap: true,
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Title(
-                color: MainColors.accent,
+          children: [
+            const SizedBox(height: 20),
+            Title(
+              color: MainColors.accent,
+              child: Center(
                 child: Text(
                   step,
                   style: poppinsFont.copyWith(
@@ -43,19 +48,19 @@ class RegistrationScreenTemplate extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: Text(
-                  instruction,
-                  style: poppinsFont.copyWith(
-                    fontSize: 15,
-                  ),
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Text(
+                instruction,
+                style: poppinsFont.copyWith(
+                  fontSize: 15,
                 ),
               ),
-              child,
-            ],
-          ),
+            ),
+            child,
+          ],
         ),
       ),
     );

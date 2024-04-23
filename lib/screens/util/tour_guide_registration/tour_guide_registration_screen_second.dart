@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/screens/util/tour_guide_registration/tour_registration_template.dart';
+import 'package:guidely/widgets/user_image_picker_widget.dart';
 
+// ignore: must_be_immutable
 class TourGuideRegistrationScreenSecond extends StatelessWidget {
-  const TourGuideRegistrationScreenSecond({super.key});
+  TourGuideRegistrationScreenSecond({super.key, required this.description});
+
+  var description;
 
   @override
   Widget build(BuildContext context) {
@@ -54,18 +58,22 @@ class TourGuideRegistrationScreenSecond extends StatelessWidget {
               ),
             ],
           ),
-
           // add a button to let the user take a photo of their ID
           const SizedBox(height: 25),
-          ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Colors.grey),
+          const Text(
+            'Take a photo',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 15,
             ),
-            onPressed: () {
-              // add a function to take a photo of the ID
+          ),
+          const SizedBox(height: 10),
+
+          UserImagePickerWidget(
+            onImagePicked: (pickedImage) {
+              // Handle the picked image here
             },
-            child: const Text('Take a photo',
-                style: TextStyle(color: Colors.white)),
+            radius: 80,
           ),
           const SizedBox(height: 25),
           ElevatedButton(
