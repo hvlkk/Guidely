@@ -41,12 +41,14 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
           final userData = snapshot.data!;
           final finalJsonData = userData.data()?.entries;
 
-          final username = finalJsonData?.first.value['username'];
-          final imageUrl = finalJsonData?.first.value['imageUrl'];
-
           if (finalJsonData == null) {
             return const Center(child: CircularProgressIndicator());
           }
+
+          final jsonDataMap = Map<String, dynamic>.fromEntries(finalJsonData);
+
+          final username = jsonDataMap['username'];
+          final imageUrl = jsonDataMap['imageUrl'];
 
           return Scaffold(
             appBar: AppBar(

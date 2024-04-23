@@ -78,13 +78,11 @@ class _AuthScreenState extends State<AuthScreen> {
         await FirebaseFirestore.instance
             .collection('users')
             .doc(newUser.uid)
-            .set(
-          {
-            newUser.uid: newUser.toMap(),
-          },
-        );
+            .set(newUser.toMap());
       }
     } on FirebaseAuthException catch (error) {
+      print("ERROR: ${error.code}");
+      print(error.message);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.message!),

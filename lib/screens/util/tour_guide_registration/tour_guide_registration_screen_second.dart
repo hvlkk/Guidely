@@ -1,16 +1,57 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/registration_data.dart';
+import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/util/tour_guide_registration/tour_registration_template.dart';
 import 'package:guidely/widgets/user_image_picker_widget.dart';
+import 'package:guidely/models/user.dart' as myuser; // alias to avoid conflicts
 
-// ignore: must_be_immutable
-class TourGuideRegistrationScreenSecond extends StatelessWidget {
-  TourGuideRegistrationScreenSecond({super.key, required this.description});
+class TourGuideRegistrationScreenSecond extends ConsumerWidget {
+  const TourGuideRegistrationScreenSecond(
+      {super.key, required this.description});
 
-  var description;
+  final String description;
+
+  void _submitRegistration(BuildContext context, myuser.User user) async {
+    // we will prefer to use the copyWith method to update the user object rather than directly modifying it
+    // to ensure immutability and avoid side effects
+    RegistrationData registrationData = RegistrationData(
+      uid: user.uid,
+      description: description,
+      uploadedIdURL: '',
+    );
+
+    final updatedUser =
+        user.copyWith(isTourGuide: true, registrationData: registrationData);
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(updatedUser.uid)
+          .set(
+        {
+          'isTourGuide': true,
+          'registrationData': registrationData.toJson(),
+        },
+        SetOptions(merge: true), // Merge with existing data
+      );
+    } catch (error) {
+      // handle the error
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An error occurred. Please try again later.'),
+        ),
+      );
+    }
+    // TODO: this needs to return the user to the home screen
+    Navigator.of(context).pop();
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return RegistrationScreenTemplate(
       title: 'Tour Guide Registration',
       step: 'Step 2: ID Submission',
@@ -81,9 +122,19 @@ class TourGuideRegistrationScreenSecond extends StatelessWidget {
               backgroundColor: MaterialStateProperty.all(ButtonColors.primary),
             ),
             onPressed: () {
-              // add a function to submit the ID
+              final user = ref.read(userDataProvider);
+              user.when(
+                data: (userData) {
+                  _submitRegistration(context, userData);
+                },
+                loading: () {},
+                error: (_, __) {},
+              );
             },
-            child: const Text('Submit', style: TextStyle(color: Colors.black)),
+            child: const Text(
+              'Submit',
+              style: TextStyle(color: Colors.black),
+            ),
           ),
         ],
       ),

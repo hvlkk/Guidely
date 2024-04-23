@@ -12,7 +12,7 @@ class TourGuideRegistrationScreen extends StatelessWidget {
   void _submit(BuildContext context) {
     final text = _descController.text;
 
-    final isValid = text.trim().isNotEmpty && text.length > 10;
+    final isValid = _descController.text.trim().isNotEmpty && text.length > 10;
 
     if (!isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
