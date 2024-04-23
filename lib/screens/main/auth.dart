@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:guidely/main.dart';
 
 import 'package:guidely/widgets/user_image_picker_widget.dart';
 import 'package:guidely/models/user.dart'
@@ -75,13 +76,17 @@ class _AuthScreenState extends State<AuthScreen> {
           email: _enteredEmail,
           imageUrl: imageURL,
         );
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(newUser.uid)
-            .set(newUser.toMap());
+        FirebaseFirestore.instance.collection('users').doc(newUser.uid).set(
+              newUser.toMap(),
+            );
+        // after successful signup, navigate to the main app
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainApp()),
+        );
       }
     } on FirebaseAuthException catch (error) {
-      print("ERROR: ${error.code}");
+      print("Petakse error: ${error.code}");
       print(error.message);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

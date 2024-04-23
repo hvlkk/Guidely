@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guidely/main.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/registration_data.dart';
 import 'package:guidely/providers/user_data_provider.dart';
@@ -47,7 +48,11 @@ class TourGuideRegistrationScreenSecond extends ConsumerWidget {
       );
     }
     // TODO: this needs to return the user to the home screen
-    Navigator.of(context).pop();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => const MainApp(),
+      ),
+    );
   }
 
   @override
