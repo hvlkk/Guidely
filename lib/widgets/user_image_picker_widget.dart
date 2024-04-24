@@ -6,8 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 class UserImagePickerWidget extends StatefulWidget {
   const UserImagePickerWidget(
-      {Key? key, required this.onImagePicked, this.radius = 40.0})
-      : super(key: key);
+      {super.key, required this.onImagePicked, this.radius = 40.0});
 
   final void Function(File pickedImage) onImagePicked;
   final double radius;
