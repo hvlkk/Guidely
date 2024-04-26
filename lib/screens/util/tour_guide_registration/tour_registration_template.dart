@@ -20,7 +20,8 @@ class RegistrationScreenTemplate extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(
-            FocusNode()); // use to dismiss the keyboard when the user taps outside the text field
+          FocusNode(),
+        ); // use to dismiss the keyboard when the user taps outside the text field
       },
       child: Scaffold(
         appBar: AppBar(

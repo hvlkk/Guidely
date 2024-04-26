@@ -11,6 +11,8 @@ class TourCreatorScreen extends StatefulWidget {
 class _TourCreatorScreenState extends State<TourCreatorScreen> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
+  final _tourTitleController = TextEditingController();
+  final _tourDescriptionController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -19,14 +21,9 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       firstDate: DateTime(2015, 8),
       lastDate: DateTime(2101),
     );
-    // validate also that the date is does not exceed the current date
-    if (picked != null &&
-        picked != _selectedDate &&
-        picked.isAfter(DateTime.now())) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
+    setState(() {
+      _selectedDate = picked!;
+    });
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -34,11 +31,33 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       context: context,
       initialTime: _selectedTime,
     );
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
+    setState(() {
+      _selectedTime = picked!;
+    });
+  }
+
+  void _submit() {
+    // validate the form
+    if (_tourTitleController.text.isEmpty ||
+        _tourDescriptionController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill in all the fields.'),
+        ),
+      );
+      return;
     }
+    // validate the date
+    if (_selectedDate.isBefore(DateTime.now())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a correct date.'),
+        ),
+      );
+      return;
+    }
+
+    // navigate to the next screen
   }
 
   @override
@@ -51,7 +70,7 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
           preferredSize: Size.fromHeight(4.0),
           child: Divider(
             color: MainColors.divider,
-            thickness: 1.0,
+            thickness: 0.5,
           ),
         ),
       ),
@@ -72,18 +91,27 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
                 hintText: 'Enter the name of the tour',
                 border: OutlineInputBorder(),
               ),
+              controller: _tourTitleController,
             ),
             const SizedBox(height: 25),
-            TextFormField(
-              decoration: const InputDecoration(
-                hintText: 'Enter your description here',
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: MainColors.divider),
+            GestureDetector(
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'Enter your description here',
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(color: MainColors.divider),
+                  ),
+                  fillColor: MainColors.textHint,
                 ),
-                fillColor: MainColors.textHint,
+                keyboardType: TextInputType.multiline,
+                controller: _tourDescriptionController,
+                maxLines: 10,
               ),
-              keyboardType: TextInputType.multiline,
-              maxLines: 10,
+              onTap: () {
+                FocusScope.of(context).requestFocus(
+                  FocusNode(),
+                );
+              },
             ),
             Row(
               children: [
@@ -136,6 +164,7 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
             ElevatedButton(
               onPressed: () {
                 // submit the tour
+                _submit();
               },
               style: ButtonStyle(
                 backgroundColor:
