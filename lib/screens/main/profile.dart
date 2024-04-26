@@ -140,6 +140,9 @@ class ProfileScreen extends ConsumerWidget {
                           fontSize: 17,
                         ),
                       ),
+                      onTap: () {
+                        // navigate to the personal information screen
+                      },
                     ),
                     const Divider(
                       color: MainColors.divider,
@@ -156,6 +159,9 @@ class ProfileScreen extends ConsumerWidget {
                           fontSize: 17,
                         ),
                       ),
+                      onTap: () {
+                        // navigate to the payment information screen
+                      },
                     ),
                   ],
                 ),

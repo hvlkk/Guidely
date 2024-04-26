@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
 
 class ToursScreen extends ConsumerStatefulWidget {
   const ToursScreen({super.key});
@@ -20,7 +21,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tours'),
+        title: Text('Tours', style: poppinsFont),
       ),
       body: userDataAsync.when(
         loading: () => const Center(
@@ -45,12 +46,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
               // TODO: to be removed later
               body: TabBarView(
                 children: [
-                  isTourGuide
-                      ? _buildTourGuideContent()
-                      : _buildTabContent('No ${tabNames[0]}'),
-                  isTourGuide
-                      ? _buildTourGuideContent()
-                      : _buildTabContent('No ${tabNames[1]}'),
+                  _buildTabContent('No ${tabNames[0]}'),
+                  _buildTabContent('No ${tabNames[1]}'),
                   isTourGuide
                       ? _buildTourGuideContent()
                       : _buildTabContent('No ${tabNames[2]}'),
@@ -74,23 +71,24 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             'Nothing to see here, why don\'t you add a tour?',
-            style: TextStyle(
-              fontSize: 13,
-            ),
+            style: poppinsFont.copyWith(fontSize: 15),
           ),
           const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
               // navigate to the add tour screen
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return const TourCreatorScreen();
+              }));
             },
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(ButtonColors.primary),
             ),
-            child: const Text(
+            child: Text(
               'Add a tour',
-              style: TextStyle(color: Colors.black),
+              style: poppinsFont.copyWith(color: Colors.black),
             ),
           ),
         ],
