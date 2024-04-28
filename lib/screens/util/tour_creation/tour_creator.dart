@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/screens/util/tour_creation/tour_creator_second.dart';
 
 class TourCreatorScreen extends StatefulWidget {
   const TourCreatorScreen({super.key});
@@ -58,6 +59,11 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
     }
 
     // navigate to the next screen
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const TourCreatorSecondScreen(),
+      ),
+    );
   }
 
   @override
