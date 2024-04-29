@@ -6,15 +6,16 @@ import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/utils/location_input.dart';
 import 'package:guidely/models/data/tour_event_location.dart';
 import 'package:guidely/screens/util/map.dart';
+import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_third.dart';
 import 'package:guidely/widgets/custom_text_field.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 
-const apiKey = 'AIzaSyDKQj67ZoqcZ-UPXO1cnmGdYQ9wpKAoltI'; // to be changed
+const apiKey = 'YOUR_API_KEY'; // to be changed
 
 class TourCreatorSecondScreen extends StatefulWidget {
-  const TourCreatorSecondScreen({super.key});
+  const TourCreatorSecondScreen({Key? key}) : super(key: key);
 
   @override
   State<TourCreatorSecondScreen> createState() =>
@@ -40,7 +41,9 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
     final response = await http.get(url);
 
     if (response.statusCode != 200) {
-      const SnackBar(content: Text('Failed to get location'));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to get location')),
+      );
       return;
     }
 
@@ -55,12 +58,10 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
       address: address,
     );
 
-    setState(
-      () {
-        _pickedLocation = tour_location;
-        _isGettingLocation = false;
-      },
-    );
+    setState(() {
+      _pickedLocation = tour_location;
+      _isGettingLocation = false;
+    });
   }
 
   void _getCurrentLocation() async {
@@ -86,11 +87,9 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
       }
     }
 
-    setState(
-      () {
-        _isGettingLocation = true;
-      },
-    );
+    setState(() {
+      _isGettingLocation = true;
+    });
 
     locationData = await location.getLocation();
     final lat = locationData.latitude;
@@ -138,71 +137,53 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
       previewContent = Text('No location chosen', style: poppinsFont);
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Tour Creation', style: poppinsFont),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text(
-                'Location',
-                style: poppinsFont.copyWith(
-                    fontSize: 20.0, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 25),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: Colors.grey),
-                ),
-                height: 250,
-                width: double.infinity,
-                alignment: Alignment.center,
-                child: Container(
-                  child: _isGettingLocation
-                      ? const CircularProgressIndicator()
-                      : previewContent,
-                ),
-              ),
-              const SizedBox(height: 10),
-              LocationInput(
-                onCurrentLocation: () {
-                  _getCurrentLocation();
-                },
-                onSelectMap: () {
-                  _selectOnMap();
-                },
-              ),
-              const SizedBox(height: 10),
-              CustomTextField(
-                header: 'Message to participants',
-                controller: _messageController,
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  // to be implemented
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const TourCreatorThirdScreen(),
-                    ),
-                  );
-                },
-                style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(ButtonColors.primary),
-                ),
-                child: const Text(
-                  'Next',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ),
-            ],
+    return TourCreatorTemplate(
+      title: 'Tour Creation',
+      body: Column(
+        children: [
+          Text(
+            'Location',
+            style: poppinsFont.copyWith(
+                fontSize: 20.0, fontWeight: FontWeight.bold),
           ),
-        ),
+          const SizedBox(height: 25),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(width: 1, color: Colors.grey),
+            ),
+            height: 250,
+            width: double.infinity,
+            alignment: Alignment.center,
+            child: Container(
+              child: _isGettingLocation
+                  ? const CircularProgressIndicator()
+                  : previewContent,
+            ),
+          ),
+          const SizedBox(height: 10),
+          LocationInput(
+            onCurrentLocation: () {
+              _getCurrentLocation();
+            },
+            onSelectMap: () {
+              _selectOnMap();
+            },
+          ),
+          const SizedBox(height: 10),
+          CustomTextField(
+            header: 'Message to participants',
+            controller: _messageController,
+          ),
+        ],
       ),
+      callBack: () {
+        // to be implemented
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const TourCreatorThirdScreen(),
+          ),
+        );
+      },
     );
   }
 }

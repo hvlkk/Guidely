@@ -40,9 +40,11 @@ class _MapScreenState extends State<MapScreen> {
       ),
       body: GoogleMap(
         onTap: (position) {
-          setState(() {
-            _pickedLocation = position;
-          });
+          setState(
+            () {
+              _pickedLocation = position;
+            },
+          );
         },
         initialCameraPosition: CameraPosition(
           target: LatLng(
