@@ -12,7 +12,7 @@ import 'package:guidely/widgets/custom_text_field.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 
-const apiKey = 'YOUR_API_KEY'; // to be changed
+const apiKey = 'AIzaSyDKQj67ZoqcZ-UPXO1cnmGdYQ9wpKAoltI'; // to be changed
 
 class TourCreatorSecondScreen extends StatefulWidget {
   const TourCreatorSecondScreen({Key? key}) : super(key: key);
