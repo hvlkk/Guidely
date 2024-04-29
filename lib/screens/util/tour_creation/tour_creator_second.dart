@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/misc/common.dart';
-import 'package:guidely/models/location_input.dart';
-import 'package:guidely/models/tour_event_location.dart';
+import 'package:guidely/models/utils/location_input.dart';
+import 'package:guidely/models/data/tour_event_location.dart';
 import 'package:guidely/screens/util/map.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
@@ -27,8 +27,8 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
 
   @override
   void dispose() {
-    _focusScopeNode.dispose();
     super.dispose();
+    _focusScopeNode.dispose();
   }
 
   Future<void> _savePlace(double lat, double long) async {
@@ -61,7 +61,7 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
   }
 
   void _getCurrentLocation() async {
-    Location location = new Location();
+    Location location = Location();
 
     bool serviceEnabled;
     PermissionStatus permissionGranted;

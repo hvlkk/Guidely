@@ -1,4 +1,4 @@
-import 'package:guidely/models/registration_data.dart';
+import 'package:guidely/models/data/registration_data.dart';
 
 class User {
   final String uid;
@@ -27,11 +27,6 @@ class User {
     };
   }
 
-  @override
-  String toString() {
-    return 'User{uid: $uid, username: $username, email: $email, isTourGuide: $isTourGuide}';
-  }
-
   User copyWith({
     String? uid,
     String? username,
@@ -48,5 +43,10 @@ class User {
       isTourGuide: isTourGuide ?? this.isTourGuide,
       registrationData: registrationData,
     );
+  }
+
+  @override
+  String toString() {
+    return 'User{uid: $uid, username: $username, email: $email, isTourGuide: $isTourGuide}';
   }
 }

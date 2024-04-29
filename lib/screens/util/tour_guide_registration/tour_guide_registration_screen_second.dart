@@ -4,11 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/misc/common.dart';
-import 'package:guidely/models/registration_data.dart';
+import 'package:guidely/models/data/registration_data.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/util/tour_guide_registration/tour_registration_template.dart';
 import 'package:guidely/widgets/user_image_picker_widget.dart';
-import 'package:guidely/models/user.dart' as myuser;
+import 'package:guidely/models/entities/user.dart' as myuser;
 import 'package:image_picker/image_picker.dart'; // alias to avoid conflicts
 
 class TourGuideRegistrationScreenSecond extends ConsumerStatefulWidget {

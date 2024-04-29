@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,7 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:guidely/main.dart';
 
 import 'package:guidely/widgets/user_image_picker_widget.dart';
-import 'package:guidely/models/user.dart'
+import 'package:guidely/models/entities/user.dart'
     // ignore: library_prefixes
     as TourUser; // Renamed to avoid conflict with FirebaseAuth
 import 'package:guidely/misc/common.dart';
@@ -27,12 +29,12 @@ enum AuthMode { login, signup }
 
 class _AuthScreenState extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
-  AuthMode _authMode = AuthMode.login;
 
   var _enteredEmail = '';
   var _enteredUsername = '';
   var _enteredPassword = '';
   File? _userImageFile;
+  AuthMode _authMode = AuthMode.login;
 
   void _submit() async {
     final isValid = _formKey.currentState!.validate();
@@ -81,9 +83,8 @@ class _AuthScreenState extends State<AuthScreen> {
             );
         // after successful signup, navigate to the main app
         Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
           context,
-          MaterialPageRoute(builder: (context) => MainApp()),
+          MaterialPageRoute(builder: (context) => const MainApp()),
         );
       }
     } on FirebaseAuthException catch (error) {
@@ -153,8 +154,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             focusedBorder: const UnderlineInputBorder(
                               borderSide: BorderSide(
                                 color: MainColors.accent,
-                              ), // Change color to whatever you want
-                              // Change color to whatever you want
+                              ),
                             ),
                           ),
                           validator: (value) {

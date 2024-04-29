@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guidely/models/user.dart' as myuser;
+import 'package:guidely/models/entities/user.dart' as myuser;
 
+// a provider that returns the current user data from the database
 final userDataProvider = FutureProvider.autoDispose(
   (ref) async {
     final user = FirebaseAuth.instance.currentUser;
