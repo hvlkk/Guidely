@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_second.dart';
+import 'package:guidely/widgets/custom_text_field.dart';
 
 class TourCreatorScreen extends StatefulWidget {
   const TourCreatorScreen({super.key});
@@ -101,23 +102,10 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
             ),
             const SizedBox(height: 25),
             GestureDetector(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  hintText: 'Enter your description here',
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: MainColors.divider),
-                  ),
-                  fillColor: MainColors.textHint,
-                ),
-                keyboardType: TextInputType.multiline,
+              child: CustomTextField(
+                header: 'Tour description',
                 controller: _tourDescriptionController,
-                maxLines: 10,
               ),
-              onTap: () {
-                FocusScope.of(context).requestFocus(
-                  FocusNode(),
-                );
-              },
             ),
             Row(
               children: [
@@ -143,7 +131,6 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 15),
                 Expanded(
                   child: InkWell(

@@ -6,10 +6,12 @@ import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/utils/location_input.dart';
 import 'package:guidely/models/data/tour_event_location.dart';
 import 'package:guidely/screens/util/map.dart';
+import 'package:guidely/screens/util/tour_creation/tour_creator_third.dart';
+import 'package:guidely/widgets/custom_text_field.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 
-const API_KEY = 'AIzaSyDKQj67ZoqcZ-UPXO1cnmGdYQ9wpKAoltI'; // to be changed
+const apiKey = 'AIzaSyDKQj67ZoqcZ-UPXO1cnmGdYQ9wpKAoltI'; // to be changed
 
 class TourCreatorSecondScreen extends StatefulWidget {
   const TourCreatorSecondScreen({super.key});
@@ -22,6 +24,7 @@ class TourCreatorSecondScreen extends StatefulWidget {
 class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
   TourEventLocation? _pickedLocation;
   var _isGettingLocation = false;
+  final _messageController = TextEditingController();
 
   final FocusScopeNode _focusScopeNode = FocusScopeNode();
 
@@ -33,7 +36,7 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
 
   Future<void> _savePlace(double lat, double long) async {
     final url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$long&key=$API_KEY');
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$long&key=$apiKey');
     final response = await http.get(url);
 
     if (response.statusCode != 200) {
@@ -116,7 +119,7 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
 
     final lat = _pickedLocation!.latitude;
     final long = _pickedLocation!.longitude;
-    return 'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$long&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C$lat,$long&key=$API_KEY';
+    return 'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$long&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C$lat,$long&key=$apiKey';
   }
 
   @override
@@ -173,28 +176,20 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
                 },
               ),
               const SizedBox(height: 10),
-              GestureDetector(
-                onTap: () {
-                  if (!_focusScopeNode.hasPrimaryFocus) {
-                    _focusScopeNode.unfocus();
-                  }
-                },
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: 'Message to participants',
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(color: MainColors.divider),
-                    ),
-                    fillColor: MainColors.textHint,
-                  ),
-                  cursorHeight: 20,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: 10,
-                ),
+              CustomTextField(
+                header: 'Message to participants',
+                controller: _messageController,
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // to be implemented
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const TourCreatorThirdScreen(),
+                    ),
+                  );
+                },
                 style: ButtonStyle(
                   backgroundColor:
                       MaterialStateProperty.all(ButtonColors.primary),
