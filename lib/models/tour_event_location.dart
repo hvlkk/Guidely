@@ -4,7 +4,7 @@ class TourEventLocation {
   final double longitude;
   final String address;
 
-  TourEventLocation({
+  const TourEventLocation({
     required this.name,
     required this.latitude,
     required this.longitude,

@@ -13,9 +13,9 @@ class User {
     required this.username,
     required this.email,
     required this.imageUrl,
-    isTourGuide = false,
+    this.isTourGuide = false,
     registrationData,
-  }) : isTourGuide = isTourGuide;
+  });
 
   Map<String, dynamic> toMap() {
     return {

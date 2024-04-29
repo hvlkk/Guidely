@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/location_input.dart';
 import 'package:guidely/models/tour_event_location.dart';
+import 'package:guidely/screens/util/map.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,6 +22,43 @@ class TourCreatorSecondScreen extends StatefulWidget {
 class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
   TourEventLocation? _pickedLocation;
   var _isGettingLocation = false;
+
+  final FocusScopeNode _focusScopeNode = FocusScopeNode();
+
+  @override
+  void dispose() {
+    _focusScopeNode.dispose();
+    super.dispose();
+  }
+
+  Future<void> _savePlace(double lat, double long) async {
+    final url = Uri.parse(
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$long&key=$API_KEY');
+    final response = await http.get(url);
+
+    if (response.statusCode != 200) {
+      const SnackBar(content: Text('Failed to get location'));
+      return;
+    }
+
+    final data = json.decode(response.body);
+    final address = data['results'][0]['formatted_address'];
+
+    TourEventLocation tour_location = TourEventLocation(
+      name:
+          'Current Location', // to be changed later with the name we receive from the previous screen
+      latitude: lat,
+      longitude: long,
+      address: address,
+    );
+
+    setState(
+      () {
+        _pickedLocation = tour_location;
+        _isGettingLocation = false;
+      },
+    );
+  }
 
   void _getCurrentLocation() async {
     Location location = new Location();
@@ -54,32 +93,20 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
     final lat = locationData.latitude;
     final long = locationData.longitude;
 
-    final url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$long&key=$API_KEY');
-    final response = await http.get(url);
+    _savePlace(lat!, long!);
+  }
 
-    if (response.statusCode != 200 || lat == null || long == null) {
-      const SnackBar(content: Text('Failed to get location'));
+  void _selectOnMap() async {
+    final pickedLocation = await Navigator.of(context).push<LatLng>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) => const MapScreen(),
+      ),
+    );
+    if (pickedLocation == null) {
       return;
     }
-
-    final data = json.decode(response.body);
-    final address = data['results'][0]['formatted_address'];
-
-    TourEventLocation tour_location = TourEventLocation(
-      name:
-          'Current Location', // to be changed later with the name we receive from the previous screen
-      latitude: lat,
-      longitude: long,
-      address: address,
-    );
-
-    setState(
-      () {
-        _pickedLocation = tour_location;
-        _isGettingLocation = false;
-      },
-    );
+    _savePlace(pickedLocation.latitude, pickedLocation.longitude);
   }
 
   String get locationImage {
@@ -141,9 +168,17 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
                 onCurrentLocation: () {
                   _getCurrentLocation();
                 },
+                onSelectMap: () {
+                  _selectOnMap();
+                },
               ),
               const SizedBox(height: 10),
               GestureDetector(
+                onTap: () {
+                  if (!_focusScopeNode.hasPrimaryFocus) {
+                    _focusScopeNode.unfocus();
+                  }
+                },
                 child: TextFormField(
                   decoration: const InputDecoration(
                     hintText: 'Message to participants',
@@ -156,7 +191,18 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
                   keyboardType: TextInputType.multiline,
                   maxLines: 10,
                 ),
-                onTap: () {},
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {},
+                style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all(ButtonColors.primary),
+                ),
+                child: const Text(
+                  'Next',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
             ],
           ),

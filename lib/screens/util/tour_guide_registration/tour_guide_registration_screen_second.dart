@@ -58,6 +58,7 @@ class _TourGuideRegistrationScreenSecondState
       );
     }
 
+    // ignore: use_build_context_synchronously
     Navigator.of(context).popUntil(
       (route) => route.isFirst,
     );

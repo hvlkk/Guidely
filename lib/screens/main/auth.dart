@@ -81,13 +81,12 @@ class _AuthScreenState extends State<AuthScreen> {
             );
         // after successful signup, navigate to the main app
         Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(builder: (context) => MainApp()),
         );
       }
     } on FirebaseAuthException catch (error) {
-      print("Petakse error: ${error.code}");
-      print(error.message);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.message!),

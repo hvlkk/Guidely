@@ -143,6 +143,7 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 15),
                 Expanded(
                   child: InkWell(

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class LocationInput extends StatefulWidget {
-  LocationInput({super.key, required this.onCurrentLocation});
+  LocationInput(
+      {super.key, required this.onCurrentLocation, required this.onSelectMap});
 
   void Function() onCurrentLocation;
+  void Function() onSelectMap;
 
   @override
   State<LocationInput> createState() => _LocationInputState();
@@ -30,7 +32,7 @@ class _LocationInputState extends State<LocationInput> {
             child: TextButton.icon(
               icon: const Icon(Icons.location_on),
               label: const Text('Select on map'),
-              onPressed: () {},
+              onPressed: widget.onSelectMap,
             ),
           ),
         ]),
