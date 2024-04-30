@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/data/waypoint.dart';
 import 'package:guidely/models/utils/location_input.dart';
-import 'package:guidely/models/data/tour_event_location.dart';
 import 'package:guidely/screens/util/map.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_third.dart';
-import 'package:guidely/widgets/custom_text_field.dart';
-import 'package:location/location.dart';
+import 'package:guidely/widgets/customs/custom_location_container.dart';
+import 'package:guidely/widgets/customs/custom_text_field.dart';
 import 'package:http/http.dart' as http;
 
 const apiKey = 'AIzaSyDKQj67ZoqcZ-UPXO1cnmGdYQ9wpKAoltI'; // to be changed
@@ -23,7 +23,7 @@ class TourCreatorSecondScreen extends StatefulWidget {
 }
 
 class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
-  TourEventLocation? _pickedLocation;
+  List<Waypoint>? _pickedLocations;
   var _isGettingLocation = false;
   final _messageController = TextEditingController();
 
@@ -35,97 +35,78 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
     _focusScopeNode.dispose();
   }
 
-  Future<void> _savePlace(double lat, double long) async {
-    final url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$long&key=$apiKey');
-    final response = await http.get(url);
+  Future<void> _savePlace(List<LatLng> waypoints) async {
+    List<Waypoint> tempLocation = [];
 
-    if (response.statusCode != 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to get location')),
+    for (final LatLng waypoint in waypoints) {
+      final url = Uri.parse(
+          'https://maps.googleapis.com/maps/api/geocode/json?latlng=${waypoint.latitude},${waypoint.longitude}&key=$apiKey');
+      final response = await http.get(url);
+
+      if (response.statusCode != 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to get location')),
+        );
+        return;
+      }
+
+      final data = json.decode(response.body);
+      final address = data['results'][0]['formatted_address'];
+
+      final tourWaypoints = Waypoint(
+        // to be changed later with the name we receive from the previous screen
+        latitude: waypoint.latitude,
+        longitude: waypoint.longitude,
+        address: address,
       );
-      return;
+      tempLocation?.add(tourWaypoints);
     }
-
-    final data = json.decode(response.body);
-    final address = data['results'][0]['formatted_address'];
-
-    TourEventLocation tour_location = TourEventLocation(
-      name:
-          'Current Location', // to be changed later with the name we receive from the previous screen
-      latitude: lat,
-      longitude: long,
-      address: address,
-    );
-
     setState(() {
-      _pickedLocation = tour_location;
+      _pickedLocations = tempLocation;
       _isGettingLocation = false;
     });
   }
 
-  void _getCurrentLocation() async {
-    Location location = Location();
-
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-    LocationData locationData;
-
-    serviceEnabled = await location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled) {
-        return;
-      }
-    }
-
-    permissionGranted = await location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    setState(() {
-      _isGettingLocation = true;
-    });
-
-    locationData = await location.getLocation();
-    final lat = locationData.latitude;
-    final long = locationData.longitude;
-
-    _savePlace(lat!, long!);
-  }
-
   void _selectOnMap() async {
-    final pickedLocation = await Navigator.of(context).push<LatLng>(
+    final pickedLocations = await Navigator.of(context).push<List<LatLng>>(
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (ctx) => const MapScreen(),
       ),
     );
-    if (pickedLocation == null) {
+    if (pickedLocations == null) {
       return;
     }
-    _savePlace(pickedLocation.latitude, pickedLocation.longitude);
+
+    _savePlace(pickedLocations);
   }
 
   String get locationImage {
-    if (_pickedLocation == null) {
+    if (_pickedLocations == null || _pickedLocations!.isEmpty) {
       return '';
     }
 
-    final lat = _pickedLocation!.latitude;
-    final long = _pickedLocation!.longitude;
-    return 'https://maps.googleapis.com/maps/api/staticmap?center=$lat,$long&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:S%7C$lat,$long&key=$apiKey';
+    final firstMarker =
+        'markers=color:red%7Clabel:A%7C${_pickedLocations!.first.latitude},${_pickedLocations!.first.longitude}';
+    final lastMarker =
+        'markers=color:black%7Clabel:S%7C${_pickedLocations!.last.latitude},${_pickedLocations!.last.longitude}';
+
+    final middleMarkers = _pickedLocations!
+        .sublist(1, _pickedLocations!.length - 1)
+        .map((location) {
+      final lat = location.latitude;
+      final long = location.longitude;
+      return 'markers=color:blue%7Clabel:M%7C$lat,$long';
+    }).join('&');
+
+    return 'https://maps.googleapis.com/maps/api/staticmap?center=${_pickedLocations!.map((e) => '${e.latitude},${e.longitude}').join('|')}&zoom=16&size=600x300&maptype=roadmap&$firstMarker&$middleMarkers&$lastMarker&key=$apiKey';
   }
 
   @override
   Widget build(BuildContext context) {
     Widget previewContent;
 
-    if (_pickedLocation != null) {
+    if (_pickedLocations != null) {
       previewContent = Image.network(
         locationImage,
         fit: BoxFit.cover,
@@ -147,24 +128,12 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
                 fontSize: 20.0, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 25),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(width: 1, color: Colors.grey),
-            ),
-            height: 250,
-            width: double.infinity,
-            alignment: Alignment.center,
-            child: Container(
-              child: _isGettingLocation
-                  ? const CircularProgressIndicator()
-                  : previewContent,
-            ),
+          LocationContainer(
+            previewContent: previewContent,
+            isGettingLocation: _isGettingLocation,
           ),
           const SizedBox(height: 10),
           LocationInput(
-            onCurrentLocation: () {
-              _getCurrentLocation();
-            },
             onSelectMap: () {
               _selectOnMap();
             },

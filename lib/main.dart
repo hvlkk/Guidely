@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/screens/main/auth.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:guidely/widgets/custom_navigator.dart';
+import 'package:guidely/widgets/customs/custom_navigator.dart';
 import 'package:guidely/screens/main/profile.dart';
 import 'package:guidely/screens/main/tours.dart';
 import 'package:guidely/screens/main/tours_home.dart';

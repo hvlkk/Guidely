@@ -4,7 +4,7 @@ import 'package:guidely/models/data/tour_event_location.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({
-    super.key,
+    Key? key,
     this.initialLocation = const TourEventLocation(
       latitude: 37.422,
       longitude: -122.084,
@@ -12,16 +12,18 @@ class MapScreen extends StatefulWidget {
       name: 'Googleplex',
     ),
     this.isSelecting = true,
-  });
+    this.maxWaypoints = 50,
+  }) : super(key: key);
 
   final TourEventLocation? initialLocation;
   final bool isSelecting;
+  final int maxWaypoints; // Maximum number of waypoints
   @override
   State<MapScreen> createState() => _MapScreenState();
 }
 
 class _MapScreenState extends State<MapScreen> {
-  LatLng? _pickedLocation;
+  final List<LatLng> _pickedLocations = [];
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +35,28 @@ class _MapScreenState extends State<MapScreen> {
             IconButton(
               icon: const Icon(Icons.check),
               onPressed: () {
-                Navigator.of(context).pop(_pickedLocation);
+                if (widget.maxWaypoints == 1) {
+                  // If maxWaypoints is 1, return just the LatLng
+                  if (_pickedLocations.isEmpty) {
+                    Navigator.of(context).pop();
+                  } else {
+                    Navigator.of(context).pop(_pickedLocations.first);
+                  }
+                } else {
+                  // If maxWaypoints is more than 1, return the list of LatLngs
+                  Navigator.of(context).pop(_pickedLocations);
+                }
               },
             ),
         ],
       ),
       body: GoogleMap(
         onTap: (position) {
-          setState(
-            () {
-              _pickedLocation = position;
-            },
-          );
+          if (_pickedLocations.length < widget.maxWaypoints) {
+            setState(() {
+              _pickedLocations.add(position);
+            });
+          }
         },
         initialCameraPosition: CameraPosition(
           target: LatLng(
@@ -53,19 +65,19 @@ class _MapScreenState extends State<MapScreen> {
           ),
           zoom: 16,
         ),
-        markers: (_pickedLocation == null && widget.isSelecting)
-            ? {}
-            : {
+        markers: _pickedLocations
+            .asMap()
+            .map(
+              (index, location) => MapEntry(
+                index.toString(),
                 Marker(
-                  markerId: const MarkerId('m1'),
-                  position: _pickedLocation != null
-                      ? _pickedLocation!
-                      : LatLng(
-                          widget.initialLocation!.latitude,
-                          widget.initialLocation!.longitude,
-                        ),
+                  markerId: MarkerId(index.toString()),
+                  position: location,
                 ),
-              },
+              ),
+            )
+            .values
+            .toSet(),
       ),
     );
   }

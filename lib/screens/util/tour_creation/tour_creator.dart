@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_second.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
-import 'package:guidely/widgets/custom_text_field.dart';
+import 'package:guidely/widgets/customs/custom_text_field.dart';
 
 class TourCreatorScreen extends StatefulWidget {
   const TourCreatorScreen({Key? key}) : super(key: key);

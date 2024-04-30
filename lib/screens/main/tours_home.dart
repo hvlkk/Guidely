@@ -8,7 +8,7 @@ import 'package:guidely/models/data/tour_event_location.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/utils/language.dart';
 import 'package:guidely/screens/util/notifications.dart';
-import 'package:guidely/widgets/tour_list_item.dart';
+import 'package:guidely/widgets/entities/tour_list_item.dart';
 
 class ToursHomeScreen extends StatefulWidget {
   const ToursHomeScreen({super.key});
@@ -80,7 +80,10 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
             description: 'Tour Description...',
             duration: Duration(hours: 1, minutes: 30),
             images: ['assets/images/tours/tour2.jpg'],
-            languages: [Language(name: 'English', code: 'gb'), Language(name: 'German', code: 'de')],
+            languages: [
+              Language(name: 'English', code: 'gb'),
+              Language(name: 'German', code: 'de')
+            ],
             startLocation: TourEventLocation(
               name: 'Start Location',
               address: 'Start Address',

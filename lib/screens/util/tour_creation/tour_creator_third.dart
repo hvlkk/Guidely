@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 
 class TourCreatorThirdScreen extends StatefulWidget {
-  const TourCreatorThirdScreen({Key? key}) : super(key: key);
+  const TourCreatorThirdScreen({super.key});
 
   @override
   State<TourCreatorThirdScreen> createState() => _TourCreatorThirdScreenState();
@@ -24,7 +24,17 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
               ),
             ),
           ),
-          SizedBox(height: 25),
+          SizedBox(height: 10),
+          SizedBox(height: 10),
+          Center(
+            child: Text(
+              'Languages',
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
       isFinal: true,
