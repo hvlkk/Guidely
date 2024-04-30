@@ -149,7 +149,7 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
         // to be implemented
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => const TourCreatorThirdScreen(),
+            builder: (context) => TourCreatorThirdScreen(),
           ),
         );
       },
