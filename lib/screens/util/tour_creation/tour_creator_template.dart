@@ -19,7 +19,7 @@ class TourCreatorTemplate extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(title, style: poppinsFont),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
