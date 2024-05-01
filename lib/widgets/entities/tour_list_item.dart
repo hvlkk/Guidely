@@ -11,8 +11,6 @@ class TourListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(tour.images.first);
-
     return Container(
       padding: const EdgeInsets.all(8),
       child: Column(

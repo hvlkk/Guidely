@@ -31,5 +31,5 @@ class Tour {
   // final User organizer;
 
   final TourState state = TourState.upcoming;
-  final double rating = 0.0;
+  final double rating = 4.0;
 }
