@@ -7,6 +7,7 @@ import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/tour_event_location.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/utils/language.dart';
+import 'package:guidely/screens/main/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
 import 'package:guidely/widgets/entities/tour_list_item.dart';
 
@@ -60,7 +61,7 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
           const tour1 = Tour(
             title: 'The hidden gem',
             area: 'Acropolis',
-            description: 'Tour Description...',
+            description: 'Embark on an unforgettable journey through time as you explore the ancient marvels of the Acropolis in Athens. Immerse yourself in the rich history and culture of Greece as you wander through iconic landmarks such as the Parthenon, Erechtheion, and Temple of Athena Nike. Marvel at the stunning architectural brilliance of these ancient wonders, each telling its own story of the glorious past of Athens. As you stroll along the marble pathways, guided by knowledgeable experts, let the breathtaking views of the city below and the majestic ruins above transport you to a bygone era. This tour promises an awe-inspiring experience that will leave you with a profound appreciation for the enduring legacy of ancient Greece.',
             duration: Duration(hours: 2, minutes: 30),
             images: ['assets/images/tours/tour1.jpg'],
             languages: [Language(name: 'English', code: 'gb')],
@@ -79,7 +80,7 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
             area: 'Utrecht',
             description: 'Tour Description...',
             duration: Duration(hours: 1, minutes: 30),
-            images: ['assets/images/tours/tour2.jpg'],
+            images: ['assets/images/tours/tour2.jpg', 'assets/images/tours/tour1.jpg'],
             languages: [
               Language(name: 'English', code: 'gb'),
               Language(name: 'German', code: 'de')
@@ -176,12 +177,38 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
                   //     );
                   //   },
                   // ),
-                  const TourListItem(
-                    tour: tour1,
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to a new page when the TourListItem is tapped
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TourDetailsScreen(
+                            tour: tour1,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const TourListItem(
+                      tour: tour1,
+                    ),
                   ),
                   const SizedBox(height: 15),
-                  const TourListItem(
-                    tour: tour2,
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to a new page when the TourListItem is tapped
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TourDetailsScreen(
+                            tour: tour2,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const TourListItem(
+                      tour: tour2,
+                    ),
                   ),
                 ],
               ),
