@@ -1,11 +1,13 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/data/registration_data.dart';
 import 'package:guidely/models/data/tour_event_location.dart';
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/models/utils/language.dart';
 import 'package:guidely/screens/main/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
@@ -58,45 +60,75 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
           final imageUrl = jsonDataMap['imageUrl'];
 
           // TEMP CODE FOR DEBUGGING
-          const tour1 = Tour(
-            title: 'The hidden gem',
-            area: 'Acropolis',
-            description: 'Embark on an unforgettable journey through time as you explore the ancient marvels of the Acropolis in Athens. Immerse yourself in the rich history and culture of Greece as you wander through iconic landmarks such as the Parthenon, Erechtheion, and Temple of Athena Nike. Marvel at the stunning architectural brilliance of these ancient wonders, each telling its own story of the glorious past of Athens. As you stroll along the marble pathways, guided by knowledgeable experts, let the breathtaking views of the city below and the majestic ruins above transport you to a bygone era. This tour promises an awe-inspiring experience that will leave you with a profound appreciation for the enduring legacy of ancient Greece.',
-            duration: Duration(hours: 2, minutes: 30),
-            images: ['assets/images/tours/tour1.jpg'],
-            languages: [Language(name: 'English', code: 'gb')],
-            startLocation: TourEventLocation(
-              name: 'Start Location',
-              address: 'Start Address',
-              latitude: 0,
-              longitude: 0,
-            ),
-            locations: [],
-            // organizer: username,
+          RegistrationData registrationData = RegistrationData(
+            uid: 'registration123',
+            description: 'This is a registration description.',
+            uploadedIdURL: 'https://example.com/registration.jpg',
           );
 
-          const tour2 = Tour(
+          // Create an instance of User using the default constructor
+          var user1 = User(
+            uid: 'user123',
+            username: 'exampleUser',
+            email: 'user@example.com',
+            imageUrl: 'https://example.com/image.jpg',
+            registrationData: registrationData,
+          );
+
+          var user2 = User(
+            uid: 'user456',
+            username: 'exampleUser2',
+            email: 'user2@example.com',
+            imageUrl: 'https://example.com/image2.jpg',
+            registrationData: registrationData,
+          );
+
+          var tour1 = Tour(
+            title: 'The hidden gem',
+            area: 'Acropolis',
+            description:
+                'Embark on an unforgettable journey through time as you explore the ancient marvels of the Acropolis in Athens. Immerse yourself in the rich history and culture of Greece as you wander through iconic landmarks such as the Parthenon, Erechtheion, and Temple of Athena Nike. Marvel at the stunning architectural brilliance of these ancient wonders, each telling its own story of the glorious past of Athens. As you stroll along the marble pathways, guided by knowledgeable experts, let the breathtaking views of the city below and the majestic ruins above transport you to a bygone era. This tour promises an awe-inspiring experience that will leave you with a profound appreciation for the enduring legacy of ancient Greece.',
+            duration: const Duration(hours: 2, minutes: 30),
+            images: ['assets/images/tours/tour1.jpg'],
+            languages: [const Language(name: 'English', code: 'gb')],
+            startLocation: const TourEventLocation(
+              name: 'Start Location',
+              address: 'Acropolis, Athens',
+              latitude: 37.9838,
+              longitude: 23.7275,
+            ),
+            locations: [],
+            organizer: user1,
+          );
+
+          var tour2 = Tour(
             title: 'Free Tour of Essentials',
             area: 'Utrecht',
             description: 'Tour Description...',
-            duration: Duration(hours: 1, minutes: 30),
-            images: ['assets/images/tours/tour2.jpg', 'assets/images/tours/tour1.jpg'],
-            languages: [
-              Language(name: 'English', code: 'gb'),
-              Language(name: 'German', code: 'de')
+            duration: const Duration(hours: 1, minutes: 30),
+            images: [
+              'assets/images/tours/tour2.jpg',
+              'assets/images/tours/tour1.jpg'
             ],
-            startLocation: TourEventLocation(
+            languages: [
+              const Language(name: 'English', code: 'gb'),
+              const Language(name: 'German', code: 'de')
+            ],
+            startLocation: const TourEventLocation(
               name: 'Start Location',
               address: 'Start Address',
-              latitude: 0,
-              longitude: 0,
+              latitude: 37.9838,
+              longitude: 23.7275,
             ),
             locations: [],
-            // organizer: username,
+            organizer: user2,
           );
 
           tours.add(tour1);
           tours.add(tour2);
+          tours.add(tour1);
+          tours.add(tour2);
+          tours.add(tour1);
           // TEMP CODE FOR DEBUGGING
 
           return Scaffold(
@@ -168,46 +200,31 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  // ListView.builder(
-                  //   itemCount: items.length,
-                  //   itemBuilder: (BuildContext context, int index) {
-                  //     return Padding(
-                  //       padding: const EdgeInsets.all(8),
-                  //       child: TourListItem(tour: items[index]),
-                  //     );
-                  //   },
-                  // ),
-                  GestureDetector(
-                    onTap: () {
-                      // Navigate to a new page when the TourListItem is tapped
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const TourDetailsScreen(
-                            tour: tour1,
+                  SizedBox(
+                    height: 450,
+                    child: ListView.builder(
+                      itemCount: tours.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: GestureDetector(
+                            onTap: () {
+                              // Navigate to a new page when the TourListItem is tapped
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => TourDetailsScreen(
+                                    tour: tours[index],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: TourListItem(
+                              tour: tours[index],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: const TourListItem(
-                      tour: tour1,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  GestureDetector(
-                    onTap: () {
-                      // Navigate to a new page when the TourListItem is tapped
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const TourDetailsScreen(
-                            tour: tour2,
-                          ),
-                        ),
-                      );
-                    },
-                    child: const TourListItem(
-                      tour: tour2,
+                        );
+                      },
                     ),
                   ),
                 ],
