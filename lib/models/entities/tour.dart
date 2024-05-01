@@ -1,4 +1,5 @@
 import 'package:guidely/models/data/tour_event_location.dart';
+import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/models/utils/language.dart';
 
 enum TourState {
@@ -17,7 +18,7 @@ class Tour {
     required this.languages,
     required this.startLocation,
     required this.locations,
-    // required this.organizer,
+    required this.organizer,
   });
 
   final String title;
@@ -28,7 +29,7 @@ class Tour {
   final List<Language> languages;
   final TourEventLocation startLocation;
   final List<TourEventLocation> locations;
-  // final User organizer;
+  final User organizer;
 
   final TourState state = TourState.upcoming;
   final double rating = 4.0;
