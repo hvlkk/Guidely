@@ -3,8 +3,11 @@ class Waypoint {
   final double latitude;
   final double longitude;
 
-  Waypoint(
-      {required this.address, required this.latitude, required this.longitude});
+  Waypoint({
+    required this.address,
+    required this.latitude,
+    required this.longitude,
+  });
 
   factory Waypoint.fromJson(Map<String, dynamic> json) {
     return Waypoint(
@@ -12,5 +15,13 @@ class Waypoint {
       latitude: json['latitude'],
       longitude: json['longitude'],
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
+    };
   }
 }

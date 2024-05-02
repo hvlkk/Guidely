@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/data/tour_creation_data.dart';
+import 'package:guidely/models/data/tour_event_location.dart';
 import 'package:guidely/models/data/waypoint.dart';
 import 'package:guidely/models/utils/location_input.dart';
 import 'package:guidely/screens/util/map.dart';
@@ -15,7 +17,12 @@ import 'package:http/http.dart' as http;
 const apiKey = 'AIzaSyDKQj67ZoqcZ-UPXO1cnmGdYQ9wpKAoltI'; // to be changed
 
 class TourCreatorSecondScreen extends StatefulWidget {
-  const TourCreatorSecondScreen({Key? key}) : super(key: key);
+  const TourCreatorSecondScreen({
+    super.key,
+    required this.tourData,
+  });
+
+  final TourCreationData tourData;
 
   @override
   State<TourCreatorSecondScreen> createState() =>
@@ -28,6 +35,8 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
   final _messageController = TextEditingController();
 
   final FocusScopeNode _focusScopeNode = FocusScopeNode();
+
+  late final TourEventLocation startingLocation;
 
   @override
   void dispose() {
@@ -54,16 +63,16 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
       final address = data['results'][0]['formatted_address'];
 
       final tourWaypoints = Waypoint(
-        // to be changed later with the name we receive from the previous screen
         latitude: waypoint.latitude,
         longitude: waypoint.longitude,
         address: address,
       );
-      tempLocation?.add(tourWaypoints);
+      tempLocation.add(tourWaypoints);
     }
     setState(() {
       _pickedLocations = tempLocation;
       _isGettingLocation = false;
+      widget.tourData.copyWith(waypoints: _pickedLocations);
     });
   }
 
@@ -146,10 +155,16 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
         ],
       ),
       callBack: () {
-        // to be implemented
+        // Pass the updated data to the next screen
+        final updatedTourData = widget.tourData.copyWith(
+          messageToParticipants: _messageController.text,
+          waypoints: _pickedLocations,
+        );
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => TourCreatorThirdScreen(),
+            builder: (context) => TourCreatorThirdScreen(
+              tourData: updatedTourData,
+            ),
           ),
         );
       },

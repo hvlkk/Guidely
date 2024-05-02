@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_second.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 import 'package:guidely/widgets/customs/custom_text_field.dart';
 
 class TourCreatorScreen extends StatefulWidget {
-  const TourCreatorScreen({Key? key}) : super(key: key);
+  const TourCreatorScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _TourCreatorScreenState createState() => _TourCreatorScreenState();
 }
 
@@ -60,10 +62,18 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       return;
     }
 
+    final tourData = TourCreationData(
+      title: _tourTitleController.text,
+      description: _tourDescriptionController.text,
+      startDate: _selectedDate,
+      startTime: _selectedTime,
+      messageToParticipants: '',
+    );
+
     // navigate to the next screen
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const TourCreatorSecondScreen(),
+        builder: (context) => TourCreatorSecondScreen(tourData: tourData),
       ),
     );
   }

@@ -1,19 +1,24 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/activity.dart';
+import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/models/utils/language.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 
 class TourCreatorThirdScreen extends StatefulWidget {
-  TourCreatorThirdScreen({super.key});
+  TourCreatorThirdScreen({super.key, required this.tourData});
 
   List<Activity> activities = [];
   List<Language> languages = [];
 
   List<Activity> activeActivities = [];
   List<Language> activeLanguages = [];
+
+  final TourCreationData tourData;
 
   @override
   State<TourCreatorThirdScreen> createState() => _TourCreatorThirdScreenState();
@@ -79,13 +84,13 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
                     activity.isSelected = value!;
                     bool exists = widget.activeActivities.contains(activity);
 
-                    if (exists) {
-                      if (!activity.isSelected) {
+                    setState(() {
+                      if (exists) {
                         widget.activeActivities.remove(activity);
                       } else {
                         widget.activeActivities.add(activity);
                       }
-                    }
+                    });
                   },
                 );
               },
@@ -146,8 +151,27 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       ),
       isFinal: true,
       callBack: () {
-        // Action to be performed when Submit button is pressed
+        _uploadData();
       },
+    );
+  }
+
+  void _uploadData() {
+    final finalData = widget.tourData.copyWith(
+      activities: widget.activeActivities,
+      languages: widget.activeLanguages,
+    );
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    FirebaseFirestore.instance
+        .collection('tours') // Collection for user tours
+        .doc(currentUser?.uid) // Document for each user
+        .collection('user_tours') // Subcollection for tours of each user
+        .add(finalData.toMap()); // Adding tour data to the subcollection
+
+    Navigator.of(context).popUntil(
+      (route) => route.isFirst,
     );
   }
 }

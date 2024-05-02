@@ -19,4 +19,13 @@ class TourEventLocation {
       address: json['address'],
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'latitude': latitude,
+      'longitude': longitude,
+      'address': address,
+    };
+  }
 }
