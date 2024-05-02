@@ -28,7 +28,7 @@ class TourListItem extends StatelessWidget {
                 right: 10,
                 child: Row(
                   children: [
-                    for (final language in tour.languages)
+                    for (final language in tour.tourDetails.languages)
                       Row(
                         children: [
                           CircleAvatar(
@@ -58,14 +58,14 @@ class TourListItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    tour.title,
+                    tour.tourDetails.title,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    tour.area,
+                    tour.area ?? 'Unknown area',
                     style: const TextStyle(
                       fontSize: 16,
                     ),

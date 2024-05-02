@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/registration_data.dart';
-import 'package:guidely/models/data/tour_event_location.dart';
+import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/models/utils/language.dart';
@@ -83,52 +83,52 @@ class _ToursHomeScreenState extends State<ToursHomeScreen> {
             registrationData: registrationData,
           );
 
-          var tour1 = Tour(
+          final tourCreationData = TourCreationData(
             title: 'The hidden gem',
-            area: 'Acropolis',
             description:
                 'Embark on an unforgettable journey through time as you explore the ancient marvels of the Acropolis in Athens. Immerse yourself in the rich history and culture of Greece as you wander through iconic landmarks such as the Parthenon, Erechtheion, and Temple of Athena Nike. Marvel at the stunning architectural brilliance of these ancient wonders, each telling its own story of the glorious past of Athens. As you stroll along the marble pathways, guided by knowledgeable experts, let the breathtaking views of the city below and the majestic ruins above transport you to a bygone era. This tour promises an awe-inspiring experience that will leave you with a profound appreciation for the enduring legacy of ancient Greece.',
-            duration: const Duration(hours: 2, minutes: 30),
-            images: ['assets/images/tours/tour1.jpg'],
             languages: [const Language(name: 'English', code: 'gb')],
-            startLocation: const TourEventLocation(
-              name: 'Start Location',
-              address: 'Acropolis, Athens',
-              latitude: 37.9838,
-              longitude: 23.7275,
-            ),
-            locations: [],
-            organizer: user1,
+            startDate: DateTime.now(),
+            startTime: const TimeOfDay(hour: 10, minute: 30),
           );
 
-          var tour2 = Tour(
-            title: 'Free Tour of Essentials',
-            area: 'Utrecht',
-            description: 'Tour Description...',
+          var tour1 = Tour(
+            tourDetails: tourCreationData,
+            organizer: user1,
             duration: const Duration(hours: 1, minutes: 30),
             images: [
               'assets/images/tours/tour2.jpg',
               'assets/images/tours/tour1.jpg'
             ],
-            languages: [
-              const Language(name: 'English', code: 'gb'),
-              const Language(name: 'German', code: 'de')
-            ],
-            startLocation: const TourEventLocation(
-              name: 'Start Location',
-              address: 'Start Address',
-              latitude: 37.9838,
-              longitude: 23.7275,
-            ),
-            locations: [],
-            organizer: user2,
           );
 
+          // var tour2 = Tour(
+          //   title: 'Free Tour of Essentials',
+          //   area: 'Utrecht',
+          //   description: 'Tour Description...',
+          //   duration: const Duration(hours: 1, minutes: 30),
+          //   images: [
+          //     'assets/images/tours/tour2.jpg',
+          //     'assets/images/tours/tour1.jpg'
+          //   ],
+          //   languages: [
+          //     const Language(name: 'English', code: 'gb'),
+          //     const Language(name: 'German', code: 'de')
+          //   ],
+          //   startLocation: const Waypoint(
+          //     address: 'Start Address',
+          //     latitude: 37.9838,
+          //     longitude: 23.7275,
+          //   ),
+          //   locations: [],
+          //   organizer: user2,
+          // );
+
           tours.add(tour1);
-          tours.add(tour2);
-          tours.add(tour1);
-          tours.add(tour2);
-          tours.add(tour1);
+          // tours.add(tour2);
+          // tours.add(tour1);
+          // tours.add(tour2);
+          // tours.add(tour1);
           // TEMP CODE FOR DEBUGGING
 
           return Scaffold(

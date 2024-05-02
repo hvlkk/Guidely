@@ -6,8 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/activity.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
+import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/utils/language.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
+import 'package:guidely/models/entities/user.dart'
+    // ignore: library_prefixes
+    as TourUser; // Renamed to avoid conflict with FirebaseAuth
 
 class TourCreatorThirdScreen extends StatefulWidget {
   TourCreatorThirdScreen({super.key, required this.tourData});
@@ -164,11 +168,27 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
 
     final currentUser = FirebaseAuth.instance.currentUser;
 
+    final user = TourUser.User(
+      uid: currentUser?.uid ?? '',
+      username: currentUser?.displayName ?? '',
+      email: currentUser?.email ?? '',
+      imageUrl: currentUser?.photoURL ?? '',
+    );
+
+    if (currentUser == null) {
+      return;
+    }
+
+    final tour = Tour(
+      tourDetails: finalData,
+      organizer: user,
+    );
+
     FirebaseFirestore.instance
         .collection('tours') // Collection for user tours
-        .doc(currentUser?.uid) // Document for each user
+        .doc(currentUser.uid) // Document for each user
         .collection('user_tours') // Subcollection for tours of each user
-        .add(finalData.toMap()); // Adding tour data to the subcollection
+        .add(tour.toMap()); // Adding tour data to the subcollection
 
     Navigator.of(context).popUntil(
       (route) => route.isFirst,

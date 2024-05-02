@@ -44,9 +44,9 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String truncatedDescription = tour.description.length > 250
-        ? '${tour.description.substring(0, 250)}...'
-        : tour.description;
+    String truncatedDescription = tour.tourDetails.description.length > 250
+        ? '${tour.tourDetails.description.substring(0, 250)}...'
+        : tour.tourDetails.description;
 
     // TEMP CODE FOR DEBUGGING
     List<Review> reviews = [];
@@ -127,14 +127,14 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                     children: [
                       const SizedBox(width: 10),
                       Text(
-                        tour.title,
+                        tour.tourDetails.title,
                         style: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
                       Text(tour.area),
                       const Spacer(),
-                      for (final language in tour.languages)
+                      for (final language in tour.tourDetails.languages)
                         Row(
                           children: [
                             CircleAvatar(
@@ -258,11 +258,12 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                     },
                     child: Text(
                       showFullDescription
-                          ? tour.description
+                          ? tour.tourDetails.description
                           : truncatedDescription,
                     ),
                   ),
-                  if (!showFullDescription && tour.description.length > 250)
+                  if (!showFullDescription &&
+                      tour.tourDetails.description.length > 250)
                     TextButton(
                       onPressed: () {
                         setState(() {
@@ -347,7 +348,7 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                         ),
                       ),
                       Text(
-                        tour.startLocation.address,
+                        tour.tourDetails.waypoints![0].address,
                         style: const TextStyle(
                           fontSize: 14,
                         ),
@@ -363,17 +364,17 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                   height: 300, // Adjust the height as needed
                   child: GoogleMap(
                     initialCameraPosition: CameraPosition(
-                      target: LatLng(
-                          tour.startLocation.latitude,
-                          tour.startLocation
-                              .longitude), // Initial position (San Francisco)
+                      target: LatLng(tour.tourDetails.waypoints![0].latitude,
+                          tour.tourDetails.waypoints![0].longitude),
                       zoom: 12, // Zoom level
                     ),
                     markers: {
                       Marker(
                         markerId: const MarkerId('marker_1'),
-                        position: LatLng(tour.startLocation.latitude,
-                            tour.startLocation.longitude), // Marker position
+                        position: LatLng(
+                          tour.tourDetails.waypoints![0].latitude,
+                          tour.tourDetails.waypoints![0].longitude,
+                        ), // Marker position
                         infoWindow: const InfoWindow(
                             title: 'Athens Center'), // Info window
                       ),

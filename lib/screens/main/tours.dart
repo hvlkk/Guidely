@@ -21,7 +21,14 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tours', style: poppinsFont),
+        title: Text(
+          'Tours',
+          style: poppinsFont.copyWith(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
       ),
       body: userDataAsync.when(
         loading: () => const Center(

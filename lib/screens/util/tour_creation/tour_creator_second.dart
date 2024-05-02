@@ -155,7 +155,6 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
         ],
       ),
       callBack: () {
-        // Pass the updated data to the next screen
         final updatedTourData = widget.tourData.copyWith(
           messageToParticipants: _messageController.text,
           waypoints: _pickedLocations,

@@ -3,4 +3,11 @@ class Language {
 
   final String name;
   final String code;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'code': code,
+    };
+  }
 }
