@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/screens/main/host_profile.dart';
+import 'package:guidely/widgets/customs/custom_trail_map.dart';
 import 'package:guidely/widgets/entities/review_list_item.dart';
 
 class TourDetailsScreen extends StatefulWidget {
@@ -44,6 +44,8 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(tour.tourDetails.waypoints);
+
     String truncatedDescription = tour.tourDetails.description.length > 250
         ? '${tour.tourDetails.description.substring(0, 250)}...'
         : tour.tourDetails.description;
@@ -360,29 +362,9 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
               const SizedBox(width: 10),
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  height: 300, // Adjust the height as needed
-                  child: GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(tour.tourDetails.waypoints![0].latitude,
-                          tour.tourDetails.waypoints![0].longitude),
-                      zoom: 12, // Zoom level
-                    ),
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId('marker_1'),
-                        position: LatLng(
-                          tour.tourDetails.waypoints![0].latitude,
-                          tour.tourDetails.waypoints![0].longitude,
-                        ), // Marker position
-                        infoWindow: const InfoWindow(
-                            title: 'Athens Center'), // Info window
-                      ),
-                    },
-                    onMapCreated: (GoogleMapController controller) {
-                      // Controller is ready
-                    },
-                  ),
+                child: SizedBox(
+                  height: 300,
+                  child: CustomTrailMap(waypoints: tour.tourDetails.waypoints!),
                 ),
               ),
               const SizedBox(height: 20),
