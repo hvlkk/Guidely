@@ -27,6 +27,17 @@ class User {
     };
   }
 
+  factory User.fromMap(Map<String, dynamic> map) {
+    return User(
+      uid: map['uid'] ?? '',
+      username: map['username'] ?? '',
+      email: map['email'] ?? '',
+      imageUrl: map['imageUrl'] ?? '',
+      isTourGuide: map['isTourGuide'] ?? false,
+      registrationData: RegistrationData.fromMap(map['registrationData'] ?? {}),
+    );
+  }
+
   User copyWith({
     String? uid,
     String? username,

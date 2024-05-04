@@ -37,4 +37,18 @@ class Tour {
       'rating': rating,
     };
   }
+
+  factory Tour.fromMap(Map<String, dynamic> map) {
+    return Tour(
+      tourDetails: TourCreationData.fromMap(map['tourDetails']),
+      duration: Duration(seconds: map['duration'] ?? 0),
+      images: List<String>.from(map['images'] ?? []),
+      organizer: User.fromMap(map['organizer']),
+    );
+  }
+
+  @override
+  String toString() {
+    return 'Tour(tourDetails: $tourDetails, duration: $duration, images: $images, organizer: $organizer, state: $state, rating: $rating)';
+  }
 }

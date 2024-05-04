@@ -91,7 +91,7 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
               Stack(
                 children: [
                   Image.asset(
-                    tour.images[currentIndex],
+                    'assets/images/tours/tour2.jpg', // this should be tour's image uploaded or received by an api
                     width: double.infinity,
                     height: 200,
                     fit: BoxFit.cover,

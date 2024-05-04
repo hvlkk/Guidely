@@ -4,7 +4,7 @@ import 'package:guidely/models/data/tour_event_location.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({
-    Key? key,
+    super.key,
     this.initialLocation = const TourEventLocation(
       latitude: 37.422,
       longitude: -122.084,
@@ -13,7 +13,7 @@ class MapScreen extends StatefulWidget {
     ),
     this.isSelecting = true,
     this.maxWaypoints = 50,
-  }) : super(key: key);
+  });
 
   final TourEventLocation? initialLocation;
   final bool isSelecting;

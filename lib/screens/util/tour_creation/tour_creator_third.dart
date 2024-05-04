@@ -184,11 +184,7 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       organizer: user,
     );
 
-    FirebaseFirestore.instance
-        .collection('tours') // Collection for user tours
-        .doc(currentUser.uid) // Document for each user
-        .collection('user_tours') // Subcollection for tours of each user
-        .add(tour.toMap()); // Adding tour data to the subcollection
+    FirebaseFirestore.instance.collection('tours').add(tour.toMap());
 
     Navigator.of(context).popUntil(
       (route) => route.isFirst,

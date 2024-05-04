@@ -52,6 +52,30 @@ class TourCreationData {
     );
   }
 
+  factory TourCreationData.fromMap(Map<String, dynamic> map) {
+    return TourCreationData(
+      title: map['title'] ?? '',
+      description: map['description'] ?? '',
+      startTime: TimeOfDay(
+        hour: int.parse(map['startTime'].split(':')[0]),
+        minute: int.parse(map['startTime'].split(':')[1]),
+      ),
+      startDate: DateTime.parse(map['startDate'] ?? ''),
+      waypoints: (map['waypoints'] as List<dynamic>?)
+          ?.map((waypoint) => Waypoint.fromMap(waypoint))
+          .toList(),
+      messageToParticipants: map['messageToParticipants'] ?? '',
+      activities: (map['activities'] as List<dynamic>?)
+              ?.map((activity) => Activity(name: activity))
+              .toList() ??
+          [],
+      languages: (map['languages'] as List<dynamic>?)
+              ?.map((language) => Language(name: language, code: 'de'))
+              .toList() ??
+          [],
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'title': title,

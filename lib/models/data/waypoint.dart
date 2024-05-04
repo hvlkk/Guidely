@@ -9,11 +9,19 @@ class Waypoint {
     required this.longitude,
   });
 
+  factory Waypoint.fromMap(Map<String, dynamic> map) {
+    return Waypoint(
+      address: map['address'] ?? '',
+      latitude: map['latitude'] ?? 0.0,
+      longitude: map['longitude'] ?? 0.0,
+    );
+  }
+
   factory Waypoint.fromJson(Map<String, dynamic> json) {
     return Waypoint(
-      address: json['address'],
-      latitude: json['latitude'],
-      longitude: json['longitude'],
+      address: json['address'] ?? '',
+      latitude: json['latitude'] ?? 0.0,
+      longitude: json['longitude'] ?? 0.0,
     );
   }
 

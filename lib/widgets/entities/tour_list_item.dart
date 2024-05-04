@@ -3,9 +3,9 @@ import 'package:guidely/models/entities/tour.dart';
 
 class TourListItem extends StatelessWidget {
   const TourListItem({
-    super.key,
+    Key? key,
     required this.tour,
-  });
+  }) : super(key: key);
 
   final Tour tour;
 
@@ -18,7 +18,7 @@ class TourListItem extends StatelessWidget {
           Stack(
             children: [
               Image.asset(
-                tour.images.first,
+                'assets/images/tours/tour2.jpg', // this should be tour's image uploaded or received by an api
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,
@@ -52,7 +52,9 @@ class TourListItem extends StatelessWidget {
               CircleAvatar(
                 radius: 25,
                 // this should be organizer's photo profile
-                backgroundImage: NetworkImage(tour.images.first),
+                backgroundImage: tour.images.isNotEmpty
+                    ? NetworkImage(tour.images.first)
+                    : null,
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
