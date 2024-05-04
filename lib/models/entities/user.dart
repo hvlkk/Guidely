@@ -56,6 +56,8 @@ class User {
     );
   }
 
+  get isGuide => isTourGuide;
+
   @override
   String toString() {
     return 'User{uid: $uid, username: $username, email: $email, isTourGuide: $isTourGuide}';

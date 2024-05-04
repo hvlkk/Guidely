@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/models/entities/user.dart';
 
@@ -10,13 +11,13 @@ enum TourState {
 class Tour {
   Tour({
     required this.tourDetails,
-    this.duration = const Duration(hours: 2),
+    this.duration = const TimeOfDay(hour: 2, minute: 0),
     this.images = const [],
     required this.organizer,
   });
 
   final TourCreationData tourDetails;
-  final Duration duration;
+  final TimeOfDay duration;
   final List<String> images;
   final User organizer;
 
@@ -30,7 +31,7 @@ class Tour {
     return {
       'tourDetails': tourDetails.toMap(),
       'area': area,
-      'duration': duration.inSeconds,
+      'duration': duration.hour,
       'images': images,
       'organizer': organizer.toMap(),
       'state': state.toString().split('.').last,
@@ -41,7 +42,7 @@ class Tour {
   factory Tour.fromMap(Map<String, dynamic> map) {
     return Tour(
       tourDetails: TourCreationData.fromMap(map['tourDetails']),
-      duration: Duration(seconds: map['duration'] ?? 0),
+      duration: TimeOfDay(hour: map['duration'] ?? 0, minute: 0),
       images: List<String>.from(map['images'] ?? []),
       organizer: User.fromMap(map['organizer']),
     );

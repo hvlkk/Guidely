@@ -125,30 +125,38 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               for (final language in widget.languages)
-                Row(
-                  children: [
-                    GestureDetector(
-                        child: CircleAvatar(
-                          radius: 25,
-                          backgroundImage: AssetImage(
-                            'icons/flags/png250px/${language.code}.png',
-                            package: 'country_icons',
-                          ),
-                        ),
-                        onTap: () {
-                          bool exists =
-                              widget.activeLanguages.contains(language);
-                          setState(() {
-                            if (exists) {
-                              widget.activeLanguages.remove(language);
-                            } else {
-                              widget.activeLanguages.add(language);
-                            }
-                          });
-                        }),
-                    const SizedBox(width: 15),
-                  ],
+                GestureDetector(
+                  onTap: () {
+                    bool exists = widget.activeLanguages.contains(language);
+                    setState(() {
+                      if (exists) {
+                        widget.activeLanguages.remove(language);
+                      } else {
+                        widget.activeLanguages.add(language);
+                      }
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: widget.activeLanguages.contains(language)
+                            ? Colors.blue
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: CircleAvatar(
+                      radius: 25,
+                      backgroundImage: AssetImage(
+                        'icons/flags/png250px/${language.code}.png',
+                        package: 'country_icons',
+                      ),
+                    ),
+                  ),
                 ),
+              const SizedBox(width: 15),
             ],
           ),
         ],
@@ -160,7 +168,7 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
     );
   }
 
-  void _uploadData() {
+  Future<void> _uploadData() async {
     final finalData = widget.tourData.copyWith(
       activities: widget.activeActivities,
       languages: widget.activeLanguages,
@@ -168,11 +176,22 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
 
     final currentUser = FirebaseAuth.instance.currentUser;
 
+    final uid = currentUser?.uid;
+    Map<String, dynamic>? userData = {};
+    try {
+      final docSnapshot =
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      userData = docSnapshot.data();
+    } catch (e) {
+      print('Error fetching user data: $e');
+    }
+
     final user = TourUser.User(
-      uid: currentUser?.uid ?? '',
-      username: currentUser?.displayName ?? '',
-      email: currentUser?.email ?? '',
-      imageUrl: currentUser?.photoURL ?? '',
+      uid: userData?['uid'] ?? '',
+      username: userData?['username'] ?? '',
+      email: userData?['email'] ?? '',
+      imageUrl: userData?['imageUrl'] ?? '',
+      isTourGuide: userData?['isTourGuide'] ?? false,
     );
 
     if (currentUser == null) {
@@ -182,6 +201,7 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
     final tour = Tour(
       tourDetails: finalData,
       organizer: user,
+      duration: finalData.startTime,
     );
 
     FirebaseFirestore.instance.collection('tours').add(tour.toMap());

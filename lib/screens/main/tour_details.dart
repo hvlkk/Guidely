@@ -165,7 +165,7 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                         children: [
                           const Icon(Icons.timer),
                           Text(
-                              '${tour.duration.inHours} h ${tour.duration.inMinutes.remainder(60)} min'),
+                              '${tour.duration.hour} h ${tour.duration.minute} min'),
                         ],
                       ),
                       const Spacer(),

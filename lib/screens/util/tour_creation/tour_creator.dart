@@ -6,16 +6,17 @@ import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 import 'package:guidely/widgets/customs/custom_text_field.dart';
 
 class TourCreatorScreen extends StatefulWidget {
-  const TourCreatorScreen({super.key});
+  const TourCreatorScreen({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _TourCreatorScreenState createState() => _TourCreatorScreenState();
 }
 
 class _TourCreatorScreenState extends State<TourCreatorScreen> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
+  TimeOfDay _selectedDuration =
+      TimeOfDay(hour: 2, minute: 0); // Initial duration set to 2 hours
   final _tourTitleController = TextEditingController();
   final _tourDescriptionController = TextEditingController();
 
@@ -26,9 +27,10 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       firstDate: DateTime(2015, 8),
       lastDate: DateTime(2101),
     );
-    setState(() {
-      _selectedDate = picked!;
-    });
+    if (picked != null && picked != _selectedDate)
+      setState(() {
+        _selectedDate = picked;
+      });
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -36,9 +38,21 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       context: context,
       initialTime: _selectedTime,
     );
-    setState(() {
-      _selectedTime = picked!;
-    });
+    if (picked != null && picked != _selectedTime)
+      setState(() {
+        _selectedTime = picked;
+      });
+  }
+
+  Future<void> _selectDuration(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedDuration,
+    );
+    if (picked != null && picked != _selectedDuration)
+      setState(() {
+        _selectedDuration = picked;
+      });
   }
 
   void _submit() {
@@ -66,7 +80,7 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       title: _tourTitleController.text,
       description: _tourDescriptionController.text,
       startDate: _selectedDate,
-      startTime: _selectedTime,
+      startTime: _selectedDuration,
       messageToParticipants: '',
     );
 
@@ -87,9 +101,10 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
           Text(
             'General',
             style: poppinsFont.copyWith(
-                fontSize: 20.0, fontWeight: FontWeight.bold),
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          // add a text field for the tour name
           const SizedBox(height: 25),
           TextFormField(
             decoration: const InputDecoration(
@@ -151,6 +166,26 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 15),
+          InkWell(
+            onTap: () => _selectDuration(context),
+            child: InputDecorator(
+              decoration: const InputDecoration(
+                labelText: 'Duration',
+                hintText: 'Enter the duration of the tour',
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  Text(
+                    '${_selectedDuration.hour} h ${_selectedDuration.minute} min',
+                  ),
+                  const Icon(Icons.timer),
+                ],
+              ),
+            ),
           ),
         ],
       ),
