@@ -6,10 +6,10 @@ class CustomTextField extends StatelessWidget {
   final String header;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     this.header = '',
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

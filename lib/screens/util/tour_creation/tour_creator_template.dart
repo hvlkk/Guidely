@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 
 class TourCreatorTemplate extends StatelessWidget {
-  TourCreatorTemplate({
+  const TourCreatorTemplate({
     super.key,
     required this.title,
     required this.body,

@@ -3,7 +3,7 @@ import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
-import 'package:guidely/screens/main/host_profile.dart';
+import 'package:guidely/screens/main/user_profile.dart';
 import 'package:guidely/widgets/customs/custom_trail_map.dart';
 import 'package:guidely/widgets/entities/review_list_item.dart';
 
@@ -44,8 +44,6 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(tour.tourDetails.waypoints);
-
     String truncatedDescription = tour.tourDetails.description.length > 250
         ? '${tour.tourDetails.description.substring(0, 250)}...'
         : tour.tourDetails.description;
@@ -131,10 +129,10 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                       Text(
                         tour.tourDetails.title,
                         style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                            fontSize: 22, fontWeight: FontWeight.bold),
                       ),
-                      const Spacer(),
-                      Text(tour.area),
+                      const SizedBox(width: 20),
+                      Text(tour.country, style: const TextStyle(fontSize: 16)),
                       const Spacer(),
                       for (final language in tour.tourDetails.languages)
                         Row(
@@ -157,7 +155,7 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                       Row(
                         children: [
                           const Icon(Icons.location_on),
-                          Text(tour.area),
+                          Text(tour.location),
                         ],
                       ),
                       const Spacer(),
@@ -186,7 +184,7 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (ctx) {
-                        return HostProfileScreen(user: tour.organizer);
+                        return UserProfileScreen(user: tour.organizer);
                       },
                     ),
                   );
@@ -204,7 +202,8 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                       children: [
                         CircleAvatar(
                           radius: 30,
-                          backgroundImage: AssetImage(tour.organizer.imageUrl),
+                          backgroundImage:
+                              NetworkImage(tour.organizer.imageUrl),
                         ),
                         Expanded(
                           child: Column(
@@ -350,7 +349,7 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                         ),
                       ),
                       Text(
-                        tour.tourDetails.waypoints![0].address,
+                        tour.tourDetails.waypoints![0].area,
                         style: const TextStyle(
                           fontSize: 14,
                         ),

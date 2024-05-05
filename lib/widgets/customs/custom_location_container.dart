@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class LocationContainer extends StatelessWidget {
   const LocationContainer({
-    Key? key,
+    super.key,
     required this.previewContent,
     this.isGettingLocation = false,
-  }) : super(key: key);
+  });
 
   final Widget previewContent;
   final bool isGettingLocation;

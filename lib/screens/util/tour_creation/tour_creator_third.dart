@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -183,7 +183,9 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
       userData = docSnapshot.data();
     } catch (e) {
-      print('Error fetching user data: $e');
+      const SnackBar(
+        content: Text('Failed to get user data'),
+      );
     }
 
     final user = TourUser.User(

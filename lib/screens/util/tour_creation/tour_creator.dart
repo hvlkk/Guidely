@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
@@ -6,7 +8,7 @@ import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 import 'package:guidely/widgets/customs/custom_text_field.dart';
 
 class TourCreatorScreen extends StatefulWidget {
-  const TourCreatorScreen({Key? key}) : super(key: key);
+  const TourCreatorScreen({super.key});
 
   @override
   _TourCreatorScreenState createState() => _TourCreatorScreenState();
@@ -16,7 +18,7 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
   TimeOfDay _selectedDuration =
-      TimeOfDay(hour: 2, minute: 0); // Initial duration set to 2 hours
+      const TimeOfDay(hour: 2, minute: 0); // Initial duration set to 2 hours
   final _tourTitleController = TextEditingController();
   final _tourDescriptionController = TextEditingController();
 
@@ -27,10 +29,11 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       firstDate: DateTime(2015, 8),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate)
+    if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
       });
+    }
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -38,10 +41,11 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       context: context,
       initialTime: _selectedTime,
     );
-    if (picked != null && picked != _selectedTime)
+    if (picked != null && picked != _selectedTime) {
       setState(() {
         _selectedTime = picked;
       });
+    }
   }
 
   Future<void> _selectDuration(BuildContext context) async {
@@ -49,10 +53,11 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       context: context,
       initialTime: _selectedDuration,
     );
-    if (picked != null && picked != _selectedDuration)
+    if (picked != null && picked != _selectedDuration) {
       setState(() {
         _selectedDuration = picked;
       });
+    }
   }
 
   void _submit() {

@@ -24,13 +24,14 @@ class Tour {
   final TourState state = TourState.upcoming;
   final double rating = 4.0;
 
-  get area => 'Demo';
-  // tourDetails.waypoints![0].address.split(',')[0]
+  get country => tourDetails.waypoints![0].address.split(',').last;
+  get location => tourDetails.waypoints![0].address.split(',').first;
 
   Map<String, dynamic> toMap() {
     return {
       'tourDetails': tourDetails.toMap(),
-      'area': area,
+      'location': location,
+      'country': country,
       'duration': duration.hour,
       'images': images,
       'organizer': organizer.toMap(),

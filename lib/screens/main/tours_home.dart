@@ -135,7 +135,6 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         itemCount: tours.length,
                         itemBuilder: (BuildContext context, int index) {
                           final tour = tours[index];
-                          print("Now printig tour ${tour}");
                           return Padding(
                             padding: const EdgeInsets.all(8),
                             child: GestureDetector(

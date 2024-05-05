@@ -32,4 +32,6 @@ class Waypoint {
       'longitude': longitude,
     };
   }
+
+  get area => address.split(',').first;
 }

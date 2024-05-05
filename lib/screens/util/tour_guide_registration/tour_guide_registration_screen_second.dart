@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -58,7 +60,6 @@ class _TourGuideRegistrationScreenSecondState
       );
     }
 
-    // ignore: use_build_context_synchronously
     Navigator.of(context).popUntil(
       (route) => route.isFirst,
     );

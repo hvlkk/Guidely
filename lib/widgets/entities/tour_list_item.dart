@@ -3,9 +3,9 @@ import 'package:guidely/models/entities/tour.dart';
 
 class TourListItem extends StatelessWidget {
   const TourListItem({
-    Key? key,
+    super.key,
     required this.tour,
-  }) : super(key: key);
+  });
 
   final Tour tour;
 
@@ -67,7 +67,7 @@ class TourListItem extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    tour.area ?? 'Unknown area',
+                    tour.location ?? 'Unknown area',
                     style: const TextStyle(
                       fontSize: 16,
                     ),
