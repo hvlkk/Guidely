@@ -50,12 +50,10 @@ class TourListItem extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                radius: 25,
-                // this should be organizer's photo profile
-                backgroundImage: tour.images.isNotEmpty
-                    ? NetworkImage(tour.images.first)
-                    : null,
-              ),
+                  radius: 25,
+                  // this should be organizer's photo profile
+                  backgroundImage: NetworkImage(tour.organizer.imageUrl)),
+              const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
