@@ -53,6 +53,7 @@ class TourCreationData {
   }
 
   factory TourCreationData.fromMap(Map<String, dynamic> map) {
+    print(map);
     return TourCreationData(
       title: map['title'] ?? '',
       description: map['description'] ?? '',
@@ -72,8 +73,8 @@ class TourCreationData {
       languages: (map['languages'] as List<dynamic>?)
               ?.map(
                 (language) => Language(
-                  name: language,
-                  code: 'de',
+                  name: language['name'],
+                  code: language['code'],
                 ), // this will need to be updated
               )
               .toList() ??
@@ -90,7 +91,7 @@ class TourCreationData {
       'waypoints': waypoints?.map((waypoint) => waypoint.toMap()).toList(),
       'messageToParticipants': messageToParticipants,
       'activities': activities.map((activity) => activity.name).toList(),
-      'languages': languages.map((language) => language.name).toList(),
+      'languages': languages.map((language) => language.toMap()).toList(),
     };
   }
 }

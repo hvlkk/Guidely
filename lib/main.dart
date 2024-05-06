@@ -36,7 +36,8 @@ enum NavigationIndex {
 }
 
 class _MainAppState extends State<MainApp> {
-  // this will be used to keep track of the selected index of the bottom navigation bar
+  // this will be used to keep track of the selected index of the
+  // bottom navigation bar
   late NavigationIndex _index;
 
   @override
