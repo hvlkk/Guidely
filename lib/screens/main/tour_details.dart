@@ -4,7 +4,7 @@ import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/screens/main/user_profile.dart';
-import 'package:guidely/widgets/customs/custom_trail_map.dart';
+import 'package:guidely/widgets/customs/custom_map.dart';
 import 'package:guidely/widgets/entities/review_list_item.dart';
 
 class TourDetailsScreen extends StatefulWidget {
@@ -363,7 +363,10 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                 borderRadius: BorderRadius.circular(20),
                 child: SizedBox(
                   height: 300,
-                  child: CustomTrailMap(waypoints: tour.tourDetails.waypoints!),
+                  child: CustomMap(
+                    waypoints: tour.tourDetails.waypoints!,
+                    withTrail: true,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),

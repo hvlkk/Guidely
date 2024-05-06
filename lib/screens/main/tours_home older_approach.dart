@@ -47,11 +47,11 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tourDataAsyncUnfiltered = ref.watch(
+    final tourDataAsync = ref.watch(
         toursStreamProvider); // listens for changes in the toursStreamProvider,
     // this will not re-fetch the data from the database if the data is already available
 
-    final tourData = tourDataAsyncUnfiltered.when(
+    final tourData = tourDataAsync.map<List<Tour>>(
       data: (tours) {
         if (_currentPosition != null) {
           final closestTours = LocationService.findClosestToursToPosition(
@@ -64,12 +64,9 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           return <Tour>[];
         }
       },
-      loading: () => List<Tour>.empty(),
-      error: (error, stackTrace) => List<Tour>.empty(),
+      loading: (_) => <Tour>[],
+      error: (error) => <Tour>[],
     );
-
-    final startLocations =
-        tourData.map((tour) => tour.tourDetails.waypoints![0]).toList();
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: _userStream,
@@ -165,14 +162,24 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                     child: SizedBox(
                       width: 335,
                       height: 300,
-                      child: tourData.isEmpty
-                          ? const Center(child: CircularProgressIndicator())
-                          : CustomMap(
-                              waypoints: startLocations,
-                              withTrail: false,
-                            ),
+                      child: tourDataAsync.when(
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (error, stackTrace) =>
+                            Center(child: Text('Error: $error')),
+                        data: (tours) {
+                          final startLocations = tours
+                              .map((tour) => tour.tourDetails.waypoints![0])
+                              .toList();
+                          return CustomMap(
+                            waypoints: startLocations,
+                            withTrail: false,
+                          );
+                        },
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 10),
                   const Row(
                     children: [
                       Padding(
@@ -191,33 +198,36 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                   ),
                   SizedBox(
                     height: 450,
-                    child: tourData.isEmpty
-                        ? const Center(child: CircularProgressIndicator())
-                        : ListView.builder(
-                            itemCount: tourData.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              final tour = tourData[index];
-                              return Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // Navigate to a new page when the TourListItem is tapped
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => TourDetailsScreen(
-                                          tour: tour,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: TourListItem(
-                                    tour: tour,
+                    child: tourDataAsync.when(
+                      loading: () =>
+                          const Center(child: CircularProgressIndicator()),
+                      error: (error, stackTrace) => Text('Error: $error'),
+                      data: (tours) => ListView.builder(
+                        itemCount: tours.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final tour = tours[index];
+                          return Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: GestureDetector(
+                              onTap: () {
+                                // Navigate to a new page when the TourListItem is tapped
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TourDetailsScreen(
+                                      tour: tour,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
+                                );
+                              },
+                              child: TourListItem(
+                                tour: tour,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
