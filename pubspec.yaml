@@ -16,12 +16,14 @@ dependencies:
     sdk: flutter
   flutter_riverpod: ^2.5.1
   flutter_svg: ^2.0.10+1
+  geolocator: ^11.0.0
   google_fonts: ^6.2.1
   google_maps: ^7.1.0
   google_maps_flutter: ^2.6.1
   http: ^1.2.1
   image_picker: ^1.0.8
   location: ^6.0.1
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:
