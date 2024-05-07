@@ -12,7 +12,7 @@ import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
-import 'package:guidely/widgets/entities/tour_list_item.dart';
+import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 
 class ToursHomeScreen extends ConsumerStatefulWidget {
   const ToursHomeScreen({super.key});

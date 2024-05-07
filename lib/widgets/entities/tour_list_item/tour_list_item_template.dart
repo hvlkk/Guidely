@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/tour.dart';
 
-class TourListItem extends StatelessWidget {
-  const TourListItem({
+class TourListItemTemplate extends StatelessWidget {
+  const TourListItemTemplate({
     super.key,
     required this.tour,
+    required this.child,
   });
 
   final Tour tour;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
@@ -54,31 +56,7 @@ class TourListItem extends StatelessWidget {
                   // this should be organizer's photo profile
                   backgroundImage: NetworkImage(tour.organizer.imageUrl)),
               const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    tour.tourDetails.title,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    tour.location ?? 'Unknown area',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Column(
-                children: [
-                  const Icon(Icons.star, color: Colors.yellow),
-                  Text('${tour.rating}'),
-                ],
-              ),
+              child
             ],
           )
         ],

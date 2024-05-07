@@ -4,9 +4,8 @@ import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
-import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
-import 'package:guidely/widgets/entities/tour_list_item.dart';
+import 'package:guidely/widgets/entities/tour_list_item/tour_list_item_upcoming.dart';
 
 class ToursScreen extends ConsumerStatefulWidget {
   const ToursScreen({super.key});
@@ -71,11 +70,13 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
               // TODO: to be removed later
               body: TabBarView(
                 children: [
-                  _buildTabContent(tourDataFiltered),
-                  _buildTabContent(tourDataFiltered),
                   isTourGuide
                       ? _buildTourGuideContent()
-                      : _buildTabContent(tourDataFiltered),
+                      : _buildUpcoming(tourDataFiltered),
+                  isTourGuide
+                      ? _buildTourGuideContent()
+                      : _buildUpcoming(tourDataFiltered),
+                  _buildUpcoming(tourDataFiltered),
                 ],
               ),
             ),
@@ -85,28 +86,15 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
     );
   }
 
-  Widget _buildTabContent(List<Tour> tourDataFiltered) {
+  Widget _buildUpcoming(List<Tour> tourDataFiltered) {
     return ListView.builder(
       itemCount: tourDataFiltered.length,
       itemBuilder: (BuildContext context, int index) {
         final tour = tourDataFiltered[index];
         return Padding(
           padding: const EdgeInsets.all(8),
-          child: GestureDetector(
-            onTap: () {
-              // Navigate to a new page when the TourListItem is tapped
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TourDetailsScreen(
-                    tour: tour,
-                  ),
-                ),
-              );
-            },
-            child: TourListItem(
-              tour: tour,
-            ),
+          child: TourListItemUpcoming(
+            tour: tour,
           ),
         );
       },
