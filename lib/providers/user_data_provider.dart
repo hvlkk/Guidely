@@ -20,7 +20,8 @@ final userDataProvider = FutureProvider.autoDispose(
       email: data['email'],
       uid: data['uid'],
       isTourGuide: data['isTourGuide'] ?? false,
-      registrationData: data['registrationData'],
+      registrationData: data['registrationData'] ?? {},
+      bookedTours: List<String>.from(data['bookedTours'] ?? []),
     );
 
     return newUser;

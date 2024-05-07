@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
+import 'package:guidely/widgets/entities/tour_list_item.dart';
 
 class ToursScreen extends ConsumerStatefulWidget {
   const ToursScreen({super.key});
@@ -18,6 +22,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   @override
   Widget build(BuildContext context) {
     final userDataAsync = ref.watch(userDataProvider);
+    final tourDataAsync = ref.watch(toursStreamProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -39,7 +44,20 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         ),
         data: (userData) {
           final isTourGuide = userData.isTourGuide;
-
+          List<Tour> tourDataFiltered = tourDataAsync.when(
+            data: (tours) {
+              Set<Tour> res = Set<Tour>();
+              for (final tour in tours) {
+                if (!userData.bookedTours.contains(tour.uid)) {
+                  continue;
+                }
+                res.add(tour);
+              }
+              return res.toList();
+            },
+            loading: () => [],
+            error: (error, stackTrace) => [],
+          );
           return DefaultTabController(
             length: tabNames.length,
             child: Scaffold(
@@ -53,11 +71,11 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
               // TODO: to be removed later
               body: TabBarView(
                 children: [
-                  _buildTabContent('No ${tabNames[0]}'),
-                  _buildTabContent('No ${tabNames[1]}'),
+                  _buildTabContent(tourDataFiltered),
+                  _buildTabContent(tourDataFiltered),
                   isTourGuide
                       ? _buildTourGuideContent()
-                      : _buildTabContent('No ${tabNames[2]}'),
+                      : _buildTabContent(tourDataFiltered),
                 ],
               ),
             ),
@@ -67,9 +85,31 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
     );
   }
 
-  Widget _buildTabContent(String message) {
-    return Center(
-      child: Text(message),
+  Widget _buildTabContent(List<Tour> tourDataFiltered) {
+    return ListView.builder(
+      itemCount: tourDataFiltered.length,
+      itemBuilder: (BuildContext context, int index) {
+        final tour = tourDataFiltered[index];
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: GestureDetector(
+            onTap: () {
+              // Navigate to a new page when the TourListItem is tapped
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TourDetailsScreen(
+                    tour: tour,
+                  ),
+                ),
+              );
+            },
+            child: TourListItem(
+              tour: tour,
+            ),
+          ),
+        );
+      },
     );
   }
 

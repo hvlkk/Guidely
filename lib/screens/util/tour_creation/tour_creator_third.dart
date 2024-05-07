@@ -1,5 +1,5 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
-
+import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -194,6 +194,7 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       email: userData?['email'] ?? '',
       imageUrl: userData?['imageUrl'] ?? '',
       isTourGuide: userData?['isTourGuide'] ?? false,
+      bookedTours: List<String>.from(userData?['bookedTours'] ?? []),
     );
 
     if (currentUser == null) {
@@ -201,12 +202,16 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
     }
 
     final tour = Tour(
+      uid: const Uuid().v4(),
       tourDetails: finalData,
       organizer: user,
       duration: finalData.startTime,
     );
 
-    FirebaseFirestore.instance.collection('tours').add(tour.toMap());
+    FirebaseFirestore.instance
+        .collection('tours')
+        .doc(tour.uid)
+        .set(tour.toMap());
 
     Navigator.of(context).popUntil(
       (route) => route.isFirst,

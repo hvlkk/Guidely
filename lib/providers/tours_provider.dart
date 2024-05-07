@@ -6,5 +6,5 @@ import 'package:guidely/models/entities/tour.dart';
 final toursStreamProvider = StreamProvider.autoDispose<List<Tour>>((ref) {
   return FirebaseFirestore.instance.collection('tours').snapshots().map(
       (snapshot) =>
-          snapshot.docs.map((doc) => Tour.fromMap(doc.data())).toList());
+          snapshot.docs.map((doc) => Tour.fromFirestore(doc)).toList());
 });

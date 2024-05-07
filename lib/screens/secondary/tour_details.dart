@@ -1,13 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
-import 'package:guidely/screens/main/user_profile.dart';
+import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/screens/secondary/user_profile.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
 import 'package:guidely/widgets/entities/review_list_item.dart';
 
-class TourDetailsScreen extends StatefulWidget {
+class TourDetailsScreen extends ConsumerStatefulWidget {
   const TourDetailsScreen({
     super.key,
     required this.tour,
@@ -16,16 +20,33 @@ class TourDetailsScreen extends StatefulWidget {
   final Tour tour;
 
   @override
-  State<StatefulWidget> createState() {
+  ConsumerState<ConsumerStatefulWidget> createState() {
     return _TourDetailsScreenState();
   }
 }
 
-class _TourDetailsScreenState extends State<TourDetailsScreen> {
+class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
   int currentIndex = 0;
   bool showFullDescription = false;
+  bool isBooked = false;
 
   Tour get tour => widget.tour;
+
+  // Testing push notifications
+  void setupPushNotifications() async {
+    final fcm = FirebaseMessaging.instance;
+    await fcm.requestPermission();
+
+    final token = await fcm
+        .getToken(); // this token can be used to send notifications to the user
+    fcm.subscribeToTopic('notifications');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setupPushNotifications();
+  }
 
   void _previousImage() {
     setState(() {
@@ -42,8 +63,55 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
     });
   }
 
+  void _uploadBooking(BuildContext context) {
+    final user = ref.watch(userDataProvider);
+
+    user.when(
+      data: (userData) async {
+        userData.bookedTours.add(tour.uid);
+
+        try {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(userData.uid)
+              .set(
+            {
+              'bookedTours': userData.bookedTours,
+            },
+            SetOptions(merge: true), // Merge with existing data
+          );
+        } catch (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('An error occurred. Please try again later.'),
+            ),
+          );
+        }
+      },
+      error: (Object error, StackTrace stackTrace) {},
+      loading: () {},
+    );
+  }
+
+  void _checkIfBooked(BuildContext context) {
+    if (isBooked) {
+      return;
+    }
+    final user = ref.watch(userDataProvider);
+    user.when(
+      data: (userData) {
+        setState(() {
+          isBooked = userData.bookedTours.contains(tour.uid);
+        });
+      },
+      error: (Object error, StackTrace stackTrace) {},
+      loading: () {},
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    _checkIfBooked(context);
     String truncatedDescription = tour.tourDetails.description.length > 250
         ? '${tour.tourDetails.description.substring(0, 250)}...'
         : tour.tourDetails.description;
@@ -60,6 +128,7 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
         username: 'John Doe',
         email: 'ippo@example.com',
         imageUrl: 'assets/images/user.png',
+        bookedTours: [],
       ),
     );
 
@@ -72,6 +141,7 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
         username: 'Jane Doe',
         email: 'jane@example',
         imageUrl: 'assets/images/user.png',
+        bookedTours: [],
       ),
     );
 
@@ -309,24 +379,69 @@ class _TourDetailsScreenState extends State<TourDetailsScreen> {
                 ],
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  // Open the calendar to select a date
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ButtonColors.attention,
-                  padding: const EdgeInsets.all(15),
-                  textStyle: const TextStyle(
-                    fontSize: 20,
-                    color: Color.fromARGB(255, 26, 23, 23),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                child: const Text(
-                  'Check Availabilty',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
+              isBooked
+                  ? ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 12, 168, 59),
+                        padding: const EdgeInsets.all(15),
+                      ),
+                      child: const Text(
+                        'Booked',
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                      ),
+                    )
+                  : ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Booking'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Icon(Icons.check_circle,
+                                        color: Colors.green),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Booking successful!',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                        _uploadBooking(context);
+                        setState(() {
+                          isBooked = true;
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ButtonColors.attention,
+                        padding: const EdgeInsets.all(15),
+                        textStyle: const TextStyle(
+                          fontSize: 20,
+                          color: Color.fromARGB(255, 26, 23, 23),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      child: const Text(
+                        'Book now',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
               const SizedBox(height: 20),
               Row(
                 children: [

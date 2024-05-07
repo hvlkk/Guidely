@@ -6,7 +6,9 @@ class User {
   final String email;
   final String imageUrl;
   late bool isTourGuide = false;
-  late RegistrationData registrationData;
+  late RegistrationData registrationData =
+      RegistrationData(description: '', uid: '', uploadedIdURL: '');
+  List<String> bookedTours;
 
   User({
     required this.uid,
@@ -14,6 +16,7 @@ class User {
     required this.email,
     required this.imageUrl,
     this.isTourGuide = false,
+    required this.bookedTours,
     registrationData,
   });
 
@@ -24,6 +27,7 @@ class User {
       'email': email,
       'imageUrl': imageUrl,
       'isTourGuide': isTourGuide,
+      'bookedTours': bookedTours,
     };
   }
 
@@ -34,6 +38,7 @@ class User {
       email: map['email'] ?? '',
       imageUrl: map['imageUrl'] ?? '',
       isTourGuide: map['isTourGuide'] ?? false,
+      bookedTours: List<String>.from(map['bookedTours'] ?? []),
       registrationData: RegistrationData.fromMap(map['registrationData'] ?? {}),
     );
   }
@@ -44,7 +49,8 @@ class User {
     String? email,
     String? imageUrl,
     bool? isTourGuide,
-    required RegistrationData registrationData,
+    required List<String> bookedTours,
+    RegistrationData? registrationData,
   }) {
     return User(
       uid: uid ?? this.uid,
@@ -52,6 +58,7 @@ class User {
       email: email ?? this.email,
       imageUrl: imageUrl ?? this.imageUrl,
       isTourGuide: isTourGuide ?? this.isTourGuide,
+      bookedTours: bookedTours,
       registrationData: registrationData,
     );
   }
@@ -60,6 +67,6 @@ class User {
 
   @override
   String toString() {
-    return 'User{uid: $uid, username: $username, email: $email, isTourGuide: $isTourGuide}';
+    return 'User{uid: $uid, username: $username, email: $email, isTourGuide: $isTourGuide, bookedTours: $bookedTours, registrationData: $registrationData}';
   }
 }

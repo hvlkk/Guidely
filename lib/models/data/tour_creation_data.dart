@@ -53,7 +53,6 @@ class TourCreationData {
   }
 
   factory TourCreationData.fromMap(Map<String, dynamic> map) {
-    print(map);
     return TourCreationData(
       title: map['title'] ?? '',
       description: map['description'] ?? '',

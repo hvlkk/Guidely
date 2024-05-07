@@ -11,6 +11,7 @@ dependencies:
   country_icons: ^3.0.0
   firebase_auth: ^4.19.1
   firebase_core: ^2.29.0
+  firebase_messaging: ^14.9.2
   firebase_storage: ^11.7.2
   flutter:
     sdk: flutter
@@ -24,6 +25,7 @@ dependencies:
   image_picker: ^1.0.8
   location: ^6.0.1
   permission_handler: ^11.3.1
+  uuid: ^4.4.0
 
 dev_dependencies:
   flutter_test:

@@ -38,8 +38,8 @@ class _TourGuideRegistrationScreenSecondState
       uploadedIdURL: '',
     );
 
-    final updatedUser =
-        user.copyWith(isTourGuide: true, registrationData: registrationData);
+    final updatedUser = user.copyWith(
+        isTourGuide: true, registrationData: registrationData, bookedTours: []);
 
     try {
       await FirebaseFirestore.instance

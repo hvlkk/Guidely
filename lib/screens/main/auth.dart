@@ -77,6 +77,7 @@ class _AuthScreenState extends State<AuthScreen> {
           username: _enteredUsername,
           email: _enteredEmail,
           imageUrl: imageURL,
+          bookedTours: [],
         );
         FirebaseFirestore.instance.collection('users').doc(newUser.uid).set(
               newUser.toMap(),
