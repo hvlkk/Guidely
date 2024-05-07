@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   cloud_firestore: ^4.17.0
+  cloud_functions: ^4.7.4
   country_icons: ^3.0.0
   firebase_auth: ^4.19.1
   firebase_core: ^2.29.0
@@ -38,3 +39,4 @@ flutter:
   assets:
     - assets/images/tours/tour1.jpg
     - assets/images/tours/tour2.jpg
+    - assets/images/login_screen_logo.svg
