@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -36,20 +37,54 @@ class _AuthScreenState extends State<AuthScreen> {
   File? _userImageFile;
   AuthMode _authMode = AuthMode.login;
 
-  void _submit() async {
-    final isValid = _formKey.currentState!.validate();
-    if (!isValid) {
-      return;
-    }
-
+  bool _validateSignupImage() {
     if (_userImageFile == null && _authMode == AuthMode.signup) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please pick an image.'),
         ),
       );
+      return false;
+    }
+    return true;
+  }
+
+  /// Used during signup. Validates that the image and username the user provided are acceptable.
+  Future<bool> _validateSignup() async {
+    if (!_validateSignupImage()) {
+      return false;
+    }
+
+    final usernameAvailable = await _checkUsernameAvailability();
+    print(usernameAvailable);
+    if (!usernameAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Username already exists.'),
+        ),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  /// Uses a cloud function to check whether the username already exists in the database.
+  Future<bool> _checkUsernameAvailability() async {
+    final callable =
+        FirebaseFunctions.instance.httpsCallable('checkUsernameAvailability');
+    final response = await callable({'username': _enteredUsername});
+    return response.data;
+  }
+
+  void _submit() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
       return;
     }
+
+    _enteredUsername = _enteredUsername.trim();
+    _enteredEmail = _enteredEmail.trim();
+    _enteredPassword = _enteredPassword.trim();
 
     _formKey.currentState!.save();
     try {
@@ -59,6 +94,11 @@ class _AuthScreenState extends State<AuthScreen> {
           password: _enteredPassword,
         );
       } else if (_authMode == AuthMode.signup) {
+        bool validInputs = await _validateSignup();
+        if (!validInputs) {
+          return;
+        }
+
         final userCredentials = await _firebase.createUserWithEmailAndPassword(
           email: _enteredEmail,
           password: _enteredPassword,
@@ -94,14 +134,29 @@ class _AuthScreenState extends State<AuthScreen> {
           content: Text(error.message!),
         ),
       );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An unexpected error occurred'),
+        ),
+      );
     }
+  }
+
+  /// Validates the email given by the user.
+  bool _isValidEmail(String? email) {
+    if (email == null) {
+      return false;
+    }
+    email = email.trim();
+    final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,20}$');
+
+    return emailRegex.hasMatch(email);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset:
-          false, // Prevents the screen from resizing when the keyboard is shown
       backgroundColor: MainColors.background,
       body: Center(
         child: SingleChildScrollView(
@@ -158,10 +213,14 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                             ),
                           ),
+                          keyboardType: TextInputType.emailAddress,
+                          autocorrect: false,
+                          textCapitalization: TextCapitalization.none,
                           validator: (value) {
                             if (value == null ||
                                 value.isEmpty ||
-                                !value.contains('@')) {
+                                !value.contains('@') ||
+                                !_isValidEmail(value)) {
                               return 'Please enter a valid email address.';
                             }
                             return null;
