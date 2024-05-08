@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guidely/firestore_service.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item_upcoming.dart';
 
@@ -72,11 +76,11 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 children: [
                   isTourGuide
                       ? _buildTourGuideContent()
-                      : _buildUpcoming(tourDataFiltered),
+                      : _buildUpcoming(tourDataFiltered, userData),
                   isTourGuide
                       ? _buildTourGuideContent()
-                      : _buildUpcoming(tourDataFiltered),
-                  _buildUpcoming(tourDataFiltered),
+                      : _buildUpcoming(tourDataFiltered, userData),
+                  _buildUpcoming(tourDataFiltered, userData),
                 ],
               ),
             ),
@@ -86,7 +90,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
     );
   }
 
-  Widget _buildUpcoming(List<Tour> tourDataFiltered) {
+  Widget _buildUpcoming(List<Tour> tourDataFiltered, User userData) {
     return ListView.builder(
       itemCount: tourDataFiltered.length,
       itemBuilder: (BuildContext context, int index) {
@@ -95,6 +99,22 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
           padding: const EdgeInsets.all(8),
           child: TourListItemUpcoming(
             tour: tour,
+            onGetDetails: () {
+              // navigate to the tour details screen
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return TourDetailsScreen(tour: tour);
+              }));
+            },
+            onCancel: () async {
+              // cancel the tour
+              userData.bookedTours.remove(tour.uid);
+              // update the user data in the database
+              FirestoreService.updateUserData(userData.uid, {
+                'bookedTours': userData.bookedTours,
+              });
+              // force a rebuild of the widget
+              setState(() {});
+            },
           ),
         );
       },

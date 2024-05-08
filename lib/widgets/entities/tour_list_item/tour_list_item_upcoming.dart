@@ -3,12 +3,17 @@ import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item_template.dart';
 
 class TourListItemUpcoming extends StatelessWidget {
-  const TourListItemUpcoming({
+  TourListItemUpcoming({
     super.key,
     required this.tour,
+    required this.onGetDetails,
+    required this.onCancel,
   });
 
   final Tour tour;
+
+  void Function()? onGetDetails;
+  void Function()? onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +30,8 @@ class TourListItemUpcoming extends StatelessWidget {
           Row(
             children: [
               ElevatedButton(
-                onPressed: () => {},
+                onPressed: () => onGetDetails?.call(),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
                   backgroundColor: Colors.white,
                   side: const BorderSide(color: Colors.black),
                 ),
@@ -35,13 +39,16 @@ class TourListItemUpcoming extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () => {},
+                onPressed: () => onCancel?.call(),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.red,
+                  backgroundColor: Colors.red,
                   side: const BorderSide(color: Colors.black),
                 ),
-                child: const Text('Cancel'),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Color.fromARGB(255, 252, 252, 252)),
+                ),
               ),
             ],
           ),

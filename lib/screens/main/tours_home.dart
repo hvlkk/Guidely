@@ -160,17 +160,20 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 15),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: SizedBox(
-                      width: 335,
-                      height: 300,
-                      child: tourData.isEmpty
-                          ? const Center(child: CircularProgressIndicator())
-                          : CustomMap(
-                              waypoints: startLocations,
-                              withTrail: false,
-                            ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(25),
+                      child: SizedBox(
+                        width: 335,
+                        height: 300,
+                        child: tourData.isEmpty
+                            ? const Center(child: CircularProgressIndicator())
+                            : CustomMap(
+                                waypoints: startLocations,
+                                withTrail: false,
+                              ),
+                      ),
                     ),
                   ),
                   const Row(

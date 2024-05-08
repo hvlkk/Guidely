@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guidely/firestore_service.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
@@ -69,24 +69,9 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
     user.when(
       data: (userData) async {
         userData.bookedTours.add(tour.uid);
-
-        try {
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(userData.uid)
-              .set(
-            {
-              'bookedTours': userData.bookedTours,
-            },
-            SetOptions(merge: true), // Merge with existing data
-          );
-        } catch (error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('An error occurred. Please try again later.'),
-            ),
-          );
-        }
+        FirestoreService.updateUserData(userData.uid, {
+          'bookedTours': userData.bookedTours,
+        });
       },
       error: (Object error, StackTrace stackTrace) {},
       loading: () {},
