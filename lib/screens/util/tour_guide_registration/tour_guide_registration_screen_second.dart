@@ -39,7 +39,11 @@ class _TourGuideRegistrationScreenSecondState
     );
 
     final updatedUser = user.copyWith(
-        isTourGuide: true, registrationData: registrationData, bookedTours: []);
+      isTourGuide: true,
+      registrationData: registrationData,
+      bookedTours: [],
+      organizedTours: [],
+    );
 
     try {
       await FirebaseFirestore.instance
@@ -63,6 +67,11 @@ class _TourGuideRegistrationScreenSecondState
     Navigator.of(context).popUntil(
       (route) => route.isFirst,
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override

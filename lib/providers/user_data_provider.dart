@@ -22,6 +22,8 @@ final userDataProvider = FutureProvider.autoDispose(
       isTourGuide: data['isTourGuide'] ?? false,
       registrationData: data['registrationData'] ?? {},
       bookedTours: List<String>.from(data['bookedTours'] ?? []),
+      organizedTours: List<String>.from(data['organizedTours'] ?? []),
+      fcmToken: data['fcmToken'] ?? '',
     );
 
     return newUser;

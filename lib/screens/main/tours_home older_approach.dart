@@ -51,7 +51,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
         toursStreamProvider); // listens for changes in the toursStreamProvider,
     // this will not re-fetch the data from the database if the data is already available
 
-    final tourData = tourDataAsync.map<List<Tour>>(
+    tourDataAsync.map<List<Tour>>(
       data: (tours) {
         if (_currentPosition != null) {
           final closestTours = LocationService.findClosestToursToPosition(

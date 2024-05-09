@@ -1,16 +1,19 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item_template.dart';
 
 class TourListItemUpcoming extends StatelessWidget {
-  TourListItemUpcoming({
-    super.key,
-    required this.tour,
-    required this.onGetDetails,
-    required this.onCancel,
-  });
+  TourListItemUpcoming(
+      {super.key,
+      required this.tour,
+      required this.onGetDetails,
+      required this.onCancel,
+      required this.isHostedTour});
 
   final Tour tour;
+  final bool isHostedTour;
 
   void Function()? onGetDetails;
   void Function()? onCancel;
@@ -29,6 +32,16 @@ class TourListItemUpcoming extends StatelessWidget {
           ),
           Row(
             children: [
+              isHostedTour
+                  ? ElevatedButton(
+                      onPressed: () => {},
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.black),
+                      ),
+                      child: const Text('Announce'),
+                    )
+                  : const SizedBox(),
               ElevatedButton(
                 onPressed: () => onGetDetails?.call(),
                 style: ElevatedButton.styleFrom(

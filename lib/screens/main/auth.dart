@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -47,6 +48,12 @@ class _AuthScreenState extends State<AuthScreen> {
       return false;
     }
     return true;
+  }
+
+  Future<String> _getFcmToken() async {
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+    String? token = await _firebaseMessaging.getToken();
+    return token ?? '';
   }
 
   /// Used during signup. Validates that the image and username the user provided are acceptable.
@@ -111,6 +118,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
         await storageRef.putFile(_userImageFile!);
         final imageURL = await storageRef.getDownloadURL();
+        final token = await _getFcmToken();
 
         final newUser = TourUser.User(
           uid: userCredentials.user!.uid,
@@ -118,6 +126,8 @@ class _AuthScreenState extends State<AuthScreen> {
           email: _enteredEmail,
           imageUrl: imageURL,
           bookedTours: [],
+          organizedTours: [],
+          fcmToken: token,
         );
         FirebaseFirestore.instance.collection('users').doc(newUser.uid).set(
               newUser.toMap(),

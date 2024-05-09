@@ -195,6 +195,8 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       imageUrl: userData?['imageUrl'] ?? '',
       isTourGuide: userData?['isTourGuide'] ?? false,
       bookedTours: List<String>.from(userData?['bookedTours'] ?? []),
+      fcmToken: userData?['fcmToken'] ?? '',
+      organizedTours: List<String>.from(userData?['organizedTours'] ?? []),
     );
 
     if (currentUser == null) {
@@ -207,6 +209,13 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       organizer: user,
       duration: finalData.startTime,
     );
+
+    user.organizedTours.add(tour.uid);
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .set(user.toMap());
 
     FirebaseFirestore.instance
         .collection('tours')

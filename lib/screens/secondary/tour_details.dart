@@ -1,4 +1,4 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/firestore_service.dart';
@@ -6,6 +6,7 @@ import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
+import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/secondary/user_profile.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
@@ -32,20 +33,9 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
 
   Tour get tour => widget.tour;
 
-  // Testing push notifications
-  void setupPushNotifications() async {
-    final fcm = FirebaseMessaging.instance;
-    await fcm.requestPermission();
-
-    final token = await fcm
-        .getToken(); // this token can be used to send notifications to the user
-    fcm.subscribeToTopic('notifications');
-  }
-
   @override
   void initState() {
     super.initState();
-    setupPushNotifications();
   }
 
   void _previousImage() {
@@ -72,6 +62,27 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
         FirestoreService.updateUserData(userData.uid, {
           'bookedTours': userData.bookedTours,
         });
+
+        final tours = ref.watch(toursStreamProvider);
+        tours.when(
+          data: (data) {
+            final tourIndex =
+                data.indexWhere((element) => element.uid == tour.uid);
+            data[tourIndex].registeredUsers.add(userData.uid);
+            FirestoreService.updateTourData(tour.uid, {
+              'registeredUsers': data[tourIndex].registeredUsers,
+            });
+          },
+          error: (Object error, StackTrace stackTrace) {},
+          loading: () {},
+        );
+        try {
+          final callable =
+              FirebaseFunctions.instance.httpsCallable('sendNotification');
+          await callable({'tourId': tour.uid});
+        } catch (e) {
+          print(e);
+        }
       },
       error: (Object error, StackTrace stackTrace) {},
       loading: () {},
@@ -114,6 +125,8 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
         email: 'ippo@example.com',
         imageUrl: 'assets/images/user.png',
         bookedTours: [],
+        organizedTours: [],
+        fcmToken: '',
       ),
     );
 
@@ -127,6 +140,8 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
         email: 'jane@example',
         imageUrl: 'assets/images/user.png',
         bookedTours: [],
+        organizedTours: [],
+        fcmToken: '',
       ),
     );
 

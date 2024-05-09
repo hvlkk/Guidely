@@ -24,6 +24,8 @@ class Tour {
   final User organizer;
   final String uid;
 
+  final List<String> registeredUsers = [];
+
   final TourState state = TourState.upcoming;
   final double rating = 4.0;
 

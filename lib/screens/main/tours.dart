@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/firestore_service.dart';
@@ -51,7 +50,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
             data: (tours) {
               Set<Tour> res = Set<Tour>();
               for (final tour in tours) {
-                if (!userData.bookedTours.contains(tour.uid)) {
+                if (!userData.bookedTours.contains(tour.uid) &&
+                    !userData.organizedTours.contains(tour.uid)) {
                   continue;
                 }
                 res.add(tour);
@@ -94,6 +94,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
     return ListView.builder(
       itemCount: tourDataFiltered.length,
       itemBuilder: (BuildContext context, int index) {
+        final isAHostedTour =
+            userData.organizedTours.contains(tourDataFiltered[index].uid);
         final tour = tourDataFiltered[index];
         return Padding(
           padding: const EdgeInsets.all(8),
@@ -101,20 +103,29 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
             tour: tour,
             onGetDetails: () {
               // navigate to the tour details screen
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                return TourDetailsScreen(tour: tour);
-              }));
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return TourDetailsScreen(tour: tour);
+                  },
+                ),
+              );
             },
             onCancel: () async {
               // cancel the tour
               userData.bookedTours.remove(tour.uid);
+              isAHostedTour ? userData.organizedTours.remove(tour.uid) : null;
               // update the user data in the database
-              FirestoreService.updateUserData(userData.uid, {
-                'bookedTours': userData.bookedTours,
-              });
+              FirestoreService.updateUserData(
+                userData.uid,
+                {
+                  'bookedTours': userData.bookedTours,
+                },
+              );
               // force a rebuild of the widget
               setState(() {});
             },
+            isHostedTour: isAHostedTour,
           ),
         );
       },
