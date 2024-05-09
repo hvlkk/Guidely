@@ -58,30 +58,38 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
 
     user.when(
       data: (userData) async {
-        userData.bookedTours.add(tour.uid);
-        FirestoreService.updateUserData(userData.uid, {
-          'bookedTours': userData.bookedTours,
-        });
+        if (userData.organizedTours.contains(tour.uid)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('You cannot book your own tour!'),
+            ),
+          );
+        } else {
+          userData.bookedTours.add(tour.uid);
+          FirestoreService.updateUserData(userData.uid, {
+            'bookedTours': userData.bookedTours,
+          });
 
-        final tours = ref.watch(toursStreamProvider);
-        tours.when(
-          data: (data) {
-            final tourIndex =
-                data.indexWhere((element) => element.uid == tour.uid);
-            data[tourIndex].registeredUsers.add(userData.uid);
-            FirestoreService.updateTourData(tour.uid, {
-              'registeredUsers': data[tourIndex].registeredUsers,
-            });
-          },
-          error: (Object error, StackTrace stackTrace) {},
-          loading: () {},
-        );
-        try {
-          final callable =
-              FirebaseFunctions.instance.httpsCallable('sendNotification');
-          await callable({'tourId': tour.uid});
-        } catch (e) {
-          print(e);
+          final tours = ref.watch(toursStreamProvider);
+          tours.when(
+            data: (data) {
+              final tourIndex =
+                  data.indexWhere((element) => element.uid == tour.uid);
+              data[tourIndex].registeredUsers.add(userData.uid);
+              FirestoreService.updateTourData(tour.uid, {
+                'registeredUsers': data[tourIndex].registeredUsers,
+              });
+            },
+            error: (Object error, StackTrace stackTrace) {},
+            loading: () {},
+          );
+          try {
+            final callable =
+                FirebaseFunctions.instance.httpsCallable('sendNotification');
+            await callable({'tourId': tour.uid});
+          } catch (e) {
+            print(e);
+          }
         }
       },
       error: (Object error, StackTrace stackTrace) {},
@@ -481,10 +489,45 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                   child: CustomMap(
                     waypoints: tour.tourDetails.waypoints!,
                     withTrail: true,
+                    onTapWaypoint: (LatLng) {},
                   ),
                 ),
               ),
               const SizedBox(height: 20),
+              // add the activities here
+              const Text(
+                'Activities',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // use a listview to display the activities
+              Center(
+                child: SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    itemCount: tour.tourDetails.activities.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.check_circle, color: Colors.green),
+                            const SizedBox(width: 10),
+                            Text(
+                              tour.tourDetails.activities[index].name,
+                              style: const TextStyle(fontSize: 16),
+                              textAlign: TextAlign.left,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
               const Text(
                 'Reviews',
                 style: TextStyle(

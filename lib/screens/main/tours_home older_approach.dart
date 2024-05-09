@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/location_service.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
@@ -174,6 +175,9 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                           return CustomMap(
                             waypoints: startLocations,
                             withTrail: false,
+                            onTapWaypoint: (LatLng) {
+                              // Handle waypoint taps
+                            },
                           );
                         },
                       ),

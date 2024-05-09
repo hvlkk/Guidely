@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/location_service.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
@@ -172,6 +173,84 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                             : CustomMap(
                                 waypoints: startLocations,
                                 withTrail: false,
+                                onTapWaypoint: (LatLng p0) {
+                                  // Find the tour corresponding to the tapped waypoint
+                                  final selectedTour = tourData.firstWhere(
+                                    (tour) =>
+                                        tour.tourDetails.waypoints![0]
+                                                .latitude ==
+                                            p0.latitude &&
+                                        tour.tourDetails.waypoints![0]
+                                                .longitude ==
+                                            p0.longitude,
+                                  );
+                                  // Display a card with the tour details
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Dialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: SingleChildScrollView(
+                                          padding: EdgeInsets.all(20),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                'Tour Details',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Text(
+                                                'Tour Name: ${selectedTour.tourDetails.title}',
+                                                style: const TextStyle(
+                                                    fontSize: 16),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Text(
+                                                'Tour Description: ${selectedTour.tourDetails.description}',
+                                                style: const TextStyle(
+                                                    fontSize: 16),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Text(
+                                                'Tour Duration: ${selectedTour.tourDetails.startTime}',
+                                                style: const TextStyle(
+                                                    fontSize: 16),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Text(
+                                                'Tour Start Date: ${selectedTour.tourDetails.startDate}',
+                                                style: const TextStyle(
+                                                    fontSize: 16),
+                                              ),
+                                              const SizedBox(height: 20),
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text(
+                                                    'Close',
+                                                    style:
+                                                        TextStyle(fontSize: 16),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
                               ),
                       ),
                     ),
@@ -192,6 +271,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(width: 15),
                   SizedBox(
                     height: 450,
                     child: tourData.isEmpty

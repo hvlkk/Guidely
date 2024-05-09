@@ -9,8 +9,11 @@ class CustomMap extends StatelessWidget {
   const CustomMap({
     super.key,
     required this.waypoints,
+    required this.onTapWaypoint,
     this.withTrail = false,
   });
+
+  final void Function(LatLng p0) onTapWaypoint;
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +30,23 @@ class CustomMap extends StatelessWidget {
               target: LatLng(waypoints[0].latitude, waypoints[0].longitude),
               zoom: 13.5,
             ),
-            markers:
-                withTrail ? _buildColorfulMarkers() : _buildOneColorMarkers(BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed)),
+            markers: withTrail
+                ? _buildColorfulMarkers()
+                : _buildOneColorMarkers(
+                    BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueRed),
+                  ),
             polylines: withTrail ? _buildPolylines(polylineCoordinates) : {},
             onMapCreated: (GoogleMapController controller) {
               // Controller is ready
             },
             scrollGesturesEnabled: true,
             zoomGesturesEnabled: true,
+            onTap: (LatLng latLng) {
+              // Handle taps
+              print("I was tapped at $latLng");
+              onTapWaypoint(latLng);
+            },
           ),
         ),
         if (withTrail)
@@ -79,6 +91,9 @@ class CustomMap extends StatelessWidget {
           markerId: MarkerId(waypoint.address),
           position: LatLng(waypoint.latitude, waypoint.longitude),
           icon: descriptor,
+          onTap: () {
+            onTapWaypoint(LatLng(waypoint.latitude, waypoint.longitude));
+          },
         ),
     };
   }
