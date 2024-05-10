@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -12,6 +13,7 @@ import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
+import 'package:guidely/tour_filter_service.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 
@@ -52,8 +54,11 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
         toursStreamProvider); // listens for changes in the toursStreamProvider,
     // this will not re-fetch the data from the database if the data is already available
 
-    final tourData = tourDataAsyncUnfiltered.when(
+    late List<Tour> tourDataUnfiltered;
+
+    final tourDataFiltered = tourDataAsyncUnfiltered.when(
       data: (tours) {
+        tourDataUnfiltered = tours;
         if (_currentPosition != null) {
           final closestTours = LocationService.findClosestToursToPosition(
             tours,
@@ -70,7 +75,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
     );
 
     final startLocations =
-        tourData.map((tour) => tour.tourDetails.waypoints![0]).toList();
+        tourDataFiltered.map((tour) => tour.tourDetails.waypoints![0]).toList();
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: _userStream,
@@ -92,6 +97,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final username = jsonDataMap['username'];
           final imageUrl = jsonDataMap['imageUrl'];
 
+          final _searchScreenController = TextEditingController();
           return Scaffold(
             appBar: AppBar(
               title: Text(
@@ -149,15 +155,35 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                   ),
                   const SizedBox(width: 15),
                   Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search for tours',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(25),
+                    padding: const EdgeInsets.all(25),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _searchScreenController,
+                            decoration: InputDecoration(
+                              hintText: 'Search for tours',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 5),
+                        GestureDetector(
+                          child: Icon(Icons.search),
+                          onTap: () {
+                            // Search for tours based on the search bar input
+                            final filteredTours =
+                                TourFilterService.filterSearchBar(
+                              _searchScreenController.text,
+                              tourDataUnfiltered,
+                            );
+                            print(filteredTours);
+                            // TODO - Display the filtered tours
+                          },
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -168,14 +194,15 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                       child: SizedBox(
                         width: 335,
                         height: 300,
-                        child: tourData.isEmpty
+                        child: tourDataFiltered.isEmpty
                             ? const Center(child: CircularProgressIndicator())
                             : CustomMap(
                                 waypoints: startLocations,
                                 withTrail: false,
                                 onTapWaypoint: (LatLng p0) {
                                   // Find the tour corresponding to the tapped waypoint
-                                  final selectedTour = tourData.firstWhere(
+                                  final selectedTour =
+                                      tourDataFiltered.firstWhere(
                                     (tour) =>
                                         tour.tourDetails.waypoints![0]
                                                 .latitude ==
@@ -295,12 +322,12 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                   const SizedBox(width: 15),
                   SizedBox(
                     height: 450,
-                    child: tourData.isEmpty
+                    child: tourDataFiltered.isEmpty
                         ? const Center(child: CircularProgressIndicator())
                         : ListView.builder(
-                            itemCount: tourData.length,
+                            itemCount: tourDataFiltered.length,
                             itemBuilder: (BuildContext context, int index) {
-                              final tour = tourData[index];
+                              final tour = tourDataFiltered[index];
                               return Padding(
                                 padding: const EdgeInsets.all(8),
                                 child: GestureDetector(
