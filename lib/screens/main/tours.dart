@@ -14,7 +14,6 @@ class ToursScreen extends ConsumerStatefulWidget {
   const ToursScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _ToursScreenState createState() => _ToursScreenState();
 }
 
@@ -91,45 +90,51 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   Widget _buildUpcoming(List<Tour> tourDataFiltered, User userData) {
-    return ListView.builder(
-      itemCount: tourDataFiltered.length,
-      itemBuilder: (BuildContext context, int index) {
-        final isAHostedTour =
-            userData.organizedTours.contains(tourDataFiltered[index].uid);
-        final tour = tourDataFiltered[index];
-        return Padding(
-          padding: const EdgeInsets.all(8),
-          child: TourListItemUpcoming(
-            tour: tour,
-            onGetDetails: () {
-              // navigate to the tour details screen
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) {
-                    return TourDetailsScreen(tour: tour);
+    return tourDataFiltered.isEmpty
+        ? Center(
+            child: Text('No upcoming tours',
+                style: poppinsFont.copyWith(fontSize: 15)))
+        : ListView.builder(
+            itemCount: tourDataFiltered.length,
+            itemBuilder: (BuildContext context, int index) {
+              final tour = tourDataFiltered[index];
+              final isAHostedTour = userData.organizedTours.contains(tour.uid);
+              return Padding(
+                padding: const EdgeInsets.all(8),
+                child: TourListItemUpcoming(
+                  tour: tour,
+                  onGetDetails: () {
+                    // navigate to the tour details screen
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return TourDetailsScreen(tour: tour);
+                        },
+                      ),
+                    );
                   },
+                  onCancel: () async {
+                    // cancel the tour
+                    userData.bookedTours.remove(tour.uid);
+                    isAHostedTour
+                        ? userData.organizedTours.remove(tour.uid)
+                        : null;
+                    // update the user data in the database
+                    FirestoreService.updateUserData(
+                      userData.uid,
+                      {
+                        'bookedTours': userData.bookedTours,
+                        'organizedTours': userData.organizedTours,
+                      },
+                    );
+                    // force a rebuild of the widget
+                    setState(() {});
+                  },
+                  isHostedTour: isAHostedTour,
                 ),
               );
             },
-            onCancel: () async {
-              // cancel the tour
-              userData.bookedTours.remove(tour.uid);
-              isAHostedTour ? userData.organizedTours.remove(tour.uid) : null;
-              // update the user data in the database
-              FirestoreService.updateUserData(
-                userData.uid,
-                {
-                  'bookedTours': userData.bookedTours,
-                },
-              );
-              // force a rebuild of the widget
-              setState(() {});
-            },
-            isHostedTour: isAHostedTour,
-          ),
-        );
-      },
-    );
+          );
   }
 
   Widget _buildTourGuideContent() {
@@ -148,6 +153,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                 return const TourCreatorScreen();
               }));
+              setState(() {});
             },
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(ButtonColors.primary),

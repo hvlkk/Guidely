@@ -12,7 +12,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:guidely/main.dart';
 
-import 'package:guidely/widgets/user_image_picker_widget.dart';
+import 'package:guidely/widgets/models/user_image_picker_widget.dart';
 import 'package:guidely/models/entities/user.dart'
     // ignore: library_prefixes
     as TourUser; // Renamed to avoid conflict with FirebaseAuth
@@ -51,8 +51,8 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<String> _getFcmToken() async {
-    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-    String? token = await _firebaseMessaging.getToken();
+    final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
+    String? token = await firebaseMessaging.getToken();
     return token ?? '';
   }
 
@@ -63,7 +63,6 @@ class _AuthScreenState extends State<AuthScreen> {
     }
 
     final usernameAvailable = await _checkUsernameAvailability();
-    print(usernameAvailable);
     if (!usernameAvailable) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

@@ -9,7 +9,7 @@ import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/models/data/tour_event_location.dart';
 import 'package:guidely/models/data/waypoint.dart';
 import 'package:guidely/models/utils/location_input.dart';
-import 'package:guidely/screens/util/map.dart';
+import 'package:guidely/screens/util/map_selector.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_third.dart';
 import 'package:guidely/widgets/customs/custom_location_container.dart';
@@ -82,7 +82,7 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
     final pickedLocations = await Navigator.of(context).push<List<LatLng>>(
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (ctx) => const MapScreen(),
+        builder: (ctx) => const MapSelectorScreen(),
       ),
     );
     if (pickedLocations == null) {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/models/data/tour_event_location.dart';
 
-class MapScreen extends StatefulWidget {
-  const MapScreen({
+class MapSelectorScreen extends StatefulWidget {
+  const MapSelectorScreen({
     super.key,
     this.initialLocation = const TourEventLocation(
       latitude: 37.422,
@@ -19,10 +19,10 @@ class MapScreen extends StatefulWidget {
   final bool isSelecting;
   final int maxWaypoints; // Maximum number of waypoints
   @override
-  State<MapScreen> createState() => _MapScreenState();
+  State<MapSelectorScreen> createState() => _MapSelectorScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapSelectorScreenState extends State<MapSelectorScreen> {
   final List<LatLng> _pickedLocations = [];
 
   @override

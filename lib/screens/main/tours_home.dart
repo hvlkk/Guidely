@@ -230,6 +230,27 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                                                 style: const TextStyle(
                                                     fontSize: 16),
                                               ),
+                                              const SizedBox(height: 15),
+                                              GestureDetector(
+                                                child: const Text(
+                                                  'Learn more',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: MainColors.accent,
+                                                  ),
+                                                ),
+                                                onTap: () {
+                                                  Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                      builder: (ctx) =>
+                                                          TourDetailsScreen(
+                                                        tour: selectedTour,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
                                               const SizedBox(height: 20),
                                               Align(
                                                 alignment: Alignment.center,
