@@ -42,6 +42,7 @@ class TourListItemUpcoming extends StatelessWidget {
                       child: const Text('Announce'),
                     )
                   : const SizedBox(),
+              const SizedBox(width: 5),
               ElevatedButton(
                 onPressed: () => onGetDetails?.call(),
                 style: ElevatedButton.styleFrom(

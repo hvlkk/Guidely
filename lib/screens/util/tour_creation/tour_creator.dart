@@ -71,7 +71,8 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       return;
     }
     // validate the date
-    if (_selectedDate.isBefore(DateTime.now())) {
+    DateTime yesterday = DateTime.now().subtract(Duration(days: 1));
+    if (_selectedDate.isBefore(yesterday)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please select a correct date.'),

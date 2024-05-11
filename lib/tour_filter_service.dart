@@ -32,12 +32,15 @@ class TourFilterService {
       }).toList();
     } else if (tourType == TourType.past) {
       return tours.where((tour) {
-        return tour.tourDetails.startDate.isBefore(DateTime.now());
+        final yesterday = DateTime.now().subtract(const Duration(days: 1));
+        return tour.tourDetails.startDate.isBefore(yesterday);
       }).toList();
     } else {
       // live tours
       return tours.where((tour) {
-        return tour.tourDetails.startDate.isAtSameMomentAs(DateTime.now());
+        return tour.tourDetails.startDate.day == (DateTime.now().day) &&
+            tour.tourDetails.startDate.month == (DateTime.now().month) &&
+            tour.tourDetails.startDate.year == (DateTime.now().year);
       }).toList();
     }
   }
