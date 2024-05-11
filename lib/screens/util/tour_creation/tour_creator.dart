@@ -17,8 +17,7 @@ class TourCreatorScreen extends StatefulWidget {
 class _TourCreatorScreenState extends State<TourCreatorScreen> {
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
-  TimeOfDay _selectedDuration =
-      const TimeOfDay(hour: 2, minute: 0); // Initial duration set to 2 hours
+  TimeOfDay _selectedDuration = const TimeOfDay(hour: 2, minute: 0);
   final _tourTitleController = TextEditingController();
   final _tourDescriptionController = TextEditingController();
 

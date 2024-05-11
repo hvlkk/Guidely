@@ -25,7 +25,7 @@ class TourFilterService {
     }).toList();
   }
 
-  static _filterTourType(TourType tourType, List<Tour> tours) {
+  static filterTourType(TourType tourType, List<Tour> tours) {
     if (tourType == TourType.upcoming) {
       return tours.where((tour) {
         return tour.tourDetails.startDate.isAfter(DateTime.now());
@@ -36,6 +36,9 @@ class TourFilterService {
       }).toList();
     } else {
       // live tours
+      return tours.where((tour) {
+        return tour.tourDetails.startDate.isAtSameMomentAs(DateTime.now());
+      }).toList();
     }
   }
 }
