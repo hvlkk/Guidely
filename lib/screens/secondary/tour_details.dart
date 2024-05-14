@@ -67,7 +67,7 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
           );
         } else {
           userData.bookedTours.add(tour.uid);
-          TourService.updateTourData(context, userData.uid, {
+          UserService.updateData(context, userData.uid, {
             'bookedTours': userData.bookedTours,
           });
 

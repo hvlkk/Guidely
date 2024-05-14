@@ -152,7 +152,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         ? userData.organizedTours.remove(tour.uid)
                         : null;
                     // update the user data in the database
-                    TourService.updateTourData(
+                    UserService.updateData(
                       context,
                       userData.uid,
                       {
@@ -201,7 +201,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         ? userData.organizedTours.remove(tour.uid)
                         : null;
                     // update the user data in the database
-                    TourService.updateTourData(
+                    UserService.updateData(
                       context,
                       userData.uid,
                       {

@@ -4,9 +4,7 @@ import 'package:guidely/repositories/tour_repository.dart';
 
 final tourRepositoryProvider = Provider((ref) => TourRepository());
 
-final toursStreamProvider = StreamProvider.autoDispose<List<Tour>>(
-  (ref) {
-    final repository = ref.read(tourRepositoryProvider);
-    return repository.getToursStream();
-  },
-);
+final toursStreamProvider = StreamProvider.autoDispose<List<Tour>>((ref) {
+  final repository = ref.read(tourRepositoryProvider);
+  return repository.getToursStream();
+});

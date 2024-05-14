@@ -3,6 +3,7 @@ import 'package:guidely/repositories/user_repository.dart';
 import 'package:guidely/services/firestore_service.dart';
 
 class UserService extends FirestoreService {
+  @override
   Future<void> update(
       String collectionPath, String docId, Map<String, dynamic> data) async {
     await UserRepository().updateUserData(docId, data);

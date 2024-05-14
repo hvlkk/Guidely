@@ -58,6 +58,7 @@ class Tour {
 
   factory Tour.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
     return Tour(
       uid: doc.id,
       tourDetails: TourCreationData.fromMap(data['tourDetails']),
