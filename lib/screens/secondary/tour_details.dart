@@ -1,7 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guidely/firestore_service.dart';
+import 'package:guidely/services/firestore_service.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
@@ -66,7 +66,7 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
           );
         } else {
           userData.bookedTours.add(tour.uid);
-          FirestoreService.updateUserData(userData.uid, {
+          FirestoreService.instance.updateUserData(userData.uid, {
             'bookedTours': userData.bookedTours,
           });
 
@@ -76,7 +76,7 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
               final tourIndex =
                   data.indexWhere((element) => element.uid == tour.uid);
               data[tourIndex].registeredUsers.add(userData.uid);
-              FirestoreService.updateTourData(tour.uid, {
+              FirestoreService.instance.updateTourData(tour.uid, {
                 'registeredUsers': data[tourIndex].registeredUsers,
               });
             },

@@ -15,7 +15,6 @@ class LocationService {
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
-
         return position;
       } catch (e) {
         // Handle error while getting the location
@@ -40,9 +39,9 @@ class LocationService {
 
   static List<Tour> findClosestToursToPosition(
       List<Tour> tours, Position userPosition, int k) {
-    const int MAX_DISTANCE = 100; // Maximum distance in kilometers
     // Calculate the distance from the user's position to each starting location of the tours
     List<Map<String, dynamic>> distances = [];
+    const int MAX_DISTANCE = 100; // Maximum distance in kilometers
     for (var tour in tours) {
       if (tour.tourDetails.waypoints!.isNotEmpty) {
         double distance = _calculateDistance(
@@ -50,10 +49,11 @@ class LocationService {
             userPosition.longitude,
             tour.tourDetails.waypoints![0].latitude,
             tour.tourDetails.waypoints![0].longitude);
-        if (distance <= MAX_DISTANCE) {
-          // set a limiter for the distance of the tours
-          distances.add({'tour': tour, 'distance': distance});
+        // set a limiter for the distance of the tours
+        if (distance > MAX_DISTANCE) {
+          continue;
         }
+        distances.add({'tour': tour, 'distance': distance});
       }
     }
 

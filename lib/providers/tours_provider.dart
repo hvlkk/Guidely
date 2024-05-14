@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/models/entities/tour.dart';
 
 // A provider that returns a stream of all tours
-final toursStreamProvider = StreamProvider.autoDispose<List<Tour>>((ref) {
-  return FirebaseFirestore.instance.collection('tours').snapshots().map(
-      (snapshot) =>
-          snapshot.docs.map((doc) => Tour.fromFirestore(doc)).toList());
-});
+final toursStreamProvider = StreamProvider.autoDispose<List<Tour>>(
+  (ref) {
+    return FirebaseFirestore.instance.collection('tours').snapshots().map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Tour.fromFirestore(doc)).toList(),
+        );
+  },
+);

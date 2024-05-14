@@ -38,10 +38,14 @@ class TourFilterService {
     } else {
       // live tours
       return tours.where((tour) {
-        return tour.tourDetails.startDate.day == (DateTime.now().day) &&
-            tour.tourDetails.startDate.month == (DateTime.now().month) &&
-            tour.tourDetails.startDate.year == (DateTime.now().year);
+        return _isSameDay(tour.tourDetails.startDate, DateTime.now());
       }).toList();
     }
+  }
+
+  static bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.day == date2.day &&
+        date1.month == date2.month &&
+        date1.year == date2.year;
   }
 }

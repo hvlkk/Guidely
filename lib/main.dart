@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guidely/location_service.dart';
+import 'package:guidely/services/location_service.dart';
 import 'package:guidely/screens/main/auth.dart';
 import 'package:guidely/screens/main/profile.dart';
 import 'package:guidely/screens/main/tours.dart';
@@ -15,7 +15,7 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Request location permission
   await LocationService.requestLocationPermission();
 
