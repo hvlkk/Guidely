@@ -4,7 +4,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class LocationService {
+// TODO: Composite this class to separate the location finding logic from the tour finding logic
+class LocationFinder {
   static Future<Position> getLocation() async {
     // Check if location permission is granted
     var permissionStatus = await Permission.location.status;

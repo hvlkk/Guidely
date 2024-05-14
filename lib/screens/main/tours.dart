@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guidely/services/firestore_service.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
@@ -8,7 +7,9 @@ import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
-import 'package:guidely/services/tour_filter_service.dart';
+import 'package:guidely/utils/tour_filter.dart';
+import 'package:guidely/services/tour_service.dart';
+import 'package:guidely/services/user_service.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item_upcoming.dart';
 
 class ToursScreen extends ConsumerStatefulWidget {
@@ -72,6 +73,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
           tourDataAsync.when(
             data: (tours) {
               List<Tour> res = [];
+              // filters the tours that are either booked or organized by this user
               for (final tour in tours) {
                 if (!userData.bookedTours.contains(tour.uid) &&
                     !userData.organizedTours.contains(tour.uid)) {
@@ -79,15 +81,15 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 }
                 res.add(tour);
               }
-              upcomingTours = TourFilterService.filterTourType(
+              upcomingTours = TourFilter.filterTourType(
                 TourType.upcoming,
                 res,
               );
-              pastTours = TourFilterService.filterTourType(
+              pastTours = TourFilter.filterTourType(
                 TourType.past,
                 res,
               );
-              liveTours = TourFilterService.filterTourType(
+              liveTours = TourFilter.filterTourType(
                 TourType.live,
                 res,
               );
@@ -150,7 +152,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         ? userData.organizedTours.remove(tour.uid)
                         : null;
                     // update the user data in the database
-                    FirestoreService.instance.updateUserData(
+                    TourService.updateTourData(
+                      context,
                       userData.uid,
                       {
                         'bookedTours': userData.bookedTours,
@@ -198,7 +201,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         ? userData.organizedTours.remove(tour.uid)
                         : null;
                     // update the user data in the database
-                    FirestoreService.instance.updateUserData(
+                    TourService.updateTourData(
+                      context,
                       userData.uid,
                       {
                         'bookedTours': userData.bookedTours,
@@ -246,7 +250,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         ? userData.organizedTours.remove(tour.uid)
                         : null;
                     // update the user data in the database
-                    FirestoreService.instance.updateUserData(
+                    UserService.updateData(
+                      context,
                       userData.uid,
                       {
                         'bookedTours': userData.bookedTours,

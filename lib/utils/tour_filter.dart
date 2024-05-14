@@ -8,7 +8,7 @@ enum TourType {
 
 enum FilterBy { title, location, activities, description }
 
-class TourFilterService {
+class TourFilter {
   static filterSearchBar(String filterValue, List<Tour> tours) {
     return tours.where((tour) {
       return tour.tourDetails.title

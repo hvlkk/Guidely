@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:guidely/services/location_service.dart';
+import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
@@ -54,7 +54,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
     tourDataAsync.map<List<Tour>>(
       data: (tours) {
         if (_currentPosition != null) {
-          final closestTours = LocationService.findClosestToursToPosition(
+          final closestTours = LocationFinder.findClosestToursToPosition(
             tours as List<Tour>,
             _currentPosition!,
             3, // Get the 3 closest tours

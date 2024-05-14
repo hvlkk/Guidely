@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:guidely/services/location_service.dart';
+import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
-import 'package:guidely/services/tour_filter_service.dart';
+import 'package:guidely/utils/tour_filter.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 
@@ -59,7 +59,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
       data: (tours) {
         tourDataUnfiltered = tours;
         if (_currentPosition != null) {
-          final closestTours = LocationService.findClosestToursToPosition(
+          final closestTours = LocationFinder.findClosestToursToPosition(
             tours,
             _currentPosition!,
             3, // Get the 3 closest tours
@@ -173,8 +173,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                           child: Icon(Icons.search),
                           onTap: () {
                             // Search for tours based on the search bar input
-                            final filteredTours =
-                                TourFilterService.filterSearchBar(
+                            final filteredTours = TourFilter.filterSearchBar(
                               _searchScreenController.text,
                               tourDataUnfiltered,
                             );

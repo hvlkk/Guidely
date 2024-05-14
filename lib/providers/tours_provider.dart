@@ -1,13 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/repositories/tour_repository.dart';
 
-// A provider that returns a stream of all tours
+final tourRepositoryProvider = Provider((ref) => TourRepository());
+
 final toursStreamProvider = StreamProvider.autoDispose<List<Tour>>(
   (ref) {
-    return FirebaseFirestore.instance.collection('tours').snapshots().map(
-          (snapshot) =>
-              snapshot.docs.map((doc) => Tour.fromFirestore(doc)).toList(),
-        );
+    final repository = ref.read(tourRepositoryProvider);
+    return repository.getToursStream();
   },
 );
