@@ -1,7 +1,6 @@
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guidely/services/firestore_service.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
