@@ -47,6 +47,56 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
     });
   }
 
+  Future _buildSearchResultsScreen(
+    BuildContext context,
+    List<Tour> filteredTours,
+    String searchQuery,
+  ) {
+    return Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Search Results for: $searchQuery',
+                style: TextStyle(
+                  fontFamily: poppinsFont.fontFamily,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            body: ListView.builder(
+              itemCount: filteredTours.length,
+              itemBuilder: (BuildContext context, int index) {
+                final tour = filteredTours[index];
+                return Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigate to a new page when the TourListItem is tapped
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TourDetailsScreen(
+                            tour: tour,
+                          ),
+                        ),
+                      );
+                    },
+                    child: TourListItem(
+                      tour: tour,
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final tourDataAsyncUnfiltered = ref.watch(
@@ -177,8 +227,12 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                               _searchScreenController.text,
                               tourDataUnfiltered,
                             );
-                            print(filteredTours);
-                            // TODO - Display the filtered tours
+                            // navigate to a new page with the filtered tours
+                            _buildSearchResultsScreen(
+                              context,
+                              filteredTours,
+                              _searchScreenController.text,
+                            );
                           },
                         ),
                       ],

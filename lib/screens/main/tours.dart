@@ -8,7 +8,6 @@ import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
 import 'package:guidely/utils/tour_filter.dart';
-import 'package:guidely/services/tour_service.dart';
 import 'package:guidely/services/user_service.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item_upcoming.dart';
 

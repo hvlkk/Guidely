@@ -1,15 +1,10 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guidely/blocs/secondary/tour_details_bloc.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
-import 'package:guidely/models/entities/user.dart';
-import 'package:guidely/providers/tours_provider.dart';
-import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/secondary/user_profile.dart';
-import 'package:guidely/services/tour_service.dart';
-import 'package:guidely/services/user_service.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
 import 'package:guidely/widgets/entities/review_list_item.dart';
 
@@ -30,13 +25,19 @@ class TourDetailsScreen extends ConsumerStatefulWidget {
 class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
   int currentIndex = 0;
   bool showFullDescription = false;
-  bool isBooked = false;
+  late TourDetailsBloc _bloc;
 
   Tour get tour => widget.tour;
 
   @override
   void initState() {
     super.initState();
+    _bloc = TourDetailsBloc(ref, tour);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   void _previousImage() {
@@ -55,108 +56,18 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
   }
 
   void _uploadBooking(BuildContext context) {
-    final user = ref.watch(userDataProvider);
-
-    user.when(
-      data: (userData) async {
-        if (userData.organizedTours.contains(tour.uid)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('You cannot book your own tour!'),
-            ),
-          );
-        } else {
-          userData.bookedTours.add(tour.uid);
-          UserService.updateData(context, userData.uid, {
-            'bookedTours': userData.bookedTours,
-          });
-
-          final tours = ref.watch(toursStreamProvider);
-          tours.when(
-            data: (data) {
-              final tourIndex =
-                  data.indexWhere((element) => element.uid == tour.uid);
-              data[tourIndex].registeredUsers.add(userData.uid);
-              UserService.updateData(context, tour.uid, {
-                'registeredUsers': data[tourIndex].registeredUsers,
-              });
-            },
-            error: (Object error, StackTrace stackTrace) {},
-            loading: () {},
-          );
-          try {
-            final callable =
-                FirebaseFunctions.instance.httpsCallable('sendNotification');
-            await callable({'tourId': tour.uid});
-          } catch (e) {
-            print(e);
-          }
-        }
-      },
-      error: (Object error, StackTrace stackTrace) {},
-      loading: () {},
-    );
-  }
-
-  void _checkIfBooked(BuildContext context) {
-    if (isBooked) {
-      return;
-    }
-    final user = ref.watch(userDataProvider);
-    user.when(
-      data: (userData) {
-        setState(() {
-          isBooked = userData.bookedTours.contains(tour.uid);
-        });
-      },
-      error: (Object error, StackTrace stackTrace) {},
-      loading: () {},
-    );
+    print("eimai ston patera");
+    _bloc.uploadBooking(context);
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    _checkIfBooked(context);
+    _bloc.checkIfBooked();
+
     String truncatedDescription = tour.tourDetails.description.length > 250
         ? '${tour.tourDetails.description.substring(0, 250)}...'
         : tour.tourDetails.description;
-
-    // TEMP CODE FOR DEBUGGING
-    List<Review> reviews = [];
-
-    Review review1 = Review(
-      grade: 5,
-      comment: 'Great tour!',
-      date: DateTime.now(),
-      user: User(
-        uid: '1',
-        username: 'John Doe',
-        email: 'ippo@example.com',
-        imageUrl: 'assets/images/user.png',
-        bookedTours: [],
-        organizedTours: [],
-        fcmToken: '',
-      ),
-    );
-
-    Review review2 = Review(
-      grade: 4,
-      comment: 'Nice tour!',
-      date: DateTime.now(),
-      user: User(
-        uid: '2',
-        username: 'Jane Doe',
-        email: 'jane@example',
-        imageUrl: 'assets/images/user.png',
-        bookedTours: [],
-        organizedTours: [],
-        fcmToken: '',
-      ),
-    );
-
-    reviews.add(review1);
-    reviews.add(review2);
-    // END TEMP CODE
 
     return Scaffold(
       appBar: AppBar(),
@@ -168,7 +79,7 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
               Stack(
                 children: [
                   Image.asset(
-                    'assets/images/tours/tour2.jpg', // this should be tour's image uploaded or received by an api
+                    'assets/images/tours/tour2.jpg',
                     width: double.infinity,
                     height: 200,
                     fit: BoxFit.cover,
@@ -388,7 +299,7 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                 ],
               ),
               const SizedBox(height: 10),
-              isBooked
+              _bloc.isBooked
                   ? ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
@@ -433,9 +344,6 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                           ),
                         );
                         _uploadBooking(context);
-                        setState(() {
-                          isBooked = true;
-                        });
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ButtonColors.attention,
@@ -447,7 +355,7 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Book now',
+                        'Book Now',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -536,18 +444,30 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(
-                height: 300,
-                child: ListView.builder(
-                  itemCount: reviews.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: ReviewListItem(review: reviews[index]),
-                    );
-                  },
-                ),
-              ),
+              // StreamBuilder<List<Review>>(
+              //   stream: _bloc.reviewsStream,
+              //   builder: (context, snapshot) {
+              //     if (snapshot.hasData) {
+              //       return SizedBox(
+              //         height: 300,
+              //         child: ListView.builder(
+              //           itemCount: snapshot.data!.length,
+              //           itemBuilder: (context, index) {
+              //             return Padding(
+              //               padding: const EdgeInsets.all(5.0),
+              //               child:
+              //                   ReviewListItem(review: snapshot.data![index]),
+              //             );
+              //           },
+              //         ),
+              //       );
+              //     } else if (snapshot.hasError) {
+              //       return Text('Error: ${snapshot.error}');
+              //     } else {
+              //       return const CircularProgressIndicator();
+              //     }
+              //   },
+              // ),
             ],
           ),
         ),
