@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guidely/blocs/main/tours_bloc.dart' as toursBloc;
+import 'package:guidely/blocs/main/tours_bloc.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
-import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
-import 'package:guidely/utils/tour_filter.dart';
-import 'package:guidely/services/user_service.dart';
-import 'package:guidely/widgets/entities/tour_list_item/tour_list_item_upcoming.dart';
+import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 
 class ToursScreen extends ConsumerStatefulWidget {
-  const ToursScreen({Key? key});
+  const ToursScreen({super.key});
 
   @override
   _ToursScreenState createState() => _ToursScreenState();
 }
 
 class _ToursScreenState extends ConsumerState<ToursScreen> {
-  final List<String> tabNames = ['Past tours', 'Live tours', 'Upcoming tours'];
+  final TourBloc _tourBloc = toursBloc.TourBloc();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _tourBloc.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,19 +53,20 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
-                    // navigate to the add tour screen
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) {
-                      return const TourCreatorScreen();
-                    }));
-                    setState(() {});
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const TourCreatorScreen(),
+                      ),
+                    );
                   },
                 ),
               ];
             }
             return null;
           },
-          orElse: () => [],
+          orElse: () {
+            return null;
+          },
         ),
       ),
       body: userDataAsync.when(
@@ -66,53 +77,51 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
           child: Text('Error: $error'),
         ),
         data: (userData) {
-          List<Tour> upcomingTours = [];
-          List<Tour> pastTours = [];
-          List<Tour> liveTours = [];
-          tourDataAsync.when(
+          return tourDataAsync.when(
             data: (tours) {
-              List<Tour> res = [];
-              // filters the tours that are either booked or organized by this user
-              for (final tour in tours) {
-                if (!userData.bookedTours.contains(tour.uid) &&
-                    !userData.organizedTours.contains(tour.uid)) {
-                  continue;
-                }
-                res.add(tour);
-              }
-              upcomingTours = TourFilter.filterTourType(
-                TourType.upcoming,
-                res,
-              );
-              pastTours = TourFilter.filterTourType(
-                TourType.past,
-                res,
-              );
-              liveTours = TourFilter.filterTourType(
-                TourType.live,
-                res,
+              _tourBloc.loadTours(userData, tours);
+              return StreamBuilder<toursBloc.TourState>(
+                stream: _tourBloc.state,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.active) {
+                    final state = snapshot.data;
+                    if (state is toursBloc.ToursLoaded) {
+                      return DefaultTabController(
+                        length: 3,
+                        child: Scaffold(
+                          appBar: const TabBar(
+                            tabs: [
+                              Tab(text: 'Past'),
+                              Tab(text: 'Live now'),
+                              Tab(text: 'Upcoming'),
+                            ],
+                          ),
+                          body: TabBarView(
+                            children: [
+                              _buildTourList(
+                                  state.pastTours, _buildPastActions),
+                              _buildTourList(
+                                  state.liveTours, _buildLiveActions),
+                              _buildTourList(
+                                  state.upcomingTours, _buildUpcomingActions),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else if (state is toursBloc.TourError) {
+                      return Center(child: Text('Error: ${state.error}'));
+                    }
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
               );
             },
-            loading: () => [],
-            error: (error, stackTrace) => [],
-          );
-          return DefaultTabController(
-            length: tabNames.length,
-            child: Scaffold(
-              appBar: const TabBar(
-                tabs: [
-                  Tab(text: 'Past'),
-                  Tab(text: 'Live now'),
-                  Tab(text: 'Upcoming'),
-                ],
-              ),
-              body: TabBarView(
-                children: [
-                  _buildPast(pastTours, userData),
-                  _buildLive(liveTours, userData),
-                  _buildUpcoming(upcomingTours, userData),
-                ],
-              ),
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, stackTrace) => Center(
+              child: Text('Error: $error'),
             ),
           );
         },
@@ -120,150 +129,92 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
     );
   }
 
-  Widget _buildUpcoming(List<Tour> tourDataFiltered, User userData) {
-    return tourDataFiltered.isEmpty
+  Widget _buildTourList(List<Tour> tours, actionBuilder) {
+    return tours.isEmpty
         ? Center(
-            child: Text('No upcoming tours',
-                style: poppinsFont.copyWith(fontSize: 15)))
+            child: Text(
+              'No tours available',
+              style: poppinsFont.copyWith(fontSize: 15),
+            ),
+          )
         : ListView.builder(
-            itemCount: tourDataFiltered.length,
+            itemCount: tours.length,
             itemBuilder: (BuildContext context, int index) {
-              final tour = tourDataFiltered[index];
-              final isAHostedTour = userData.organizedTours.contains(tour.uid);
+              final tour = tours[index];
               return Padding(
                 padding: const EdgeInsets.all(8),
-                child: TourListItemUpcoming(
-                  tour: tour,
-                  onGetDetails: () {
-                    // navigate to the tour details screen
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return TourDetailsScreen(tour: tour);
-                        },
-                      ),
-                    );
-                  },
-                  onCancel: () async {
-                    // cancel the tour
-                    userData.bookedTours.remove(tour.uid);
-                    isAHostedTour
-                        ? userData.organizedTours.remove(tour.uid)
-                        : null;
-                    // update the user data in the database
-                    UserService.updateData(
-                      context,
-                      userData.uid,
-                      {
-                        'bookedTours': userData.bookedTours,
-                        'organizedTours': userData.organizedTours,
-                      },
-                    );
-                    // force a rebuild of the widget
-                    setState(() {});
-                  },
-                  isHostedTour: isAHostedTour,
+                child: Column(
+                  children: [
+                    TourListItem(tour: tour),
+                    Row(
+                      children: actionBuilder(tour),
+                    ),
+                  ],
                 ),
               );
             },
           );
   }
 
-  Widget _buildLive(List<Tour> tourDataFiltered, User userData) {
-    return tourDataFiltered.isEmpty
-        ? Center(
-            child: Text('No live tours',
-                style: poppinsFont.copyWith(fontSize: 15)))
-        : ListView.builder(
-            itemCount: tourDataFiltered.length,
-            itemBuilder: (BuildContext context, int index) {
-              final tour = tourDataFiltered[index];
-              final isAHostedTour = userData.organizedTours.contains(tour.uid);
-              return Padding(
-                padding: const EdgeInsets.all(8),
-                child: TourListItemUpcoming(
-                  tour: tour,
-                  onGetDetails: () {
-                    // navigate to the tour details screen
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return TourDetailsScreen(tour: tour);
-                        },
-                      ),
-                    );
-                  },
-                  onCancel: () async {
-                    // cancel the tour
-                    userData.bookedTours.remove(tour.uid);
-                    isAHostedTour
-                        ? userData.organizedTours.remove(tour.uid)
-                        : null;
-                    // update the user data in the database
-                    UserService.updateData(
-                      context,
-                      userData.uid,
-                      {
-                        'bookedTours': userData.bookedTours,
-                        'organizedTours': userData.organizedTours,
-                      },
-                    );
-                    // force a rebuild of the widget
-                    setState(() {});
-                  },
-                  isHostedTour: isAHostedTour,
-                ),
-              );
-            },
+  List<Widget> _buildUpcomingActions(Tour tour) {
+    bool isAHostedTour = true;
+
+    return [
+      if (isAHostedTour)
+        OutlinedButton(
+          onPressed: () {
+            // Action for announcing the tour
+          },
+          child: const Text('Announce'),
+        ),
+      OutlinedButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TourDetailsScreen(tour: tour),
+            ),
           );
+        },
+        child: const Text('Get Info'),
+      ),
+      TextButton(
+        onPressed: () {
+          _tourBloc.cancelTour(tour, context);
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.red,
+        ),
+        child: const Text('Cancel'),
+      ),
+    ];
   }
 
-  Widget _buildPast(List<Tour> tourDataFiltered, User userData) {
-    return tourDataFiltered.isEmpty
-        ? Center(
-            child: Text('No past tours',
-                style: poppinsFont.copyWith(fontSize: 15)))
-        : ListView.builder(
-            itemCount: tourDataFiltered.length,
-            itemBuilder: (BuildContext context, int index) {
-              final tour = tourDataFiltered[index];
-              final isAHostedTour = userData.organizedTours.contains(tour.uid);
-              return Padding(
-                padding: const EdgeInsets.all(8),
-                child: TourListItemUpcoming(
-                  tour: tour,
-                  onGetDetails: () {
-                    // navigate to the tour details screen
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return TourDetailsScreen(tour: tour);
-                        },
-                      ),
-                    );
-                  },
-                  onCancel: () async {
-                    // cancel the tour
-                    userData.bookedTours.remove(tour.uid);
-                    isAHostedTour
-                        ? userData.organizedTours.remove(tour.uid)
-                        : null;
-                    // update the user data in the database
-                    UserService.updateData(
-                      context,
-                      userData.uid,
-                      {
-                        'bookedTours': userData.bookedTours,
-                        'organizedTours': userData.organizedTours,
-                      },
-                    );
-                    // force a rebuild of the widget
-                    setState(() {});
-                  },
-                  isHostedTour: isAHostedTour,
-                ),
-              );
-            },
-          );
+  List<Widget> _buildLiveActions(Tour tour) {
+    return [
+      OutlinedButton(
+        onPressed: () {
+          // Action for joining the tour now
+        },
+        child: const Text('Join Now'),
+      ),
+      OutlinedButton(
+        onPressed: () {
+          // Action for getting directions
+        },
+        child: const Text('Get Directions'),
+      ),
+    ];
+  }
+
+  List<Widget> _buildPastActions(Tour tour) {
+    return [
+      OutlinedButton(
+        onPressed: () {
+          // Action for adding a review
+        },
+        child: const Text('Review Now'),
+      ),
+    ];
   }
 }

@@ -56,7 +56,6 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
   }
 
   void _uploadBooking(BuildContext context) {
-    print("eimai ston patera");
     _bloc.uploadBooking(context);
     setState(() {});
   }
