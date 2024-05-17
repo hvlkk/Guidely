@@ -1,4 +1,5 @@
 import 'package:guidely/models/data/registration_data.dart';
+import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 
 class User {
   final String uid;
@@ -6,7 +7,7 @@ class User {
   final String email;
   final String imageUrl;
   final String fcmToken;
-  late bool isTourGuide = false;
+  TourGuideAuthState authState;
   late RegistrationData registrationData =
       RegistrationData(description: '', uid: '', uploadedIdURL: '');
   List<String> bookedTours;
@@ -18,7 +19,7 @@ class User {
     required this.email,
     required this.imageUrl,
     required this.fcmToken,
-    this.isTourGuide = false,
+    this.authState = TourGuideAuthState.unauthenticated,
     required this.bookedTours,
     required this.organizedTours,
     registrationData,
@@ -30,7 +31,7 @@ class User {
       'username': username,
       'email': email,
       'imageUrl': imageUrl,
-      'isTourGuide': isTourGuide,
+      'authState': authState.index,
       'bookedTours': bookedTours,
       'organizedTours': organizedTours,
       'fcmToken': fcmToken,
@@ -43,7 +44,7 @@ class User {
       username: map['username'] ?? '',
       email: map['email'] ?? '',
       imageUrl: map['imageUrl'] ?? '',
-      isTourGuide: map['isTourGuide'] ?? false,
+      authState: TourGuideAuthState.values[map['tourGuideAuthState'] ?? 0],
       bookedTours: List<String>.from(map['bookedTours'] ?? []),
       organizedTours: List<String>.from(map['organizedTours'] ?? []),
       registrationData: RegistrationData.fromMap(map['registrationData'] ?? {}),
@@ -56,7 +57,7 @@ class User {
     String? username,
     String? email,
     String? imageUrl,
-    bool? isTourGuide,
+    required TourGuideAuthState authState,
     required List<String> bookedTours,
     required List<String> organizedTours,
     RegistrationData? registrationData,
@@ -66,7 +67,7 @@ class User {
       username: username ?? this.username,
       email: email ?? this.email,
       imageUrl: imageUrl ?? this.imageUrl,
-      isTourGuide: isTourGuide ?? this.isTourGuide,
+      authState: authState,
       bookedTours: bookedTours,
       organizedTours: organizedTours,
       registrationData: registrationData,
@@ -74,10 +75,8 @@ class User {
     );
   }
 
-  get isGuide => isTourGuide;
-
   @override
   String toString() {
-    return 'User{uid: $uid, username: $username, email: $email, isTourGuide: $isTourGuide, bookedTours: $bookedTours, organizedTours: $organizedTours, registrationData: $registrationData}';
+    return 'User{uid: $uid, username: $username, email: $email, tourGuideAuthState: $authState, bookedTours: $bookedTours, organizedTours: $organizedTours, registrationData: $registrationData}';
   }
 }

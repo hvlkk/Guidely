@@ -7,6 +7,7 @@ import 'package:guidely/blocs/main/tours_bloc.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
+import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
@@ -56,7 +57,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
           data: (userData) {
             _userData = userData;
 
-            if (userData.isTourGuide) {
+            if (userData.authState == TourGuideAuthState.authenticated) {
               return [
                 IconButton(
                   icon: const Icon(Icons.add),
@@ -170,7 +171,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
 
   List<Widget> _buildUpcomingActions(Tour tour) {
     return [
-      if (_userData.isTourGuide)
+      if (_userData.authState == TourGuideAuthState.authenticated)
         OutlinedButton(
           onPressed: () {
             // Action for announcing the tour

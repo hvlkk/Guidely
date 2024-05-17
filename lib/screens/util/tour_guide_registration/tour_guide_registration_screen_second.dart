@@ -7,10 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/registration_data.dart';
+import 'package:guidely/models/entities/user.dart' as myuser;
+import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/util/tour_guide_registration/tour_registration_template.dart';
 import 'package:guidely/widgets/models/user_image_picker_widget.dart';
-import 'package:guidely/models/entities/user.dart' as myuser;
 import 'package:image_picker/image_picker.dart'; // alias to avoid conflicts
 
 class TourGuideRegistrationScreenSecond extends ConsumerStatefulWidget {
@@ -39,7 +40,7 @@ class _TourGuideRegistrationScreenSecondState
     );
 
     final updatedUser = user.copyWith(
-      isTourGuide: true,
+      authState: TourGuideAuthState.pending,
       registrationData: registrationData,
       bookedTours: [],
       organizedTours: [],
@@ -51,7 +52,7 @@ class _TourGuideRegistrationScreenSecondState
           .doc(updatedUser.uid)
           .set(
         {
-          'isTourGuide': true,
+          'authState': TourGuideAuthState.pending.index,
           'registrationData': registrationData.toJson(),
         },
         SetOptions(merge: true), // Merge with existing data

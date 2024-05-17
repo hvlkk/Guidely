@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
-import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/models/entities/review.dart';
+import 'package:guidely/models/entities/user.dart';
+import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/widgets/entities/review_list_item.dart';
 
 class UserProfileScreen extends StatelessWidget {
@@ -37,7 +38,7 @@ class UserProfileScreen extends StatelessWidget {
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              if (user.isTourGuide) ...[
+              if (user.authState == TourGuideAuthState.authenticated) ...[
                 const Text(
                   'Tour Guide',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

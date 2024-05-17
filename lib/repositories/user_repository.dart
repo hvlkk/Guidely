@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:guidely/models/entities/user.dart' as myuser;
+import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 
 // reponsible for crud operations on user data
 class UserRepository {
@@ -17,7 +18,7 @@ class UserRepository {
       imageUrl: data['imageUrl'],
       email: data['email'],
       uid: data['uid'],
-      isTourGuide: data['isTourGuide'] ?? false,
+      authState: TourGuideAuthState.values[data['authState'] ?? 0],
       registrationData: data['registrationData'] ?? {},
       bookedTours: List<String>.from(data['bookedTours'] ?? []),
       organizedTours: List<String>.from(data['organizedTours'] ?? []),
