@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Moderation Panel</title>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="static/assets/logo.png" alt="Logo" class="logo">
+            <h2>Admin Panel</h2>
+        </div>
+        <ul class="menu">
+            <li>Menu</li>
+            <li><img src="/static/assets/tour-guide.png" alt="Tour Guide Icon" class="menu-icon"> Tour Guides</li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <header>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search Tour Guides here">
+                <button class="search-btn">🔍</button>
+            </div>
+            <div class="user-profile">
+                <span>Ippo</span>
+                <img src="static/assets/avatar.jpg" alt="User" class="user-icon">
+            </div>
+        </header>
+        <div class="content">
+            <h1>Tour Guides Listing</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sr No</th>
+                        <th>Tour Guide</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="requests-list">
+                    <!-- REQUESTS DYNAMICALLY -->
+                </tbody>
+            </table>
+            <div id="no-results-text" style="display: none; text-align: center; padding: 20px; font-weight: bold;">No results found</div> 
+            <div class="pagination">
+                <span>Rows per page: 10</span>
+                <span id="pagination-info"></span>
+                <button id="prev-page" class="pagination-btn">❮</button>
+                <button id="next-page" class="pagination-btn">❯</button>
+            </div>            
+        </div>
+    </div>
+
+    <template id="request-template">
+        <tr>
+            <td class="sr-no"></td>
+            <td>
+                <a href="#" class="name"></a>
+            </td>
+            <td>
+                <button class="reject-btn">Reject</button>
+                <button class="approve-btn">Approve</button>
+            </td>
+        </tr>
+    </template>
+    
+    <script src="/static/scripts.js"></script>
+</body>
+</html>
