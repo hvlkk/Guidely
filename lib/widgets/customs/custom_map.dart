@@ -44,7 +44,6 @@ class CustomMap extends StatelessWidget {
             zoomGesturesEnabled: true,
             onTap: (LatLng latLng) {
               // Handle taps
-              print("I was tapped at $latLng");
               onTapWaypoint(latLng);
             },
           ),

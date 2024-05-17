@@ -70,16 +70,16 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       );
       return;
     }
-    // validate the date
-    DateTime yesterday = DateTime.now().subtract(Duration(days: 1));
-    if (_selectedDate.isBefore(yesterday)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a correct date.'),
-        ),
-      );
-      return;
-    }
+    // // validate the date
+    // DateTime yesterday = DateTime.now().subtract(Duration(days: 1));
+    // if (_selectedDate.isBefore(yesterday)) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: Text('Please select a correct date.'),
+    //     ),
+    //   );
+    //   return;
+    // }
 
     final tourData = TourCreationData(
       title: _tourTitleController.text,

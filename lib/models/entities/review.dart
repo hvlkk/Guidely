@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Review {
   const Review({
     required this.grade,
@@ -7,9 +9,19 @@ class Review {
     required this.tourId,
   });
 
-  final int grade;
+  final double grade;
   final String comment;
-  final DateTime date;
+  final Timestamp date;
   final String uid;
   final String tourId;
+
+  static fromMap(review) {
+    return Review(
+      grade: review['grade'],
+      comment: review['comment'],
+      date: review['date'],
+      uid: review['userId'],
+      tourId: review['tourId'],
+    );
+  }
 }

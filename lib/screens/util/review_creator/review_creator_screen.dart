@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:guidely/blocs/util/review_bloc.dart';
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/widgets/customs/custom_text_field.dart';
 
 class ReviewCreatorScreen extends StatefulWidget {
-  const ReviewCreatorScreen({super.key, required this.tour});
+  const ReviewCreatorScreen(
+      {super.key, required this.tour, required this.userData});
 
   final Tour tour;
+  final User userData;
 
   @override
   State<ReviewCreatorScreen> createState() => _ReviewCreatorScreenState();
@@ -17,12 +20,12 @@ class ReviewCreatorScreen extends StatefulWidget {
 
 class _ReviewCreatorScreenState extends State<ReviewCreatorScreen> {
   late final _reviewBloc;
-  late final String rating;
+  late final double rating;
 
   @override
   void initState() {
     super.initState();
-    _reviewBloc = ReviewBloc();
+    _reviewBloc = ReviewBloc(userData: widget.userData);
   }
 
   @override
@@ -34,8 +37,8 @@ class _ReviewCreatorScreenState extends State<ReviewCreatorScreen> {
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(height: 25),
             Text(
               'Create a review for ${widget.tour.tourDetails.title}',
               style: const TextStyle(fontSize: 20),
@@ -55,13 +58,14 @@ class _ReviewCreatorScreenState extends State<ReviewCreatorScreen> {
                 color: Colors.amber,
               ),
               onRatingUpdate: (rating) {
-                this.rating = rating.toString();
+                this.rating = rating;
               },
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                _reviewBloc.submitReview(rating, widget.tour.uid);
+                _reviewBloc.submitReview(rating, widget.tour);
+                setState(() {});
               },
               child: const Text('Save'),
             ),

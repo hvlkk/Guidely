@@ -9,7 +9,7 @@ class ReviewService {
       'userId': review.uid,
       'comment': review.comment,
       'grade': review.grade,
-      'date': review.date.toIso8601String(),
+      'date': review.date,
     };
     await TourService.updateTourData(tourId, {
       // here arrayUnion is used to add the review to the reviews array

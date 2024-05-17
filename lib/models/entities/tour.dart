@@ -15,6 +15,7 @@ class Tour {
     required this.tourDetails,
     required this.uid,
     required this.organizer,
+    required this.reviews,
     this.duration = const TimeOfDay(hour: 2, minute: 0),
     this.images = const [],
   });
@@ -26,7 +27,7 @@ class Tour {
   final String uid;
 
   final List<String> registeredUsers = [];
-  final List<Review> reviews = [];
+  final List<Review> reviews;
 
   final TourState state = TourState.upcoming;
   final double rating = 4.0;
@@ -55,23 +56,30 @@ class Tour {
       images: List<String>.from(map['images'] ?? []),
       organizer: User.fromMap(map['organizer']),
       uid: map['uid'],
+      reviews: List<Review>.from(
+        map['reviews']?.map((review) => Review.fromMap(review)) ?? [],
+      ),
     );
   }
 
   factory Tour.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 
-    return Tour(
-      uid: doc.id,
+    Tour tour = Tour(
+      uid: data['uid'],
       tourDetails: TourCreationData.fromMap(data['tourDetails']),
       duration: TimeOfDay(hour: data['duration'] ?? 0, minute: 0),
       images: List<String>.from(data['images'] ?? []),
       organizer: User.fromMap(data['organizer']),
+      reviews: List<Review>.from(
+          data['reviews']?.map((review) => Review.fromMap(review)) ?? []),
     );
+    print(tour);
+    return tour;
   }
 
   @override
   String toString() {
-    return 'Tour(tourDetails: $tourDetails, duration: $duration, images: $images, organizer: $organizer, state: $state, rating: $rating)';
+    return 'Tour(tou, duration: $duration, images: $images, organizer: $organizer, state: $state, rating: $rating, uid: $uid, registeredUsers: $registeredUsers, reviews: $reviews)';
   }
 }

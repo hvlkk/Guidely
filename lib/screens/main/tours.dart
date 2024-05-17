@@ -6,6 +6,7 @@ import 'package:guidely/blocs/main/tours_bloc.dart' as toursBloc;
 import 'package:guidely/blocs/main/tours_bloc.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
@@ -22,6 +23,7 @@ class ToursScreen extends ConsumerStatefulWidget {
 
 class _ToursScreenState extends ConsumerState<ToursScreen> {
   final TourBloc _tourBloc = toursBloc.TourBloc();
+  late User _userData;
 
   @override
   void initState() {
@@ -51,6 +53,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         ),
         actions: userDataAsync.maybeWhen(
           data: (userData) {
+            _userData = userData;
+
             if (userData.isTourGuide) {
               return [
                 IconButton(
@@ -160,11 +164,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildUpcomingActions(Tour tour) {
-    bool isAHostedTour =
-        true; // fix to check if the user is the host of the tour
-
     return [
-      if (isAHostedTour)
+      if (_userData.isTourGuide)
         OutlinedButton(
           onPressed: () {
             // Action for announcing the tour
@@ -212,14 +213,34 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildPastActions(Tour tour) {
+    bool userHasReviewed =
+        tour.reviews.any((review) => review.uid == _userData.uid);
+
     return [
-      OutlinedButton(
-        onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-            return ReviewCreatorScreen(tour: tour);
-          }));
-        },
-        child: const Text('Review Now'),
+      ElevatedButton(
+        onPressed: userHasReviewed
+            ? () {} // No action when user has reviewed
+            : () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return ReviewCreatorScreen(
+                        tour: tour,
+                        userData: _userData,
+                      );
+                    },
+                  ),
+                );
+              },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: userHasReviewed ? Colors.green : Colors.grey,
+        ),
+        child: Text(
+          userHasReviewed ? 'Reviewed' : 'Review',
+          style: TextStyle(
+            color: userHasReviewed ? Colors.white : Colors.black,
+          ),
+        ),
       ),
     ];
   }

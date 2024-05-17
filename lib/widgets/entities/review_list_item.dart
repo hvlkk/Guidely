@@ -21,7 +21,7 @@ class ReviewListItem extends StatelessWidget {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: List.generate(
-            review.grade,
+            review.grade as int,
             (index) => const Icon(Icons.star, color: Colors.amber),
           ),
         ),
