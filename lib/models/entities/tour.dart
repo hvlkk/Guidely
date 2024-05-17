@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
+import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/user.dart';
 
 enum TourState {
@@ -13,9 +14,9 @@ class Tour {
   Tour({
     required this.tourDetails,
     required this.uid,
+    required this.organizer,
     this.duration = const TimeOfDay(hour: 2, minute: 0),
     this.images = const [],
-    required this.organizer,
   });
 
   final TourCreationData tourDetails;
@@ -25,6 +26,7 @@ class Tour {
   final String uid;
 
   final List<String> registeredUsers = [];
+  final List<Review> reviews = [];
 
   final TourState state = TourState.upcoming;
   final double rating = 4.0;

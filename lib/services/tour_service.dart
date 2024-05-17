@@ -1,6 +1,5 @@
 import 'package:guidely/repositories/tour_repository.dart';
 import 'package:guidely/services/firestore_service.dart';
-import 'package:flutter/material.dart';
 
 class TourService extends FirestoreService {
   @override
@@ -11,7 +10,7 @@ class TourService extends FirestoreService {
 
   // interface for updating tour data
   static Future<void> updateTourData(
-      BuildContext context, String uid, Map<String, dynamic> data) async {
+      String uid, Map<String, dynamic> data) async {
     final service = TourService();
     await service.update('tours', uid, data);
   }

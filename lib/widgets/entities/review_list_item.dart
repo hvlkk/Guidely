@@ -14,9 +14,9 @@ class ReviewListItem extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundImage: AssetImage(review.user.imageUrl),
-        ),
-        title: Text(review.user.username),
+            // backgroundImage: AssetImage(review.user.imageUrl),
+            ),
+        // title: Text(review.user.username),
         subtitle: Text(review.comment),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

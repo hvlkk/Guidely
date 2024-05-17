@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/blocs/main/tours_bloc.dart' as toursBloc;
@@ -7,6 +9,7 @@ import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
+import 'package:guidely/screens/util/review_creator/review_creator_screen.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 
@@ -157,7 +160,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildUpcomingActions(Tour tour) {
-    bool isAHostedTour = true;
+    bool isAHostedTour =
+        true; // fix to check if the user is the host of the tour
 
     return [
       if (isAHostedTour)
@@ -211,7 +215,9 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
     return [
       OutlinedButton(
         onPressed: () {
-          // Action for adding a review
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+            return ReviewCreatorScreen(tour: tour);
+          }));
         },
         child: const Text('Review Now'),
       ),

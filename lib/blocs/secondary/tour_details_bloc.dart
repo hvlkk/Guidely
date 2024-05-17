@@ -5,6 +5,7 @@ import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/services/tour_service.dart';
 import 'package:guidely/services/user_service.dart';
 
 class TourDetailsBloc {
@@ -51,7 +52,7 @@ class TourDetailsBloc {
               final tourIndex =
                   data.indexWhere((element) => element.uid == tour.uid);
               data[tourIndex].registeredUsers.add(userData.uid);
-              UserService.updateData(context, tour.uid, {
+              TourService.updateTourData(tour.uid, {
                 'registeredUsers': data[tourIndex].registeredUsers,
               });
             },

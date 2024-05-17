@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/blocs/secondary/tour_details_bloc.dart';
 import 'package:guidely/misc/common.dart';
-import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/screens/secondary/user_profile.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
-import 'package:guidely/widgets/entities/review_list_item.dart';
 
 class TourDetailsScreen extends ConsumerStatefulWidget {
   const TourDetailsScreen({
