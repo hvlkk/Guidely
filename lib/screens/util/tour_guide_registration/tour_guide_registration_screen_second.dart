@@ -11,6 +11,7 @@ import 'package:guidely/models/entities/user.dart' as myuser;
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/util/tour_guide_registration/tour_registration_template.dart';
+import 'package:guidely/services/http_post_service.dart';
 import 'package:guidely/widgets/models/user_image_picker_widget.dart';
 import 'package:image_picker/image_picker.dart'; // alias to avoid conflicts
 
@@ -52,7 +53,7 @@ class _TourGuideRegistrationScreenSecondState
           .doc(updatedUser.uid)
           .set(
         {
-          'authState': TourGuideAuthState.pending.index,
+          'authState': TourGuideAuthState.unauthenticated.index,
           'registrationData': registrationData.toJson(),
         },
         SetOptions(merge: true), // Merge with existing data
@@ -64,6 +65,17 @@ class _TourGuideRegistrationScreenSecondState
         ),
       );
     }
+
+    // Construct the body of the POST request
+    final Map<String, dynamic> requestBody = {
+      'uid': user.uid,
+      'username': user.username,
+      'email': user.email,
+      // Add other user data fields as needed
+    };
+
+    final userDataService = HttpPostService();
+    await userDataService.postUserData('/submit-user-data', requestBody);
 
     Navigator.of(context).popUntil(
       (route) => route.isFirst,

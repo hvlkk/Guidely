@@ -28,6 +28,26 @@ requests_data = [
     {"name": "Benjamin Thomas", "email": "benjamin@example.com", "message": "Let’s start the tours."}
 ]
 
+@app.route('/submit-user-data', methods=['POST'])
+def submit_user_data():
+    # Extract user data from the request body
+    data = request.json
+    uid = data.get('uid')
+    username = data.get('username')
+    email = data.get('email')
+    auth_state = data.get('authState')
+
+    # Process the user data (e.g., save to a database)
+    # Replace this with your actual data processing logic
+    print('Received user data:')
+    print('UID:', uid)
+    print('Username:', username)
+    print('Email:', email)
+    print('Auth State:', auth_state)
+
+    # Respond with a success message
+    return jsonify({'message': 'User data received successfully'})
+
 @app.route('/requests')
 def get_requests():
     page = int(request.args.get('page', 1))
