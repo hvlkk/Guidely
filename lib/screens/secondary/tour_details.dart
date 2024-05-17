@@ -5,6 +5,7 @@ import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/screens/secondary/user_profile.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
+import 'package:guidely/widgets/entities/review_list_item.dart';
 
 class TourDetailsScreen extends ConsumerStatefulWidget {
   const TourDetailsScreen({
@@ -441,30 +442,23 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              // StreamBuilder<List<Review>>(
-              //   stream: _bloc.reviewsStream,
-              //   builder: (context, snapshot) {
-              //     if (snapshot.hasData) {
-              //       return SizedBox(
-              //         height: 300,
-              //         child: ListView.builder(
-              //           itemCount: snapshot.data!.length,
-              //           itemBuilder: (context, index) {
-              //             return Padding(
-              //               padding: const EdgeInsets.all(5.0),
-              //               child:
-              //                   ReviewListItem(review: snapshot.data![index]),
-              //             );
-              //           },
-              //         ),
-              //       );
-              //     } else if (snapshot.hasError) {
-              //       return Text('Error: ${snapshot.error}');
-              //     } else {
-              //       return const CircularProgressIndicator();
-              //     }
-              //   },
-              // ),
+              const SizedBox(height: 10),
+              // add the reviews here
+              // use a listview to display the reviews
+              Center(
+                child: SizedBox(
+                  height: 300,
+                  child: ListView.builder(
+                    itemCount: tour.reviews.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: ReviewListItem(review: tour.reviews[index]),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -472,3 +466,28 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
     );
   }
 }
+
+// StreamBuilder<List<Review>>(
+//   stream: _bloc.reviewsStream,
+//   builder: (context, snapshot) {
+//     if (snapshot.hasData) {
+//       return SizedBox(
+//         height: 300,
+//         child: ListView.builder(
+//           itemCount: snapshot.data!.length,
+//           itemBuilder: (context, index) {
+//             return Padding(
+//               padding: const EdgeInsets.all(5.0),
+//               child:
+//                   ReviewListItem(review: snapshot.data![index]),
+//             );
+//           },
+//         ),
+//       );
+//     } else if (snapshot.hasError) {
+//       return Text('Error: ${snapshot.error}');
+//     } else {
+//       return const CircularProgressIndicator();
+//     }
+//   },
+// ),
