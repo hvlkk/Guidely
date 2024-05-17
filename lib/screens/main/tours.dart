@@ -13,6 +13,7 @@ import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/review_creator/review_creator_screen.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ToursScreen extends ConsumerStatefulWidget {
   const ToursScreen({super.key});
@@ -109,11 +110,11 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                           body: TabBarView(
                             children: [
                               _buildTourList(
-                                  state.pastTours, _buildPastActions),
+                                  state.pastTours, _buildPastActions, false),
                               _buildTourList(
-                                  state.liveTours, _buildLiveActions),
-                              _buildTourList(
-                                  state.upcomingTours, _buildUpcomingActions),
+                                  state.liveTours, _buildLiveActions, true),
+                              _buildTourList(state.upcomingTours,
+                                  _buildUpcomingActions, true),
                             ],
                           ),
                         ),
@@ -136,7 +137,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
     );
   }
 
-  Widget _buildTourList(List<Tour> tours, actionBuilder) {
+  Widget _buildTourList(
+      List<Tour> tours, actionBuilder, bool displayRemainingTime) {
     return tours.isEmpty
         ? Center(
             child: Text(
@@ -152,7 +154,10 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: [
-                    TourListItem(tour: tour),
+                    TourListItem(
+                      tour: tour,
+                      displayRemainingTime: displayRemainingTime,
+                    ),
                     Row(
                       children: actionBuilder(tour),
                     ),
@@ -205,7 +210,12 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
       ),
       OutlinedButton(
         onPressed: () {
-          // Action for getting directions
+          final startingLocationWaypoints = tour.tourDetails.startingLocation;
+          // open google maps with the starting location
+          openGoogleMaps(
+            startingLocationWaypoints.latitude,
+            startingLocationWaypoints.longitude,
+          );
         },
         child: const Text('Get Directions'),
       ),
@@ -243,5 +253,14 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         ),
       ),
     ];
+  }
+
+  Future<void> openGoogleMaps(double latitude, double longitude) async {
+    final googleMapsUrl = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude');
+
+    await canLaunchUrl(googleMapsUrl)
+        ? await launchUrl(googleMapsUrl)
+        : throw 'Could not launch $googleMapsUrl';
   }
 }
