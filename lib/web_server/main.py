@@ -36,6 +36,10 @@ def submit_user_data():
     username = data.get('username')
     email = data.get('email')
     auth_state = data.get('authState')
+    registration_data = data.get('registrationData')
+
+    description = registration_data.get('description')
+    uploaded_url = registration_data.get('uploadedUrl')
 
     # Process the user data (e.g., save to a database)
     # Replace this with your actual data processing logic
@@ -44,7 +48,19 @@ def submit_user_data():
     print('Username:', username)
     print('Email:', email)
     print('Auth State:', auth_state)
+    print('Description:', description)
+    print('Uploaded URL:', uploaded_url)
 
+     # Create new request data
+    new_request = {
+        "name": username,
+        "email": email,
+        "message": description
+    }
+
+    # Add the new request to the list of requests
+    requests_data.append(new_request)
+    
     # Respond with a success message
     return jsonify({'message': 'User data received successfully'})
 

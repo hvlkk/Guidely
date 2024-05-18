@@ -71,6 +71,7 @@ class _TourGuideRegistrationScreenSecondState
       'uid': user.uid,
       'username': user.username,
       'email': user.email,
+      'registrationData': registrationData.toJson(),
       // Add other user data fields as needed
     };
 
