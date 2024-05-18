@@ -53,7 +53,7 @@ class _TourGuideRegistrationScreenSecondState
           .doc(updatedUser.uid)
           .set(
         {
-          'authState': TourGuideAuthState.unauthenticated.index,
+          'authState': TourGuideAuthState.pending.index,
           'registrationData': registrationData.toJson(),
         },
         SetOptions(merge: true), // Merge with existing data
