@@ -48,6 +48,8 @@ def submit_user_data():
         "message": description
     }
 
+    print('new_request: ', new_request)
+
     requests_data = read_requests()
     requests_data.append(new_request)
     write_requests(requests_data)
@@ -63,6 +65,7 @@ def reject_request():
     # Convert request_index to an integer
     try:
         request_index = int(request_index)
+        print(request_index)
     except ValueError:
         return jsonify({'error': 'Invalid request index format'}), 400
 
@@ -82,11 +85,13 @@ def reject_request():
         # Get the user ID from the rejected request
         user_id = rejected_request.get('user_id')
 
+        print(user_id)
         if user_id:
             # Update AuthState in Firestore
             try:
                 user_ref = db.collection('users').document(user_id)
-                user_ref.update({'authState': 'unauthenticated'})
+                print(user_ref)
+                user_ref.update({'authState': 0})
             except Exception as e:
                 return jsonify({'error': f'Failed to update Firestore: {e}'}), 500
 
