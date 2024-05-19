@@ -60,44 +60,44 @@ def submit_user_data():
 def reject_request():
     """Endpoint to reject a request."""
     data = request.json
-    request_index = data.get('index')
+    user_id = data.get('userId') # Retrieve user_id instead of index
+    print('user_id: ', user_id)
 
-    # Convert request_index to an integer
-    try:
-        request_index = int(request_index)
-        print(request_index)
-    except ValueError:
-        return jsonify({'error': 'Invalid request index format'}), 400
+    if user_id:
+        # Read requests data from file
+        requests_data = read_requests()
 
-    # Read requests data from file
-    requests_data = read_requests()
-
-    if 0 <= request_index < len(requests_data):
-        # Remove the request at the specified index
-        rejected_request = requests_data.pop(request_index)
-
-        # Write updated requests data back to the file
-        write_requests(requests_data)
-
-        # Notify the mobile application that the request was rejected
-        notification_message = f"Request from {rejected_request['name']} was rejected"
+        # Find the request by user_id
+        rejected_request = None
+        for request_data in requests_data:
+            if request_data.get('user_id') == user_id:
+                rejected_request = request_data
+                break
         
-        # Get the user ID from the rejected request
-        user_id = rejected_request.get('user_id')
+        print('rejected_request: ', rejected_request)
+        if rejected_request:
+            # Remove the rejected request from the list
+            requests_data.remove(rejected_request)
 
-        print(user_id)
-        if user_id:
+            # Write updated requests data back to the file
+            write_requests(requests_data)
+
+            # Notify the mobile application that the request was rejected
+            notification_message = f"Request from {rejected_request['name']} was rejected"
+
             # Update AuthState in Firestore
             try:
                 user_ref = db.collection('users').document(user_id)
-                print(user_ref)
                 user_ref.update({'authState': 0})
             except Exception as e:
                 return jsonify({'error': f'Failed to update Firestore: {e}'}), 500
 
-        return jsonify({'message': 'Request rejected successfully', 'notification': notification_message})
+            return jsonify({'message': 'Request rejected successfully', 'notification': notification_message})
+        else:
+            return jsonify({'error': 'Request not found'}), 404
     else:
-        return jsonify({'error': 'Invalid request index'}), 400
+        return jsonify({'error': 'Missing user ID'}), 400
+
     
 @app.route('/requests')
 def get_requests():

@@ -1,100 +1,84 @@
 [
     {
+        "user_id": 1,
         "name": "James Taylor",
         "email": "james@example.com",
         "message": "Ready to start guiding."
     },
     {
+        "user_id": 2,
         "name": "Amelia Martinez",
         "email": "amelia@example.com",
         "message": "Passionate about local history."
     },
     {
+        "user_id": 3,
         "name": "Logan Hernandez",
         "email": "logan@example.com",
         "message": "Eager to meet new people."
     },
     {
+        "user_id": 4,
         "name": "Mia Lopez",
         "email": "mia@example.com",
         "message": "Ready to show the best spots."
     },
     {
-        "name": "Lucas Gonzalez",
-        "email": "lucas@example.com",
-        "message": "Tour guiding is my calling."
-    },
-    {
+        "user_id": 5,
         "name": "Harper Clark",
         "email": "harper@example.com",
         "message": "Excited to start this journey."
     },
     {
-        "name": "Ethan Lewis",
-        "email": "ethan@example.com",
-        "message": "Can\u00e2\u20ac\u2122t wait to begin guiding."
-    },
-    {
+        "user_id": 6,
         "name": "Avery Lee",
         "email": "avery@example.com",
         "message": "Looking forward to this new experience."
     },
     {
+        "user_id": 7,
         "name": "Daniel Walker",
         "email": "daniel@example.com",
         "message": "Happy to guide and assist."
     },
     {
-        "name": "Abigail Hall",
-        "email": "abigail@example.com",
-        "message": "Passionate about providing great tours."
-    },
-    {
+        "user_id": 8,
         "name": "Sebastian Allen",
         "email": "sebastian@example.com",
         "message": "Eager to start guiding tours."
     },
     {
-        "name": "Sofia Young",
-        "email": "sofia@example.com",
-        "message": "Looking forward to guiding adventures."
-    },
-    {
+        "user_id": 10,
         "name": "Matthew King",
         "email": "matthew@example.com",
         "message": "Excited to be part of the team."
     },
     {
-        "name": "Ella Wright",
-        "email": "ella@example.com",
-        "message": "Ready to share my knowledge."
-    },
-    {
+        "user_id": 12,
         "name": "Aiden Hill",
         "email": "aiden@example.com",
         "message": "Thrilled to start guiding."
     },
     {
+        "user_id": 13,
         "name": "Lily Scott",
         "email": "lily@example.com",
         "message": "Passionate about tour guiding."
     },
     {
+        "user_id": 14,
         "name": "Henry Green",
         "email": "henry@example.com",
         "message": "Eager to meet new people and guide them."
     },
     {
-        "name": "Scarlett Adams",
-        "email": "scarlett@example.com",
-        "message": "Can\u00e2\u20ac\u2122t wait to guide tours."
-    },
-    {
+        "user_id": 16,
         "name": "Alexander Baker",
         "email": "alexander@example.com",
         "message": "Happy to be a part of this journey."
     },
     {
+        "user_id": 17,
         "name": "Grace Nelson",
         "email": "grace@example.com",
         "message": "Excited to guide and explore."
