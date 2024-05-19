@@ -98,6 +98,49 @@ def reject_request():
     else:
         return jsonify({'error': 'Missing user ID'}), 400
 
+@app.route('/accept-request', methods=['POST'])
+def aveppro_request():
+    """Endpoint to accept a request."""
+    data = request.json
+    user_id = data.get('userId')  # Retrieve user_id from the request data
+    print('user_id: ', user_id)
+
+    if user_id:
+        # Read requests data from file
+        requests_data = read_requests()
+
+        # Find the request by user_id
+        approved_request = None
+        for request_data in requests_data:
+            if request_data.get('user_id') == user_id:
+                approved_request = request_data
+                break
+
+        print('accepted_request: ', approved_request)
+        if approved_request:
+            # Remove the rejected request from the list
+            requests_data.remove(approved_request)
+
+            # Write updated requests data back to the file
+            write_requests(requests_data)
+
+            # For demonstration, let's print a success message.
+            notification_message = f"Request from {approved_request['name']} was accepted"
+
+            # Update AuthState in Firestore or perform any other necessary actions
+            try:
+                user_ref = db.collection('users').document(user_id)
+                user_ref.update({'authState': 2})  # Update authState to indicate request accepted
+            except Exception as e:
+                return jsonify({'error': f'Failed to update Firestore: {e}'}), 500
+
+            return jsonify({'message': 'Request accepted successfully', 'notification': notification_message})
+        else:
+            return jsonify({'error': 'Request not found'}), 404
+    else:
+        return jsonify({'error': 'Missing user ID'}), 400
+
+
     
 @app.route('/requests')
 def get_requests():
