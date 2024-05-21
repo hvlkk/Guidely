@@ -5,14 +5,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/blocs/main/tours_bloc.dart' as toursBloc;
 import 'package:guidely/blocs/main/tours_bloc.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/entities/tour.dart' as toursModel;
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/screens/main/tour_session.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/review_creator/review_creator_screen.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
+import 'package:guidely/screens/util/waitingforhost.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -25,7 +28,7 @@ class ToursScreen extends ConsumerStatefulWidget {
 
 class _ToursScreenState extends ConsumerState<ToursScreen> {
   final TourBloc _tourBloc = toursBloc.TourBloc();
-  late User _userData;
+  User? _userData;
 
   @override
   void initState() {
@@ -55,9 +58,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         ),
         actions: userDataAsync.maybeWhen(
           data: (userData) {
-            _userData = userData;
-
             if (userData.authState == TourGuideAuthState.authenticated) {
+              _userData = userData;
               return [
                 IconButton(
                   icon: const Icon(Icons.add),
@@ -86,6 +88,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
           child: Text('Error: $error'),
         ),
         data: (userData) {
+          // Assign _userData when data is available
+          _userData = userData;
           return tourDataAsync.when(
             data: (tours) {
               _tourBloc.loadTours(userData, tours);
@@ -171,7 +175,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
 
   List<Widget> _buildUpcomingActions(Tour tour) {
     return [
-      if (_userData.authState == TourGuideAuthState.authenticated)
+      if (_userData != null &&
+          _userData!.authState == TourGuideAuthState.authenticated)
         OutlinedButton(
           onPressed: () {
             // Action for announcing the tour
@@ -202,10 +207,50 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildLiveActions(Tour tour) {
+    final isAHoster = _userData?.organizedTours.contains(tour.uid) ?? false;
+    final tourHasStarted = tour.state == toursModel.TourState.live;
     return [
       OutlinedButton(
         onPressed: () {
-          // Action for joining the tour now
+          // If the user is a hoster, ask him to start the tour
+          if (isAHoster && !tourHasStarted) {
+            // Start the tour
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Start Tour'),
+                  content: const Text('Do you want to start the tour?'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('Start'),
+                      onPressed: () {
+                        _tourBloc.startTour();
+                        Navigator.of(context).pop();
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => tourHasStarted
+                    ? const TourSessionScreen()
+                    : WaitingForHostScreen(
+                        tour: tour,
+                      ),
+              ),
+            );
+          }
         },
         child: const Text('Join Now'),
       ),
@@ -224,9 +269,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildPastActions(Tour tour) {
-    bool userHasReviewed =
-        tour.reviews.any((review) => review.uid == _userData.uid);
-
+    final userHasReviewed =
+        tour.reviews.any((review) => review.uid == _userData?.uid);
     return [
       ElevatedButton(
         onPressed: userHasReviewed
@@ -237,7 +281,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                     builder: (context) {
                       return ReviewCreatorScreen(
                         tour: tour,
-                        userData: _userData,
+                        userData: _userData!,
                       );
                     },
                   ),

@@ -74,7 +74,6 @@ class Tour {
       reviews: List<Review>.from(
           data['reviews']?.map((review) => Review.fromMap(review)) ?? []),
     );
-    print(tour);
     return tour;
   }
 

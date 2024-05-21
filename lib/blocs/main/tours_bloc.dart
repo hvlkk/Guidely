@@ -7,9 +7,11 @@ import 'package:guidely/utils/tour_filter.dart';
 
 abstract class TourState {}
 
-class ToursLoading extends TourState {}
+abstract class TourLoadingState extends TourState {}
 
-class ToursLoaded extends TourState {
+class ToursLoading extends TourLoadingState {}
+
+class ToursLoaded extends TourLoadingState {
   final List<Tour> upcomingTours;
   final List<Tour> pastTours;
   final List<Tour> liveTours;
@@ -26,12 +28,25 @@ class TourError extends TourState {
   TourError({required this.error});
 }
 
+class TourSessionState extends TourState {
+  final bool isLive;
+
+  TourSessionState({required this.isLive});
+}
+
 class TourBloc {
   User? userData;
   List<Tour>? tours;
 
+  TourBloc() {
+    _sessionStateController.add(TourSessionState(isLive: false));
+  }
+
   final _stateController = StreamController<TourState>();
   Stream<TourState> get state => _stateController.stream;
+
+  final _sessionStateController = StreamController<TourSessionState>();
+  Stream<TourSessionState> get sessionState => _sessionStateController.stream;
 
   void loadTours(User user, List<Tour> tours) {
     userData = user;
@@ -86,5 +101,10 @@ class TourBloc {
 
   void dispose() {
     _stateController.close();
+    _sessionStateController.close();
+  }
+
+  void startTour() {
+    _sessionStateController.add(TourSessionState(isLive: true));
   }
 }

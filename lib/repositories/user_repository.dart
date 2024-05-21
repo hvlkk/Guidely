@@ -24,7 +24,6 @@ class UserRepository {
       organizedTours: List<String>.from(data['organizedTours'] ?? []),
       fcmToken: data['fcmToken'] ?? '',
     );
-
     return newUser;
   }
 
