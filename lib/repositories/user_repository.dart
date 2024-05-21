@@ -37,4 +37,23 @@ class UserRepository {
       rethrow;
     }
   }
+
+  // Retrieve user's via user id (uid)
+  Future<myuser.User> getUserById(String uid) async {
+    final userData = await _firestore.collection('users').doc(uid).get();
+    final data = userData.data() as Map<String, dynamic>;
+
+    final newUser = myuser.User(
+      username: data['username'],
+      imageUrl: data['imageUrl'],
+      email: data['email'],
+      uid: data['uid'],
+      authState: TourGuideAuthState.values[data['authState'] ?? 0],
+      registrationData: data['registrationData'] ?? {},
+      bookedTours: List<String>.from(data['bookedTours'] ?? []),
+      organizedTours: List<String>.from(data['organizedTours'] ?? []),
+      fcmToken: data['fcmToken'] ?? '',
+    );
+    return newUser;
+  }
 }

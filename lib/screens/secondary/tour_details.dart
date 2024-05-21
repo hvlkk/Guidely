@@ -67,6 +67,8 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
         ? '${tour.tourDetails.description.substring(0, 250)}...'
         : tour.tourDetails.description;
 
+    bool hasReviews = tour.reviews.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -319,7 +321,7 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                             const Duration(days: 365),
                           ),
                         );
-                        // _uploadBooking(context);
+                        _uploadBooking(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ButtonColors.attention,
@@ -424,18 +426,32 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
               // add the reviews here
               // use a listview to display the reviews
               Center(
-                child: SizedBox(
-                  height: 300,
-                  child: ListView.builder(
-                    itemCount: tour.reviews.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: ReviewListItem(review: tour.reviews[index]),
-                      );
-                    },
-                  ),
-                ),
+                child: hasReviews
+                    ? SizedBox(
+                        height: 300,
+                        child: ListView.builder(
+                          itemCount: tour.reviews.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child:
+                                  ReviewListItem(review: tour.reviews[index]),
+                            );
+                          },
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          'No reviews yet',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
               ),
             ],
           ),

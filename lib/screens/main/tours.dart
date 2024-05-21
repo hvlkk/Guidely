@@ -271,9 +271,10 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   List<Widget> _buildPastActions(Tour tour) {
     final userHasReviewed =
         tour.reviews.any((review) => review.uid == _userData?.uid);
+    final organizedByUser = _userData?.uid == tour.organizer.uid;
     return [
       ElevatedButton(
-        onPressed: userHasReviewed
+        onPressed: userHasReviewed || organizedByUser
             ? () {} // No action when user has reviewed
             : () {
                 Navigator.of(context).push(
@@ -288,12 +289,13 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 );
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: userHasReviewed ? Colors.green : Colors.grey,
+          backgroundColor: userHasReviewed || organizedByUser ? Colors.green : Colors.grey,
         ),
         child: Text(
+          organizedByUser ? 'Your Tour' :
           userHasReviewed ? 'Reviewed' : 'Review',
           style: TextStyle(
-            color: userHasReviewed ? Colors.white : Colors.black,
+            color: userHasReviewed || organizedByUser ? Colors.white : Colors.black,
           ),
         ),
       ),

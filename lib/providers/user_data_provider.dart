@@ -9,3 +9,10 @@ final userDataProvider = FutureProvider.autoDispose(
     return await repository.getUserData();
   },
 );
+
+final userSpecificDataProvider = FutureProvider.autoDispose.family(
+  (ref, String uid) async {
+    final repository = ref.read(userRepositoryProvider);
+    return await repository.getUserById(uid);
+  },
+);

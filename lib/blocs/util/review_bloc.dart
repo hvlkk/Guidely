@@ -36,6 +36,11 @@ class ReviewBloc {
       return false;
     }
 
+    // if (tour.organizer.uid == userData.uid) {
+    //   submitError('You cannot review your own tour');
+    //   return false;
+    // }
+
     Review review = Review(
       comment: comment,
       grade: rating,
