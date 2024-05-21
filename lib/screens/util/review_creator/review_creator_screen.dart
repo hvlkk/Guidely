@@ -20,7 +20,7 @@ class ReviewCreatorScreen extends StatefulWidget {
 
 class _ReviewCreatorScreenState extends State<ReviewCreatorScreen> {
   late final _reviewBloc;
-  late final double rating;
+  double rating = 0;
 
   @override
   void initState() {
@@ -64,8 +64,21 @@ class _ReviewCreatorScreenState extends State<ReviewCreatorScreen> {
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
-                _reviewBloc.submitReview(rating, widget.tour);
-                setState(() {});
+                if(_reviewBloc.submitReview(rating, widget.tour)) {
+                  setState(() {});
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Review submitted'),
+                    ),
+                  );
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a review'),
+                    ),
+                  );
+                }
               },
               child: const Text('Save'),
             ),
