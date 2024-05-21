@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class HttpPostService {
-  final String _baseUrl = 'http://localhost:5000'; 
+  final String _baseUrl = 'http://10.0.2.2:5000/';
 
-  Future<void> postUserData(String endpoint, Map<String, dynamic> requestBody) async {
+  Future<void> postUserData(
+      String endpoint, Map<String, dynamic> requestBody) async {
     try {
       final response = await http.post(
         Uri.parse(_baseUrl + endpoint),

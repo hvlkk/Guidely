@@ -8,7 +8,7 @@ class ReviewListItem extends StatelessWidget {
   });
 
   final Review review;
-
+  
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -16,7 +16,7 @@ class ReviewListItem extends StatelessWidget {
         leading: CircleAvatar(
             // backgroundImage: AssetImage(review.user.imageUrl),
             ),
-        // title: Text(review.user.username),
+        title: Text(review.uid),
         subtitle: Text(review.comment),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
