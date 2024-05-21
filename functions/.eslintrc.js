@@ -9,6 +9,7 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "google",
+    "prettier",
   ],
   rules: {
     "no-restricted-globals": ["error", "name", "length"],
