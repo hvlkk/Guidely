@@ -279,12 +279,20 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
+                                              // Image 
                                               const Text(
                                                 'Tour Details',
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.bold,
                                                 ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Image.asset(
+                                                'assets/images/tours/tour2.jpg',
+                                                width: double.infinity,
+                                                height: 200,
+                                                fit: BoxFit.cover,
                                               ),
                                               const SizedBox(height: 10),
                                               Text(

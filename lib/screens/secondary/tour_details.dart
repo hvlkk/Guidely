@@ -311,37 +311,15 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                     )
                   : ElevatedButton(
                       onPressed: () {
-                        showDialog(
+                        showDatePicker(
                           context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Booking'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Row(
-                                  children: [
-                                    Icon(Icons.check_circle,
-                                        color: Colors.green),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      'Booking successful!',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            ),
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime.now().add(
+                            const Duration(days: 365),
                           ),
                         );
-                        _uploadBooking(context);
+                        // _uploadBooking(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ButtonColors.attention,
@@ -466,6 +444,8 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
     );
   }
 }
+
+
 
 // StreamBuilder<List<Review>>(
 //   stream: _bloc.reviewsStream,
