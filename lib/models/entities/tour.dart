@@ -80,6 +80,6 @@ class Tour {
 
   @override
   String toString() {
-    return 'Tour(tou, duration: $duration, images: $images, organizer: $organizer, state: $state, rating: $rating, uid: $uid, registeredUsers: $registeredUsers, reviews: $reviews)';
+    return 'Tour(tour, duration: $duration, images: $images, organizer: $organizer, state: $state, rating: $rating, uid: $uid, registeredUsers: $registeredUsers, reviews: $reviews)';
   }
 }

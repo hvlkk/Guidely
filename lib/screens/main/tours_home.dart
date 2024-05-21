@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
+import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/utils/tour_filter.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
@@ -112,7 +112,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final closestTours = LocationFinder.findClosestToursToPosition(
             tours,
             _currentPosition!,
-            3, // Get the 3 closest tours
+            8, // Get the 3 closest tours
           );
           return closestTours;
         } else {
@@ -251,6 +251,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                             : CustomMap(
                                 waypoints: startLocations,
                                 withTrail: false,
+                                currentLocation: true,
                                 onTapWaypoint: (LatLng p0) {
                                   // Find the tour corresponding to the tapped waypoint
                                   final selectedTour =
