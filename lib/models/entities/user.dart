@@ -1,4 +1,5 @@
 import 'package:guidely/models/data/registration_data.dart';
+import 'package:guidely/models/entities/notification.dart';
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 
 class User {
@@ -12,6 +13,7 @@ class User {
       RegistrationData(description: '', uid: '', uploadedIdURL: '');
   List<String> bookedTours;
   List<String> organizedTours; // for organized tours of the host
+  List<Notification> notifications;
 
   User({
     required this.uid,
@@ -22,6 +24,7 @@ class User {
     this.authState = TourGuideAuthState.unauthenticated,
     required this.bookedTours,
     required this.organizedTours,
+    this.notifications = const [],
     registrationData,
   });
 

@@ -193,7 +193,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (ctx) {
-                                  return const NotificationsScreen();
+                                  return NotificationsScreen();
                                 },
                               ),
                             );
