@@ -45,6 +45,7 @@ class _TourGuideRegistrationScreenSecondState
       registrationData: registrationData,
       bookedTours: [],
       organizedTours: [],
+      notifications: [],
     );
 
     try {

@@ -24,7 +24,7 @@ class User {
     this.authState = TourGuideAuthState.unauthenticated,
     required this.bookedTours,
     required this.organizedTours,
-    this.notifications = const [],
+    required this.notifications,
     registrationData,
   });
 
@@ -37,6 +37,7 @@ class User {
       'authState': authState.index,
       'bookedTours': bookedTours,
       'organizedTours': organizedTours,
+      'notifications': notifications.map((notification) => notification.toMap()).toList(),
       'fcmToken': fcmToken,
     };
   }
@@ -50,6 +51,7 @@ class User {
       authState: TourGuideAuthState.values[map['tourGuideAuthState'] ?? 0],
       bookedTours: List<String>.from(map['bookedTours'] ?? []),
       organizedTours: List<String>.from(map['organizedTours'] ?? []),
+      notifications: List<Notification>.from(map['notifications']?.map((item) => Notification.fromMap(item)) ?? []),
       registrationData: RegistrationData.fromMap(map['registrationData'] ?? {}),
       fcmToken: map['fcmToken'] ?? '',
     );
@@ -63,6 +65,7 @@ class User {
     required TourGuideAuthState authState,
     required List<String> bookedTours,
     required List<String> organizedTours,
+    required List<Notification> notifications,
     RegistrationData? registrationData,
   }) {
     return User(
@@ -73,6 +76,7 @@ class User {
       authState: authState,
       bookedTours: bookedTours,
       organizedTours: organizedTours,
+      notifications: notifications,
       registrationData: registrationData,
       fcmToken: fcmToken,
     );

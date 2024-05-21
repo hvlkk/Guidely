@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/activity.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
+import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart'
     // ignore: library_prefixes
@@ -198,6 +199,11 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       bookedTours: List<String>.from(userData?['bookedTours'] ?? []),
       fcmToken: userData?['fcmToken'] ?? '',
       organizedTours: List<String>.from(userData?['organizedTours'] ?? []),
+      notifications: List<myNoti.Notification>.from(
+        userData?['notifications']
+                ?.map((item) => myNoti.Notification.fromMap(item)) ??
+            [],
+      ),
     );
 
     if (currentUser == null) {

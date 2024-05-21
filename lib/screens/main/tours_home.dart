@@ -14,6 +14,7 @@ import 'package:guidely/screens/util/notifications.dart';
 import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/utils/tour_filter.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
+import 'package:guidely/widgets/customs/custom_notification_icon.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 
 class ToursHomeScreen extends ConsumerStatefulWidget {
@@ -142,9 +143,15 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           }
 
           final jsonDataMap = Map<String, dynamic>.fromEntries(finalJsonData);
+          print(jsonDataMap);
 
           final username = jsonDataMap['username'];
           final imageUrl = jsonDataMap['imageUrl'];
+          final notifications = jsonDataMap['notifications'];
+          // filter notifications that are unread
+          final unreadNotifications = notifications
+              .where((notification) => !notification.isRead)
+              .toList();
 
           final _searchScreenController = TextEditingController();
           return Scaffold(
@@ -188,7 +195,9 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         ),
                         const Spacer(),
                         GestureDetector(
-                          child: const Icon(Icons.notifications, size: 30),
+                          child: CustomNotificationIcon(
+                              unreadCount: 6),
+                          // child: CustomNotificationIcon(unreadCount: unreadNotifications.length),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
@@ -279,7 +288,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              // Image 
+                                              // Image
                                               const Text(
                                                 'Tour Details',
                                                 style: TextStyle(
