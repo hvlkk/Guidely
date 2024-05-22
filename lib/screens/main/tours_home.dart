@@ -149,9 +149,9 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final imageUrl = jsonDataMap['imageUrl'];
           final notifications = jsonDataMap['notifications'];
           // filter notifications that are unread
-          final unreadNotifications = notifications
-              .where((notification) => !notification.isRead)
-              .toList();
+          // final unreadNotifications = notifications
+          //     .where((notification) => !notification.isRead)
+          //     .toList();
 
           final searchScreenController = TextEditingController();
           return Scaffold(
@@ -195,8 +195,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         ),
                         const Spacer(),
                         GestureDetector(
-                          child: CustomNotificationIcon(
-                              unreadCount: 6),
+                          child: CustomNotificationIcon(unreadCount: 6),
                           // child: CustomNotificationIcon(unreadCount: unreadNotifications.length),
                           onTap: () {
                             Navigator.of(context).push(

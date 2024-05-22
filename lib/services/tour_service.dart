@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:guidely/repositories/tour_repository.dart';
 import 'package:guidely/services/firestore_service.dart';
 
@@ -13,5 +14,10 @@ class TourService extends FirestoreService {
       String uid, Map<String, dynamic> data) async {
     final service = TourService();
     await service.update('tours', uid, data);
+  }
+
+  // Interface for streaming tour data by ID
+  static Stream<DocumentSnapshot> getTourStream(String tourId) {
+    return TourRepository().getTourStream(tourId);
   }
 }

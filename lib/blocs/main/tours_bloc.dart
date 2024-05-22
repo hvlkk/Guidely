@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
+import 'package:guidely/services/tour_service.dart';
 import 'package:guidely/services/user_service.dart';
 import 'package:guidely/utils/tour_filter.dart';
 
@@ -38,19 +39,12 @@ class TourBloc {
   User? userData;
   List<Tour>? tours;
 
-  TourBloc() {
-    _sessionStateController.add(TourSessionState(isLive: false));
-  }
-
   final _stateController = StreamController<TourState>();
   Stream<TourState> get state => _stateController.stream;
 
-  final _sessionStateController = StreamController<TourSessionState>();
-  Stream<TourSessionState> get sessionState => _sessionStateController.stream;
-
   void loadTours(User user, List<Tour> tours) {
-    userData = user;
     this.tours = tours;
+    userData = user;
     _loadTours();
   }
 
@@ -81,6 +75,10 @@ class TourBloc {
     }
   }
 
+  void startTour(Tour tour) {
+    TourService.updateTourData(tour.uid, {'state': 'live'});
+  }
+
   Future<void> cancelTour(Tour tour, BuildContext context) async {
     if (userData == null) return;
     final isAHostedTour = userData!.organizedTours.contains(tour.uid);
@@ -101,10 +99,5 @@ class TourBloc {
 
   void dispose() {
     _stateController.close();
-    _sessionStateController.close();
-  }
-
-  void startTour() {
-    _sessionStateController.add(TourSessionState(isLive: true));
   }
 }

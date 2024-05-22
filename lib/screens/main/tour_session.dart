@@ -10,6 +10,10 @@ class TourSessionScreen extends StatefulWidget {
 class _TourSessionScreenState extends State<TourSessionScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Scaffold(
+      body: Center(
+        child: Text('Tour session is live'),
+      ),
+    );
   }
 }

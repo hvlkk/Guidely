@@ -12,6 +12,10 @@ class TourRepository {
         );
   }
 
+  Stream<DocumentSnapshot> getTourStream(String tourId) {
+    return _firestore.collection('tours').doc(tourId).snapshots();
+  }
+
   Future<void> updateTourData(String uid, Map<String, dynamic> data) async {
     try {
       await _firestore.collection('tours').doc(uid).set(

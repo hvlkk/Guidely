@@ -231,7 +231,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                     TextButton(
                       child: const Text('Start'),
                       onPressed: () {
-                        _tourBloc.startTour();
+                        _tourBloc.startTour(tour);
                         Navigator.of(context).pop();
                         setState(() {});
                       },
@@ -289,13 +289,19 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 );
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: userHasReviewed || organizedByUser ? Colors.green : Colors.grey,
+          backgroundColor:
+              userHasReviewed || organizedByUser ? Colors.green : Colors.grey,
         ),
         child: Text(
-          organizedByUser ? 'Your Tour' :
-          userHasReviewed ? 'Reviewed' : 'Review',
+          organizedByUser
+              ? 'Your Tour'
+              : userHasReviewed
+                  ? 'Reviewed'
+                  : 'Review',
           style: TextStyle(
-            color: userHasReviewed || organizedByUser ? Colors.white : Colors.black,
+            color: userHasReviewed || organizedByUser
+                ? Colors.white
+                : Colors.black,
           ),
         ),
       ),
