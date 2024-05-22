@@ -1,17 +1,19 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
-import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/activity.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
+import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/models/entities/tour.dart';
-import 'package:guidely/models/utils/language.dart';
-import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 import 'package:guidely/models/entities/user.dart'
     // ignore: library_prefixes
     as TourUser; // Renamed to avoid conflict with FirebaseAuth
+import 'package:guidely/models/enums/tour_guide_auth_state.dart';
+import 'package:guidely/models/utils/language.dart';
+import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
+import 'package:uuid/uuid.dart';
 
 class TourCreatorThirdScreen extends StatefulWidget {
   TourCreatorThirdScreen({super.key, required this.tourData});
@@ -193,10 +195,15 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       username: userData?['username'] ?? '',
       email: userData?['email'] ?? '',
       imageUrl: userData?['imageUrl'] ?? '',
-      isTourGuide: userData?['isTourGuide'] ?? false,
+      authState: TourGuideAuthState.values[userData?['authState'] ?? 0],
       bookedTours: List<String>.from(userData?['bookedTours'] ?? []),
       fcmToken: userData?['fcmToken'] ?? '',
       organizedTours: List<String>.from(userData?['organizedTours'] ?? []),
+      notifications: List<myNoti.Notification>.from(
+        userData?['notifications']
+                ?.map((item) => myNoti.Notification.fromMap(item)) ??
+            [],
+      ),
     );
 
     if (currentUser == null) {

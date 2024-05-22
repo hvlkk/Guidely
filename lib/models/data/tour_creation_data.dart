@@ -29,6 +29,8 @@ class TourCreationData {
     return 'TourCreationData{title: $title, description: $description, startTime: $startTime, startDate: $startDate, waypoints: $waypoints, messageToParticipants: $messageToParticipants, activities: $activities, languages: $languages}';
   }
 
+  get startingLocation => waypoints?.first;
+
   TourCreationData copyWith({
     String? title,
     String? description,

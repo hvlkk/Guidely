@@ -85,7 +85,7 @@ class _TourCreatorScreenState extends State<TourCreatorScreen> {
       title: _tourTitleController.text,
       description: _tourDescriptionController.text,
       startDate: _selectedDate,
-      startTime: _selectedDuration,
+      startTime: _selectedTime,
       messageToParticipants: '',
     );
 

@@ -1,6 +1,8 @@
 import 'package:guidely/models/data/registration_data.dart';
 import 'package:guidely/models/utils/language.dart';
 import 'package:guidely/models/utils/tour_category.dart';
+import 'package:guidely/models/entities/notification.dart';
+import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 
 class User {
   final String uid;
@@ -15,11 +17,12 @@ class User {
   final DateTime? dateJoined;
   final String imageUrl;
   final String fcmToken;
-  late bool isTourGuide = false;
+  TourGuideAuthState authState;
   late RegistrationData registrationData =
       RegistrationData(description: '', uid: '', uploadedIdURL: '');
   List<String> bookedTours;
   List<String> organizedTours; // for organized tours of the host
+  List<Notification> notifications;
 
   User({
     required this.uid,
@@ -27,9 +30,10 @@ class User {
     required this.email,
     required this.imageUrl,
     required this.fcmToken,
-    this.isTourGuide = false,
+    this.authState = TourGuideAuthState.unauthenticated,
     required this.bookedTours,
     required this.organizedTours,
+    required this.notifications,
     registrationData,
     this.firstName = '',
     this.lastName = '',
@@ -51,9 +55,11 @@ class User {
       'languages': languages.map((language) => language.toMap()).toList(),
       'dateJoined': dateJoined?.toString(),
       'imageUrl': imageUrl,
-      'isTourGuide': isTourGuide,
+      'authState': authState.index,
       'bookedTours': bookedTours,
       'organizedTours': organizedTours,
+      'notifications':
+          notifications.map((notification) => notification.toMap()).toList(),
       'fcmToken': fcmToken,
     };
   }
@@ -73,9 +79,12 @@ class User {
       dateJoined:
           map['dateJoined'] != null ? DateTime.parse(map['dateJoined']) : null,
       imageUrl: map['imageUrl'] ?? '',
-      isTourGuide: map['isTourGuide'] ?? false,
+      authState: TourGuideAuthState.values[map['tourGuideAuthState'] ?? 0],
       bookedTours: List<String>.from(map['bookedTours'] ?? []),
       organizedTours: List<String>.from(map['organizedTours'] ?? []),
+      notifications: List<Notification>.from(
+          map['notifications']?.map((item) => Notification.fromMap(item)) ??
+              []),
       registrationData: RegistrationData.fromMap(map['registrationData'] ?? {}),
       fcmToken: map['fcmToken'] ?? '',
     );
@@ -92,9 +101,10 @@ class User {
     String? phoneNumber,
     List<Language>? languages,
     String? imageUrl,
-    bool? isTourGuide,
+    required TourGuideAuthState authState,
     required List<String> bookedTours,
     required List<String> organizedTours,
+    required List<Notification> notifications,
     RegistrationData? registrationData,
   }) {
     return User(
@@ -102,9 +112,10 @@ class User {
       username: username ?? this.username,
       email: email ?? this.email,
       imageUrl: imageUrl ?? this.imageUrl,
-      isTourGuide: isTourGuide ?? this.isTourGuide,
+      authState: authState,
       bookedTours: bookedTours,
       organizedTours: organizedTours,
+      notifications: notifications,
       registrationData: registrationData,
       fcmToken: fcmToken,
       firstName: firstName ?? this.firstName,
@@ -116,10 +127,8 @@ class User {
     );
   }
 
-  get isGuide => isTourGuide;
-
   @override
   String toString() {
-    return 'User{uid: $uid, username: $username, email: $email, isTourGuide: $isTourGuide, bookedTours: $bookedTours, organizedTours: $organizedTours, registrationData: $registrationData}';
+    return 'User{uid: $uid, username: $username, email: $email, tourGuideAuthState: $authState, bookedTours: $bookedTours, organizedTours: $organizedTours, registrationData: $registrationData}';
   }
 }

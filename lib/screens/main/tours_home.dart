@@ -6,14 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
+import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/utils/tour_filter.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
+import 'package:guidely/widgets/customs/custom_notification_icon.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 
 class ToursHomeScreen extends ConsumerStatefulWidget {
@@ -112,7 +113,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final closestTours = LocationFinder.findClosestToursToPosition(
             tours,
             _currentPosition!,
-            3, // Get the 3 closest tours
+            8, // Get the 3 closest tours
           );
           return closestTours;
         } else {
@@ -142,9 +143,15 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           }
 
           final jsonDataMap = Map<String, dynamic>.fromEntries(finalJsonData);
+          print(jsonDataMap);
 
           final username = jsonDataMap['username'];
           final imageUrl = jsonDataMap['imageUrl'];
+          final notifications = jsonDataMap['notifications'];
+          // filter notifications that are unread
+          final unreadNotifications = notifications
+              .where((notification) => !notification.isRead)
+              .toList();
 
           final searchScreenController = TextEditingController();
           return Scaffold(
@@ -188,12 +195,14 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         ),
                         const Spacer(),
                         GestureDetector(
-                          child: const Icon(Icons.notifications, size: 30),
+                          child: CustomNotificationIcon(
+                              unreadCount: 6),
+                          // child: CustomNotificationIcon(unreadCount: unreadNotifications.length),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (ctx) {
-                                  return const NotificationsScreen();
+                                  return NotificationsScreen();
                                 },
                               ),
                             );
@@ -251,6 +260,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                             : CustomMap(
                                 waypoints: startLocations,
                                 withTrail: false,
+                                currentLocation: true,
                                 onTapWaypoint: (LatLng p0) {
                                   // Find the tour corresponding to the tapped waypoint
                                   final selectedTour =
@@ -278,12 +288,20 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
+                                              // Image
                                               const Text(
                                                 'Tour Details',
                                                 style: TextStyle(
                                                   fontSize: 20,
                                                   fontWeight: FontWeight.bold,
                                                 ),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Image.asset(
+                                                'assets/images/tours/tour2.jpg',
+                                                width: double.infinity,
+                                                height: 200,
+                                                fit: BoxFit.cover,
                                               ),
                                               const SizedBox(height: 10),
                                               Text(

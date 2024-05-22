@@ -7,10 +7,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:guidely/screens/main/auth.dart';
 import 'package:guidely/models/entities/user.dart'
     // ignore: library_prefixes
     as TourUser; // Renamed to avoid conflict with FirebaseAuth
+import 'package:guidely/screens/main/auth.dart';
 
 class AuthBloc {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -94,6 +94,7 @@ class AuthBloc {
       imageUrl: imageURL,
       bookedTours: [],
       organizedTours: [],
+      notifications: [],
       fcmToken: token,
       dateJoined: DateTime.now(),
     );

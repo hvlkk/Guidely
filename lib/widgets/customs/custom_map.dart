@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/models/data/waypoint.dart';
+import 'package:guidely/utils/location_finder.dart';
 
 class CustomMap extends StatelessWidget {
   final List<Waypoint> waypoints;
   final bool withTrail;
+  final bool currentLocation;
 
   const CustomMap({
     super.key,
     required this.waypoints,
     required this.onTapWaypoint,
     this.withTrail = false,
+    this.currentLocation = false,
   });
 
   final void Function(LatLng p0) onTapWaypoint;
@@ -25,26 +28,44 @@ class CustomMap extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: LatLng(waypoints[0].latitude, waypoints[0].longitude),
-              zoom: 13.5,
-            ),
-            markers: withTrail
-                ? _buildColorfulMarkers()
-                : _buildOneColorMarkers(
-                    BitmapDescriptor.defaultMarkerWithHue(
-                        BitmapDescriptor.hueRed),
-                  ),
-            polylines: withTrail ? _buildPolylines(polylineCoordinates) : {},
-            onMapCreated: (GoogleMapController controller) {
-              // Controller is ready
-            },
-            scrollGesturesEnabled: true,
-            zoomGesturesEnabled: true,
-            onTap: (LatLng latLng) {
-              // Handle taps
-              onTapWaypoint(latLng);
+          child: FutureBuilder<LatLng?>(
+            future: currentLocation ? LocationFinder.getLocation().then((position) => LatLng(position.latitude, position.longitude)) : Future.value(null),
+            builder: (context, snapshot) {
+              LatLng? userLocation = snapshot.data;
+              return GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(waypoints[0].latitude, waypoints[0].longitude),
+                  zoom: 13.5,
+                ),
+                markers: {
+                  ...withTrail
+                      ? _buildColorfulMarkers()
+                      : _buildOneColorMarkers(
+                          BitmapDescriptor.defaultMarkerWithHue(
+                              BitmapDescriptor.hueRed),
+                        ),
+                  if (userLocation != null)
+                    Marker(
+                      markerId: MarkerId('currentLocation'),
+                      position: userLocation,
+                      icon: BitmapDescriptor.defaultMarkerWithHue(
+                          BitmapDescriptor.hueBlue),
+                      infoWindow: InfoWindow(title: "Your Location"),
+                    ),
+                },
+                polylines: withTrail ? _buildPolylines(polylineCoordinates) : {},
+                onMapCreated: (GoogleMapController controller) {
+                  // Controller is ready
+                },
+                scrollGesturesEnabled: true,
+                zoomGesturesEnabled: true,
+                rotateGesturesEnabled: true,
+                tiltGesturesEnabled: true,
+                onTap: (LatLng latLng) {
+                  // Handle taps
+                  onTapWaypoint(latLng);
+                },
+              );
             },
           ),
         ),

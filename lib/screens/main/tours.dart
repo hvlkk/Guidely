@@ -5,14 +5,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/blocs/main/tours_bloc.dart' as toursBloc;
 import 'package:guidely/blocs/main/tours_bloc.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/entities/tour.dart' as toursModel;
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
+import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/screens/main/tour_session.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/review_creator/review_creator_screen.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
+import 'package:guidely/screens/util/waitingforhost.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ToursScreen extends ConsumerStatefulWidget {
   const ToursScreen({super.key});
@@ -23,7 +28,7 @@ class ToursScreen extends ConsumerStatefulWidget {
 
 class _ToursScreenState extends ConsumerState<ToursScreen> {
   final TourBloc _tourBloc = toursBloc.TourBloc();
-  late User _userData;
+  User? _userData;
 
   @override
   void initState() {
@@ -53,9 +58,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         ),
         actions: userDataAsync.maybeWhen(
           data: (userData) {
-            _userData = userData;
-
-            if (userData.isTourGuide) {
+            if (userData.authState == TourGuideAuthState.authenticated) {
+              _userData = userData;
               return [
                 IconButton(
                   icon: const Icon(Icons.add),
@@ -84,6 +88,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
           child: Text('Error: $error'),
         ),
         data: (userData) {
+          // Assign _userData when data is available
+          _userData = userData;
           return tourDataAsync.when(
             data: (tours) {
               _tourBloc.loadTours(userData, tours);
@@ -109,11 +115,11 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                           body: TabBarView(
                             children: [
                               _buildTourList(
-                                  state.pastTours, _buildPastActions),
+                                  state.pastTours, _buildPastActions, false),
                               _buildTourList(
-                                  state.liveTours, _buildLiveActions),
-                              _buildTourList(
-                                  state.upcomingTours, _buildUpcomingActions),
+                                  state.liveTours, _buildLiveActions, true),
+                              _buildTourList(state.upcomingTours,
+                                  _buildUpcomingActions, true),
                             ],
                           ),
                         ),
@@ -136,7 +142,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
     );
   }
 
-  Widget _buildTourList(List<Tour> tours, actionBuilder) {
+  Widget _buildTourList(
+      List<Tour> tours, actionBuilder, bool displayRemainingTime) {
     return tours.isEmpty
         ? Center(
             child: Text(
@@ -152,7 +159,10 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 padding: const EdgeInsets.all(8),
                 child: Column(
                   children: [
-                    TourListItem(tour: tour),
+                    TourListItem(
+                      tour: tour,
+                      displayRemainingTime: displayRemainingTime,
+                    ),
                     Row(
                       children: actionBuilder(tour),
                     ),
@@ -165,7 +175,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
 
   List<Widget> _buildUpcomingActions(Tour tour) {
     return [
-      if (_userData.isTourGuide)
+      if (_userData != null &&
+          _userData!.authState == TourGuideAuthState.authenticated)
         OutlinedButton(
           onPressed: () {
             // Action for announcing the tour
@@ -196,16 +207,61 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildLiveActions(Tour tour) {
+    final isAHoster = _userData?.organizedTours.contains(tour.uid) ?? false;
+    final tourHasStarted = tour.state == toursModel.TourState.live;
     return [
       OutlinedButton(
         onPressed: () {
-          // Action for joining the tour now
+          // If the user is a hoster, ask him to start the tour
+          if (isAHoster && !tourHasStarted) {
+            // Start the tour
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Start Tour'),
+                  content: const Text('Do you want to start the tour?'),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('Start'),
+                      onPressed: () {
+                        _tourBloc.startTour();
+                        Navigator.of(context).pop();
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => tourHasStarted
+                    ? const TourSessionScreen()
+                    : WaitingForHostScreen(
+                        tour: tour,
+                      ),
+              ),
+            );
+          }
         },
         child: const Text('Join Now'),
       ),
       OutlinedButton(
         onPressed: () {
-          // Action for getting directions
+          final startingLocationWaypoints = tour.tourDetails.startingLocation;
+          // open google maps with the starting location
+          openGoogleMaps(
+            startingLocationWaypoints.latitude,
+            startingLocationWaypoints.longitude,
+          );
         },
         child: const Text('Get Directions'),
       ),
@@ -213,12 +269,12 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildPastActions(Tour tour) {
-    bool userHasReviewed =
-        tour.reviews.any((review) => review.uid == _userData.uid);
-
+    final userHasReviewed =
+        tour.reviews.any((review) => review.uid == _userData?.uid);
+    final organizedByUser = _userData?.uid == tour.organizer.uid;
     return [
       ElevatedButton(
-        onPressed: userHasReviewed
+        onPressed: userHasReviewed || organizedByUser
             ? () {} // No action when user has reviewed
             : () {
                 Navigator.of(context).push(
@@ -226,22 +282,32 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                     builder: (context) {
                       return ReviewCreatorScreen(
                         tour: tour,
-                        userData: _userData,
+                        userData: _userData!,
                       );
                     },
                   ),
                 );
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: userHasReviewed ? Colors.green : Colors.grey,
+          backgroundColor: userHasReviewed || organizedByUser ? Colors.green : Colors.grey,
         ),
         child: Text(
+          organizedByUser ? 'Your Tour' :
           userHasReviewed ? 'Reviewed' : 'Review',
           style: TextStyle(
-            color: userHasReviewed ? Colors.white : Colors.black,
+            color: userHasReviewed || organizedByUser ? Colors.white : Colors.black,
           ),
         ),
       ),
     ];
+  }
+
+  Future<void> openGoogleMaps(double latitude, double longitude) async {
+    final googleMapsUrl = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude');
+
+    await canLaunchUrl(googleMapsUrl)
+        ? await launchUrl(googleMapsUrl)
+        : throw 'Could not launch $googleMapsUrl';
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/util/profile/personal_information.dart';
 import 'package:guidely/screens/util/tour_guide_registration/tour_guide_registration.dart';
@@ -50,70 +51,85 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 25),
-              userData.isTourGuide
-                  ? Text(
-                      'Thank you for being a tour guide! (to be removed)',
-                      style: poppinsFont.copyWith(
-                        fontSize: 12,
-                        color: MainColors.primary,
-                        fontWeight: FontWeight.bold,
+              if (userData.authState == TourGuideAuthState.authenticated) ...[
+                Text(
+                  'Thank you for being a tour guide! (to be removed)',
+                  style: poppinsFont.copyWith(
+                    fontSize: 12,
+                    color: MainColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 25),
+              ] else if (userData.authState ==
+                  TourGuideAuthState.unauthenticated) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                  child: SizedBox(
+                    width: 310,
+                    height: 120,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: MainColors.background,
                       ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      child: SizedBox(
-                        width: 310,
-                        height: 120,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: MainColors.background,
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) {
+                              return TourGuideRegistrationScreen();
+                            },
                           ),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (ctx) {
-                                  return TourGuideRegistrationScreen();
-                                },
-                              ),
-                            );
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Become a tour guide',
-                                      style: poppinsFont.copyWith(
-                                        fontSize: 15,
-                                        color: MainColors.primary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Earn money by becoming a tour guide',
-                                      style: poppinsFont.copyWith(
-                                          fontSize: 10,
-                                          color: MainColors.textHint,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Become a tour guide',
+                                  style: poppinsFont.copyWith(
+                                    fontSize: 15,
+                                    color: MainColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 20),
-                              SvgPicture.asset(
-                                'assets/images/car.svg',
-                                height: 70,
-                              ),
-                            ],
+                                Text(
+                                  'Earn money by becoming a tour guide',
+                                  style: poppinsFont.copyWith(
+                                    fontSize: 10,
+                                    color: MainColors.textHint,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 20),
+                          SvgPicture.asset(
+                            'assets/images/car.svg',
+                            height: 70,
+                          ),
+                        ],
                       ),
                     ),
-              const SizedBox(height: 25),
+                  ),
+                ),
+                const SizedBox(height: 25),
+              ] else if (userData.authState == TourGuideAuthState.pending) ...[
+                Text(
+                  'Your tour guide status is pending. \nPlease wait for approval. (add styling)' ,
+                  style: poppinsFont.copyWith(
+                    fontSize: 12,
+                    color: MainColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 25),
+              ],
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Column(

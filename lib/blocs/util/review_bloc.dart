@@ -29,12 +29,17 @@ class ReviewBloc {
 
   TextEditingController get textContoller => _textContoller;
 
-  void submitReview(double rating, Tour tour) {
+  bool submitReview(double rating, Tour tour) {
     String comment = _textContoller.text;
     if (comment.isEmpty) {
       submitError('Please enter a review');
-      return;
+      return false;
     }
+
+    // if (tour.organizer.uid == userData.uid) {
+    //   submitError('You cannot review your own tour');
+    //   return false;
+    // }
 
     Review review = Review(
       comment: comment,
@@ -45,6 +50,7 @@ class ReviewBloc {
     );
     tour.reviews.add(review);
     ReviewService.addReview(tour.uid, review);
+    return true;
   }
 
   void submitError(String message) {

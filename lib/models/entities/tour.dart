@@ -89,7 +89,6 @@ class Tour {
             [],
       ),
     );
-    print(tour);
     return tour;
   }
 

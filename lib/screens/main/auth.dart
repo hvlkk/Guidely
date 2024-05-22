@@ -183,7 +183,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                     style: TextStyle(color: Colors.red),
                                   );
                                 }
-                                return SizedBox.shrink();
+                                return const SizedBox.shrink();
                               },
                             ),
                           ],

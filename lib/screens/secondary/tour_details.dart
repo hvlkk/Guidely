@@ -67,6 +67,8 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
         ? '${tour.tourDetails.description.substring(0, 250)}...'
         : tour.tourDetails.description;
 
+    bool hasReviews = tour.reviews.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -311,35 +313,11 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                     )
                   : ElevatedButton(
                       onPressed: () {
-                        showDialog(
+                        showDatePicker(
                           context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Booking'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Row(
-                                  children: [
-                                    Icon(Icons.check_circle,
-                                        color: Colors.green),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      'Booking successful!',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            ),
-                          ),
+                          initialDate: tour.tourDetails.startDate ?? DateTime.now(),
+                          firstDate: tour.tourDetails.startDate ?? DateTime.now(),
+                          lastDate: tour.tourDetails.startDate ?? DateTime.now(),
                         );
                         _uploadBooking(context);
                       },
@@ -446,18 +424,32 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
               // add the reviews here
               // use a listview to display the reviews
               Center(
-                child: SizedBox(
-                  height: 300,
-                  child: ListView.builder(
-                    itemCount: tour.reviews.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: ReviewListItem(review: tour.reviews[index]),
-                      );
-                    },
-                  ),
-                ),
+                child: hasReviews
+                    ? SizedBox(
+                        height: 300,
+                        child: ListView.builder(
+                          itemCount: tour.reviews.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child:
+                                  ReviewListItem(review: tour.reviews[index]),
+                            );
+                          },
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(
+                          'No reviews yet',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
               ),
             ],
           ),
@@ -466,6 +458,8 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
     );
   }
 }
+
+
 
 // StreamBuilder<List<Review>>(
 //   stream: _bloc.reviewsStream,
