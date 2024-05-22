@@ -61,7 +61,7 @@ class AuthBloc {
         await _signUp();
       }
     } on FirebaseAuthException catch (e) {
-      _errorController.add(e.message ?? 'An error occurred');
+      _errorController.add(e.message ?? 'Firebase authentication error');
     } catch (e) {
       _errorController.add('An unexpected error occurred');
     }

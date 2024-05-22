@@ -26,7 +26,6 @@ class _PersonalInformationScreenState
   String? _lastName;
   DateTime? _dateOfBirth;
   PhoneNumber _phoneNumber = PhoneNumber(isoCode: 'GR');
-  final TextEditingController _phoneNumberController = TextEditingController();
   final Set<Language> _selectedLanguages = {};
   final Set<TourCategory> _selectedCategories = {};
   late final String _uid;
@@ -44,7 +43,11 @@ class _PersonalInformationScreenState
       _firstName = user.firstName;
       _lastName = user.lastName;
       _dateOfBirth = user.dateOfBirth;
-      _phoneNumberController.text = user.phoneNumber ?? '';
+      _phoneNumber = user.phoneNumber != null
+          ? PhoneNumber(phoneNumber: user.phoneNumber)
+          : PhoneNumber(isoCode: 'GR');
+      _selectedLanguages.addAll(user.languages);
+      _selectedCategories.addAll(user.preferredTourCategories);
     });
   }
 
@@ -70,7 +73,12 @@ class _PersonalInformationScreenState
       'firstName': _firstName,
       'lastName': _lastName,
       'dateOfBirth': _dateOfBirth,
-      'phoneNumber': _phoneNumber,
+      'phoneNumber': _phoneNumber.phoneNumber,
+      'languages':
+          _selectedLanguages.map((language) => language.toMap()).toList(),
+      'preferredTourCategories': _selectedCategories
+          .map((category) => tourCategoryToString[category])
+          .toList(),
     };
   }
 
@@ -81,12 +89,17 @@ class _PersonalInformationScreenState
     }
 
     _formKey.currentState!.save();
-    print('Form data: $_firstName, $_lastName, $_dateOfBirth, $_phoneNumber');
+    print(
+        'Form data: First name: $_firstName, Last name: $_lastName, Date of birth: $_dateOfBirth, Phone number: $_phoneNumber, $_selectedLanguages, $_selectedCategories');
 
-    UserRepository().updateUserData(_uid, formToMap());
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Personal information saved successfully!')),
-    );
+    final Map<String, dynamic> userData =
+        await UserRepository().updateUserData(_uid, formToMap());
+    if (userData.containsKey('error')) {
+      print('Failed to update user data: ${userData['error']}');
+      return;
+    }
+
+    print('User data updated successfully.');
   }
 
   @override
@@ -227,7 +240,6 @@ class _PersonalInformationScreenState
                           ignoreBlank: false,
                           autoValidateMode: AutovalidateMode.disabled,
                           initialValue: _phoneNumber,
-                          textFieldController: _phoneNumberController,
                           keyboardType: const TextInputType.numberWithOptions(
                             signed: true,
                             decimal: true,
@@ -236,7 +248,6 @@ class _PersonalInformationScreenState
                             if (value == null) {
                               return null;
                             }
-                            print('Validator: $value');
                             return null;
                           },
                         ),
@@ -289,9 +300,9 @@ class _PersonalInformationScreenState
                           ),
                         ),
                         Container(
-                          constraints: const BoxConstraints(
+                          constraints: BoxConstraints(
                             minWidth: double.infinity,
-                            maxHeight: 100,
+                            maxHeight: languages.length * 15,
                           ),
                           child: GridView.builder(
                             gridDelegate:
@@ -299,7 +310,7 @@ class _PersonalInformationScreenState
                               crossAxisCount: 3,
                               crossAxisSpacing: 4,
                               mainAxisSpacing: 4,
-                              childAspectRatio: 1 / 0.3,
+                              childAspectRatio: 1 / 0.35,
                             ),
                             itemCount: languages.length,
                             itemBuilder: (BuildContext context, int index) {
@@ -346,9 +357,9 @@ class _PersonalInformationScreenState
                           ),
                         ),
                         Container(
-                          constraints: const BoxConstraints(
+                          constraints: BoxConstraints(
                             minWidth: double.infinity,
-                            maxHeight: 280,
+                            maxHeight: tourCategories.length * 28,
                           ),
                           child: GridView.builder(
                             gridDelegate:

@@ -23,20 +23,25 @@ class UserRepository {
       registrationData: data['registrationData'] ?? {},
       bookedTours: List<String>.from(data['bookedTours'] ?? []),
       organizedTours: List<String>.from(data['organizedTours'] ?? []),
-      notifications: List<Notification>.from(data['notifications']?.map((item) => Notification.fromMap(item)) ?? [],),
+      notifications: List<Notification>.from(
+        data['notifications']?.map((item) => Notification.fromMap(item)) ?? [],
+      ),
       fcmToken: data['fcmToken'] ?? '',
     );
     return newUser;
   }
 
-  Future<void> updateUserData(String uid, Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> updateUserData(
+      String uid, Map<String, dynamic> data) async {
     try {
       await _firestore.collection('users').doc(uid).set(
             data,
             SetOptions(merge: true),
           );
+      return {'success': true};
     } catch (e) {
-      rethrow;
+      print(e);
+      return {'success': false, 'error': e};
     }
   }
 
@@ -54,7 +59,9 @@ class UserRepository {
       registrationData: data['registrationData'] ?? {},
       bookedTours: List<String>.from(data['bookedTours'] ?? []),
       organizedTours: List<String>.from(data['organizedTours'] ?? []),
-      notifications: List<Notification>.from(data['notifications']?.map((item) => Notification.fromMap(item)) ?? [],),
+      notifications: List<Notification>.from(
+        data['notifications']?.map((item) => Notification.fromMap(item)) ?? [],
+      ),
       fcmToken: data['fcmToken'] ?? '',
     );
     return newUser;
