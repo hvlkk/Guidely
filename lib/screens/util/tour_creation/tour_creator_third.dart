@@ -124,7 +124,7 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              for (final language in widget.languages)
+              for (final language in languages)
                 GestureDetector(
                   onTap: () {
                     bool exists = widget.activeLanguages.contains(language);
@@ -145,7 +145,7 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
                             : Colors.transparent,
                         width: 2,
                       ),
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: CircleAvatar(
                       radius: 25,
