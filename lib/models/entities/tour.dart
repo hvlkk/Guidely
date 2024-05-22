@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/user.dart';
+import 'package:guidely/models/utils/tour_category.dart';
 
 enum TourState {
   upcoming,
@@ -18,6 +19,7 @@ class Tour {
     required this.reviews,
     this.duration = const TimeOfDay(hour: 2, minute: 0),
     this.images = const [],
+    this.categories = const [],
   });
 
   final TourCreationData tourDetails;
@@ -28,6 +30,7 @@ class Tour {
 
   final List<String> registeredUsers = [];
   final List<Review> reviews;
+  final List<TourCategory> categories;
 
   final TourState state = TourState.upcoming;
   final double rating = 4.0;
@@ -46,6 +49,8 @@ class Tour {
       'organizer': organizer.toMap(),
       'state': state.toString().split('.').last,
       'rating': rating,
+      'categories':
+          categories.map((category) => tourCategoryToString[category]).toList(),
     };
   }
 
@@ -58,6 +63,11 @@ class Tour {
       uid: map['uid'],
       reviews: List<Review>.from(
         map['reviews']?.map((review) => Review.fromMap(review)) ?? [],
+      ),
+      categories: List<TourCategory>.from(
+        map['categories']
+                ?.map((category) => tourCategoryFromString[category]) ??
+            [],
       ),
     );
   }
@@ -73,6 +83,11 @@ class Tour {
       organizer: User.fromMap(data['organizer']),
       reviews: List<Review>.from(
           data['reviews']?.map((review) => Review.fromMap(review)) ?? []),
+      categories: List<TourCategory>.from(
+        data['categories']
+                ?.map((category) => tourCategoryFromString[category]) ??
+            [],
+      ),
     );
     print(tour);
     return tour;
@@ -80,6 +95,6 @@ class Tour {
 
   @override
   String toString() {
-    return 'Tour(tou, duration: $duration, images: $images, organizer: $organizer, state: $state, rating: $rating, uid: $uid, registeredUsers: $registeredUsers, reviews: $reviews)';
+    return 'Tour(tour, duration: $duration, images: $images, organizer: $organizer, state: $state, rating: $rating, uid: $uid, registeredUsers: $registeredUsers, reviews: $reviews)';
   }
 }
