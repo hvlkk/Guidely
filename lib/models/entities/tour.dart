@@ -17,6 +17,7 @@ class Tour {
     required this.uid,
     required this.organizer,
     required this.reviews,
+    required this.state,
     this.duration = const TimeOfDay(hour: 2, minute: 0),
     this.images = const [],
     this.categories = const [],
@@ -32,7 +33,7 @@ class Tour {
   final List<Review> reviews;
   final List<TourCategory> categories;
 
-  final TourState state = TourState.upcoming;
+  TourState state = TourState.upcoming;
   final double rating = 4.0;
 
   get country => tourDetails.waypoints![0].address.split(',').last;
@@ -69,6 +70,9 @@ class Tour {
                 ?.map((category) => tourCategoryFromString[category]) ??
             [],
       ),
+      state: TourState.values.firstWhere(
+        (element) => element.toString() == 'TourState.${map['state']}',
+      ),
     );
   }
 
@@ -77,6 +81,9 @@ class Tour {
 
     Tour tour = Tour(
       uid: data['uid'],
+      state: TourState.values.firstWhere(
+        (element) => element.toString() == 'TourState.${data['state']}',
+      ),
       tourDetails: TourCreationData.fromMap(data['tourDetails']),
       duration: TimeOfDay(hour: data['duration'] ?? 0, minute: 0),
       images: List<String>.from(data['images'] ?? []),
