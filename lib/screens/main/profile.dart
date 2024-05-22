@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/screens/util/profile/personal_information.dart';
 import 'package:guidely/screens/util/tour_guide_registration/tour_guide_registration.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -34,7 +35,6 @@ class ProfileScreen extends ConsumerWidget {
                     CircleAvatar(
                       radius: 35,
                       backgroundImage: NetworkImage(
-                        // placeholder image, replace with user's image
                         userData.imageUrl,
                       ),
                     ),
@@ -142,6 +142,13 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                       onTap: () {
                         // navigate to the personal information screen
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) {
+                              return const PersonalInformationScreen();
+                            },
+                          ),
+                        );
                       },
                     ),
                     const Divider(

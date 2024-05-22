@@ -1,9 +1,18 @@
 import 'package:guidely/models/data/registration_data.dart';
+import 'package:guidely/models/utils/language.dart';
+import 'package:guidely/models/utils/tour_category.dart';
 
 class User {
   final String uid;
   final String username;
   final String email;
+  final String? firstName;
+  final String? lastName;
+  final String? phoneNumber;
+  final DateTime? dateOfBirth;
+  List<Language> languages;
+  List<TourCategory> categories = [];
+  final DateTime? dateJoined;
   final String imageUrl;
   final String fcmToken;
   late bool isTourGuide = false;
@@ -22,6 +31,12 @@ class User {
     required this.bookedTours,
     required this.organizedTours,
     registrationData,
+    this.firstName = '',
+    this.lastName = '',
+    this.phoneNumber = '',
+    this.dateOfBirth,
+    this.dateJoined,
+    this.languages = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +44,12 @@ class User {
       'uid': uid,
       'username': username,
       'email': email,
+      'firstName': firstName,
+      'lastName': lastName,
+      'dateOfBirth': dateOfBirth?.toString(),
+      'phoneNumber': phoneNumber,
+      'languages': languages.map((language) => language.toMap()).toList(),
+      'dateJoined': dateJoined?.toString(),
       'imageUrl': imageUrl,
       'isTourGuide': isTourGuide,
       'bookedTours': bookedTours,
@@ -42,6 +63,15 @@ class User {
       uid: map['uid'] ?? '',
       username: map['username'] ?? '',
       email: map['email'] ?? '',
+      firstName: map['firstName'] ?? '',
+      lastName: map['lastName'] ?? '',
+      dateOfBirth: map['dateOfBirth'] != null
+          ? DateTime.parse(map['dateOfBirth'])
+          : null,
+      phoneNumber: map['phoneNumber'] ?? '',
+      languages: List<Language>.from(map['languages'] ?? []),
+      dateJoined:
+          map['dateJoined'] != null ? DateTime.parse(map['dateJoined']) : null,
       imageUrl: map['imageUrl'] ?? '',
       isTourGuide: map['isTourGuide'] ?? false,
       bookedTours: List<String>.from(map['bookedTours'] ?? []),
@@ -55,6 +85,12 @@ class User {
     String? uid,
     String? username,
     String? email,
+    String? firstName,
+    String? lastName,
+    DateTime? dateOfBirth,
+    DateTime? dateJoined,
+    String? phoneNumber,
+    List<Language>? languages,
     String? imageUrl,
     bool? isTourGuide,
     required List<String> bookedTours,
@@ -71,6 +107,12 @@ class User {
       organizedTours: organizedTours,
       registrationData: registrationData,
       fcmToken: fcmToken,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      dateJoined: dateJoined ?? this.dateJoined,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      languages: languages ?? this.languages,
     );
   }
 

@@ -95,6 +95,7 @@ class AuthBloc {
       bookedTours: [],
       organizedTours: [],
       fcmToken: token,
+      dateJoined: DateTime.now(),
     );
     await FirebaseFirestore.instance.collection('users').doc(newUser.uid).set(
           newUser.toMap(),
