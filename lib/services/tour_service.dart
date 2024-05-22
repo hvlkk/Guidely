@@ -20,4 +20,9 @@ class TourService extends FirestoreService {
   static Stream<DocumentSnapshot> getTourStream(String tourId) {
     return TourRepository().getTourStream(tourId);
   }
+
+  // interface for deleting tour data
+  static Future<void> deleteTour(String uid) async {
+    await TourRepository().deleteTour(uid);
+  }
 }

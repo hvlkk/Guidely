@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
@@ -80,20 +81,15 @@ class TourBloc {
   }
 
   Future<void> cancelTour(Tour tour, BuildContext context) async {
-    if (userData == null) return;
-    final isAHostedTour = userData!.organizedTours.contains(tour.uid);
-    userData!.bookedTours.remove(tour.uid);
-    if (isAHostedTour) {
-      userData!.organizedTours.remove(tour.uid);
-    }
     await UserService.updateData(
       context,
       userData!.uid,
       {
-        'bookedTours': userData!.bookedTours,
-        'organizedTours': userData!.organizedTours,
+        'bookedTours': FieldValue.arrayRemove([tour.uid]),
+        'organizedTours': FieldValue.arrayRemove([tour.uid]),
       },
     );
+    await TourService.deleteTour(tour.uid);
     _loadTours(); // Reload tours after cancelling
   }
 

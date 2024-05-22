@@ -26,4 +26,12 @@ class TourRepository {
       rethrow;
     }
   }
+
+  Future<void> deleteTour(String uid) async {
+    try {
+      await _firestore.collection('tours').doc(uid).delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

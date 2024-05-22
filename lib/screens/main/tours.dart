@@ -69,6 +69,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         builder: (context) => const TourCreatorScreen(),
                       ),
                     );
+                    setState(() {});
                   },
                 ),
               ];
@@ -174,15 +175,17 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildUpcomingActions(Tour tour) {
+    final isAHoster = _userData?.organizedTours.contains(tour.uid) ?? false;
+
     return [
-      if (_userData != null &&
-          _userData!.authState == TourGuideAuthState.authenticated)
-        OutlinedButton(
-          onPressed: () {
-            // Action for announcing the tour
-          },
-          child: const Text('Announce'),
-        ),
+      isAHoster
+          ? OutlinedButton(
+              onPressed: () {
+                // Action for announcing the tour
+              },
+              child: const Text('Announce'),
+            )
+          : const SizedBox(),
       OutlinedButton(
         onPressed: () {
           Navigator.of(context).push(
@@ -193,22 +196,50 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         },
         child: const Text('Get Info'),
       ),
-      TextButton(
-        onPressed: () {
-          _tourBloc.cancelTour(tour, context);
-        },
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.white,
-          backgroundColor: Colors.red,
-        ),
-        child: const Text('Cancel'),
-      ),
+      isAHoster
+          ? TextButton(
+              onPressed: () {
+                // ask user to cancel the tour
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Cancel Tour'),
+                      content: const Text('Do you want to cancel the tour?'),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Cancel Tour'),
+                          onPressed: () {
+                            _tourBloc.cancelTour(tour, context);
+                            Navigator.of(context).pop();
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: Colors.red,
+              ),
+              child: const Text('Cancel'),
+            )
+          : const SizedBox(),
     ];
   }
 
   List<Widget> _buildLiveActions(Tour tour) {
     final isAHoster = _userData?.organizedTours.contains(tour.uid) ?? false;
     final tourHasStarted = tour.state == toursModel.TourState.live;
+
     return [
       OutlinedButton(
         onPressed: () {
