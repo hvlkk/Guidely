@@ -315,9 +315,9 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                       onPressed: () {
                         showDatePicker(
                           context: context,
-                          initialDate: tour.tourDetails.startDate ?? DateTime.now(),
-                          firstDate: tour.tourDetails.startDate ?? DateTime.now(),
-                          lastDate: tour.tourDetails.startDate ?? DateTime.now(),
+                          initialDate: tour.tourDetails.startDate,
+                          firstDate: tour.tourDetails.startDate,
+                          lastDate: tour.tourDetails.startDate,
                         );
                         _uploadBooking(context);
                       },

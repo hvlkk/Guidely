@@ -67,7 +67,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                       ),
                                       const SizedBox(height: 10),
                                       Text(
-                                        'Photo Profile',
+                                        'Profile Picture',
                                         style: poppinsFont.copyWith(
                                           color: MainColors.textHint,
                                         ),
@@ -154,7 +154,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               child: Text(
                                 _authBloc.authMode == AuthMode.login
                                     ? 'Login'
-                                    : 'Signup',
+                                    : 'Sign Up',
                                 style: const TextStyle(
                                   color: Color.fromARGB(255, 0, 0, 0),
                                 ),
@@ -180,7 +180,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 if (snapshot.hasData) {
                                   return Text(
                                     snapshot.data!,
-                                    style: TextStyle(color: Colors.red),
+                                    style: const TextStyle(color: Colors.red),
                                   );
                                 }
                                 return const SizedBox.shrink();

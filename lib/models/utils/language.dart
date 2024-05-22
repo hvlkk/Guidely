@@ -19,4 +19,11 @@ class Language {
       'code': code,
     };
   }
+
+  factory Language.fromMap(Map<String, dynamic> map) {
+    return Language(
+      name: map['name'] ?? '',
+      code: map['code'] ?? '',
+    );
+  }
 }

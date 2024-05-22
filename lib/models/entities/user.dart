@@ -13,7 +13,7 @@ class User {
   final String? phoneNumber;
   final DateTime? dateOfBirth;
   List<Language> languages;
-  List<TourCategory> categories = [];
+  List<TourCategory> preferredTourCategories;
   final DateTime? dateJoined;
   final String imageUrl;
   final String fcmToken;
@@ -37,10 +37,11 @@ class User {
     registrationData,
     this.firstName = '',
     this.lastName = '',
-    this.phoneNumber = '',
+    this.phoneNumber,
     this.dateOfBirth,
     this.dateJoined,
     this.languages = const [],
+    this.preferredTourCategories = const [],
   });
 
   Map<String, dynamic> toMap() {
@@ -53,6 +54,9 @@ class User {
       'dateOfBirth': dateOfBirth?.toString(),
       'phoneNumber': phoneNumber,
       'languages': languages.map((language) => language.toMap()).toList(),
+      'preferredTourCategories': preferredTourCategories.map(
+        (tourCategory) => tourCategoryToString[tourCategory],
+      ),
       'dateJoined': dateJoined?.toString(),
       'imageUrl': imageUrl,
       'authState': authState.index,
@@ -74,8 +78,17 @@ class User {
       dateOfBirth: map['dateOfBirth'] != null
           ? DateTime.parse(map['dateOfBirth'])
           : null,
-      phoneNumber: map['phoneNumber'] ?? '',
-      languages: List<Language>.from(map['languages'] ?? []),
+      phoneNumber: map['phoneNumber'],
+      languages: List<Language>.from(
+        (map['languages'] ?? []).map(
+          (language) => Language.fromMap(language),
+        ),
+      ),
+      preferredTourCategories: List<TourCategory>.from(
+        (map['preferredTourCategories'] ?? []).map(
+          (category) => tourCategoryFromString[category],
+        ),
+      ),
       dateJoined:
           map['dateJoined'] != null ? DateTime.parse(map['dateJoined']) : null,
       imageUrl: map['imageUrl'] ?? '',
@@ -100,6 +113,7 @@ class User {
     DateTime? dateJoined,
     String? phoneNumber,
     List<Language>? languages,
+    List<TourCategory>? preferredTourCategories,
     String? imageUrl,
     required TourGuideAuthState authState,
     required List<String> bookedTours,
@@ -122,8 +136,10 @@ class User {
       lastName: lastName ?? this.lastName,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       dateJoined: dateJoined ?? this.dateJoined,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
+      phoneNumber: phoneNumber,
       languages: languages ?? this.languages,
+      preferredTourCategories:
+          preferredTourCategories ?? this.preferredTourCategories,
     );
   }
 
