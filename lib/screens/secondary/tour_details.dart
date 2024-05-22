@@ -396,7 +396,7 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                   child: CustomMap(
                     waypoints: tour.tourDetails.waypoints!,
                     withTrail: true,
-                    onTapWaypoint: (LatLng) {},
+                    onTapWaypoint: (latLng) {},
                   ),
                 ),
               ),

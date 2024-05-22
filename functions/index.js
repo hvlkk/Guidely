@@ -14,7 +14,6 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
-// TODO: Move the entire sign-up functionality here
 // eslint-disable-line max-len
 exports.checkUsernameAvailability = functions.https.onCall(
   async (data, context) => {
@@ -89,11 +88,3 @@ exports.sendNotification = functions.firestore
 
     return null;
   });
-
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
-
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });

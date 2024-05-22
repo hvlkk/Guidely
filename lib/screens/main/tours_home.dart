@@ -146,7 +146,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final username = jsonDataMap['username'];
           final imageUrl = jsonDataMap['imageUrl'];
 
-          final _searchScreenController = TextEditingController();
+          final searchScreenController = TextEditingController();
           return Scaffold(
             appBar: AppBar(
               title: Text(
@@ -209,7 +209,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                       children: [
                         Expanded(
                           child: TextField(
-                            controller: _searchScreenController,
+                            controller: searchScreenController,
                             decoration: InputDecoration(
                               hintText: 'Search for tours',
                               border: OutlineInputBorder(
@@ -220,18 +220,18 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         ),
                         const SizedBox(width: 5),
                         GestureDetector(
-                          child: Icon(Icons.search),
+                          child: const Icon(Icons.search),
                           onTap: () {
                             // Search for tours based on the search bar input
                             final filteredTours = TourFilter.filterSearchBar(
-                              _searchScreenController.text,
+                              searchScreenController.text,
                               tourDataUnfiltered,
                             );
                             // navigate to a new page with the filtered tours
                             _buildSearchResultsScreen(
                               context,
                               filteredTours,
-                              _searchScreenController.text,
+                              searchScreenController.text,
                             );
                           },
                         ),
@@ -273,7 +273,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                                               BorderRadius.circular(10),
                                         ),
                                         child: SingleChildScrollView(
-                                          padding: EdgeInsets.all(20),
+                                          padding: const EdgeInsets.all(20),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -360,7 +360,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                       Padding(
                         padding: EdgeInsets.only(left: 15),
                         child: Text(
-                          'Tours Nearby:',
+                          'Tours Nearby',
                           textAlign: TextAlign.left,
                           style: TextStyle(
                             fontSize: 22,

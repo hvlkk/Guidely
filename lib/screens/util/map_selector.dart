@@ -58,6 +58,7 @@ class _MapSelectorScreenState extends State<MapSelectorScreen> {
             });
           }
         },
+        zoomGesturesEnabled: true,
         initialCameraPosition: CameraPosition(
           target: LatLng(
             widget.initialLocation!.latitude,
