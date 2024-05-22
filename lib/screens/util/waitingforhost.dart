@@ -30,7 +30,7 @@ class WaitingForHostScreen extends StatelessWidget {
 
               if (isLive) {
                 // If tour session is live, navigate to TourSessionScreen
-                return const TourSessionScreen();
+                return TourSessionScreen(tour: tour);
               } else {
                 // If tour session has not started yet, show waiting message
                 return Column(

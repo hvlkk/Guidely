@@ -275,7 +275,9 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => tourHasStarted
-                    ? const TourSessionScreen()
+                    ? TourSessionScreen(
+                        tour: tour,
+                      )
                     : WaitingForHostScreen(
                         tour: tour,
                       ),
