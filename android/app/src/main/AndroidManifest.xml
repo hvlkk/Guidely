@@ -3,6 +3,19 @@
         android:label="guidely"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        
+        <service
+            android:name="io.flutter.plugins.firebasemessaging.FlutterFirebaseMessagingService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="io.flutter.plugins.firebasemessaging.FlutterFirebaseMessagingReceiver"
+            android:exported="true"/>
+
         <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyDKQj67ZoqcZ-UPXO1cnmGdYQ9wpKAoltI"/>
         <activity
