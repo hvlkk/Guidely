@@ -37,54 +37,95 @@ exports.checkUsernameAvailability = functions.https.onCall(
   }
 );
 
-exports.sendNotification = functions.https.onCall(async (data, context) => {
-  const { tourId } = data;
-
-  try {
-    const tourSnapshot = await admin
-      .firestore()
-      .collection("tours")
-      .doc(tourId)
-      .get();
-    const tourData = tourSnapshot.data();
-
-    // You can access the tour data here and perform necessary operations
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error sending notification:", error);
-    return { success: false, error: error.message };
-  }
-});
-
-exports.sendNotification = functions.firestore
+exports.sendNotificationNewTourEntry = functions.firestore
   .document("tours/{tourId}")
-  .onUpdate((change, context) => {
+  .onUpdate(async (change, context) => {
     const newValue = change.after.data();
     const previousValue = change.before.data();
+
+    console.log("Change after ", change.after.data());
+    console.log("Change before ", change.before.data());
 
     const newRegisteredUsers = newValue.registeredUsers;
     const previousRegisteredUsers = previousValue.registeredUsers;
 
-    // Check if a new user has been added
-    const addedUsers = newRegisteredUsers.filter(
-      (user) => !previousRegisteredUsers.includes(user)
+    console.log("new registered users.length", newRegisteredUsers.length);
+    console.log(
+      "previous registered users.length",
+      previousRegisteredUsers.length
     );
+    // Check if a new value was added to the registeredUsers list
+    if (newRegisteredUsers.length > previousRegisteredUsers.length) {
+      const newUserId = newRegisteredUsers.find(
+        (user) => !previousRegisteredUsers.includes(user)
+      );
+      console.log("New user added:", newUserId);
 
-    if (addedUsers.length > 0) {
-      const organizerToken = newValue.organizer.fcmToken;
-      const tourTitle = newValue.tourDetails.title;
+      const organizerFcmToken = newValue.organizer.fcmToken;
+      console.log("Organizer FCM token:", organizerFcmToken);
 
-      const payload = {
-        notification: {
-          title: "New User Registered",
-          body: `${addedUsers.length} new user(s) registered for the tour "${tourTitle}"`,
-          clickAction: "FLUTTER_NOTIFICATION_CLICK",
-        },
-      };
-      print("Sending notification...");
-      return admin.messaging().sendToDevice(organizerToken, payload);
+      if (organizerFcmToken) {
+        const message = {
+          notification: {
+            title: "New Tour Registration",
+            body: `A new user has registered for your tour.`,
+          },
+          token: organizerFcmToken,
+        };
+
+        await admin.messaging().send(message);
+        console.log("Notification sent to organizer:", organizerFcmToken);
+      } else {
+        console.log("Organizer FCM token not found");
+      }
     }
-
-    return null;
   });
+
+/*
+const tourId = context.params.tourId;
+    console.log("Tour ID:", tourId);
+
+    try {
+      const tourDoc = await admin
+        .firestore()
+        .collection("tours")
+        .doc(tourId)
+        .get();
+      const tourData = tourDoc.data();
+      const organizerUid = tourData.organizer?.uid;
+      console.log("Organizer UID: ", organizerUid);
+
+      if (organizerUid) {
+        const organizerDoc = await admin
+          .firestore()
+          .collection("users")
+          .doc(organizerUid)
+          .get();
+        const organizerData = organizerDoc.data();
+        const fcmToken = organizerData?.fcmToken;
+
+        console.log("Creating message");
+        if (fcmToken) {
+          const message = {
+            notification: {
+              title: "New Tour Registration",
+              body: `A new user has registered for your tour ${tourData.tourDetails.title}.`,
+            },
+            token: fcmToken,
+          };
+
+          await admin.messaging().send(message);
+          console.log("Notification sent to organizer:", organizerUid);
+        } else {
+          console.log("Organizer FCM token not found");
+        }
+      } else {
+        console.log("Organizer UID not found in tour data");
+      }
+    } catch (error) {
+      console.error(
+        "Error fetching tour or organizer data or sending notification:",
+        error
+      );
+    }
+    */

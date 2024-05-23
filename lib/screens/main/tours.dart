@@ -69,6 +69,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         builder: (context) => const TourCreatorScreen(),
                       ),
                     );
+                    // re-render the screen after the user has created a tour
                     setState(() {});
                   },
                 ),

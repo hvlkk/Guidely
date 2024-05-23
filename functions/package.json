@@ -18,9 +18,11 @@
     "firebase-functions": "^5.0.0"
   },
   "devDependencies": {
+    "eslint": "^9.3.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^9.1.0",
-    "firebase-functions-test": "^3.1.0"
+    "firebase-functions-test": "^3.1.0",
+    "globals": "^15.3.0"
   },
   "private": true
 }

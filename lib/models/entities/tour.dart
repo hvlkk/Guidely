@@ -21,6 +21,7 @@ class Tour {
     this.duration = const TimeOfDay(hour: 2, minute: 0),
     this.images = const [],
     this.categories = const [],
+    this.registeredUsers = const [],
   });
 
   final TourCreationData tourDetails;
@@ -29,7 +30,7 @@ class Tour {
   final User organizer;
   final String uid;
 
-  final List<String> registeredUsers = [];
+  List<String> registeredUsers;
   final List<Review> reviews;
   final List<TourCategory> categories;
 
@@ -52,6 +53,7 @@ class Tour {
       'rating': rating,
       'categories':
           categories.map((category) => tourCategoryToString[category]).toList(),
+      'registeredUsers': registeredUsers,
     };
   }
 
@@ -62,6 +64,7 @@ class Tour {
       images: List<String>.from(map['images'] ?? []),
       organizer: User.fromMap(map['organizer']),
       uid: map['uid'],
+      registeredUsers: List<String>.from(map['registeredUsers'] ?? []),
       reviews: List<Review>.from(
         map['reviews']?.map((review) => Review.fromMap(review)) ?? [],
       ),
@@ -95,6 +98,7 @@ class Tour {
                 ?.map((category) => tourCategoryFromString[category]) ??
             [],
       ),
+      registeredUsers: List<String>.from(data['registeredUsers'] ?? []),
     );
     return tour;
   }

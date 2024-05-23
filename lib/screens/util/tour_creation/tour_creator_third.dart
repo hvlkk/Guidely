@@ -228,6 +228,7 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       duration: finalData.startTime,
       reviews: [],
       state: TourState.upcoming,
+      registeredUsers: [],
     );
 
     user.organizedTours.add(tour.uid);
