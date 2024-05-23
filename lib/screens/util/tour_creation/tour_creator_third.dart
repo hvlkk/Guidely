@@ -13,6 +13,7 @@ import 'package:guidely/models/entities/user.dart'
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/models/utils/language.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
+import 'package:guidely/services/image_retrieval_service.dart';
 import 'package:uuid/uuid.dart';
 
 class TourCreatorThirdScreen extends StatefulWidget {
@@ -210,10 +211,20 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       return;
     }
 
+    ImageRetrievalService imageRetrievalService = ImageRetrievalService();
+    // final imageUrl = await imageRetrievalService.fetchCityImages(
+    //   finalData.title,
+    // );
+
+    final imageUrl = await imageRetrievalService.fetchCityImagesList(
+      finalData.title,
+    );
+
     final tour = Tour(
       uid: const Uuid().v4(),
       tourDetails: finalData,
       organizer: user,
+      images: imageUrl,
       duration: finalData.startTime,
       reviews: [],
       state: TourState.upcoming,

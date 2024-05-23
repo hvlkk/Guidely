@@ -19,9 +19,14 @@ class TourListItemTemplate extends StatelessWidget {
         children: [
           Stack(
             children: [
-              Image.asset(
-                // tour.images[0],
-                'assets/images/tours/tour2.jpg', // this should be tour's image uploaded or received by an api
+              tour.images.isNotEmpty ? 
+              Image.network(
+                tour.images[0],
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+              ) : Image.asset(
+                'assets/images/tours/tour2.jpg',
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,

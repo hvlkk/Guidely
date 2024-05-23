@@ -78,12 +78,19 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
             children: [
               Stack(
                 children: [
-                  Image.asset(
-                    'assets/images/tours/tour2.jpg',
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
+                  tour.images.isEmpty
+                      ? Image.asset(
+                          'assets/images/tours/tour2.jpg',
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.network(
+                          tour.images[currentIndex],
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        ),
                   if (tour.images.length > 1) ...[
                     Positioned(
                       left: 10,
