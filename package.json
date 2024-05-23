@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "globals": "^15.3.0"
+  },
+  "dependencies": {
+    "firebase-functions": "^5.0.1"
+  }
+}

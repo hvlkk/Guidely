@@ -37,32 +37,41 @@ exports.checkUsernameAvailability = functions.https.onCall(
   }
 );
 
-exports.sendNotificationNewTourEntry = functions.firestore
+exports.subscribeTourAndNotifyEntry = functions.firestore
   .document("tours/{tourId}")
   .onUpdate(async (change, context) => {
     const newValue = change.after.data();
     const previousValue = change.before.data();
 
-    console.log("Change after ", change.after.data());
-    console.log("Change before ", change.before.data());
-
     const newRegisteredUsers = newValue.registeredUsers;
     const previousRegisteredUsers = previousValue.registeredUsers;
 
-    console.log("new registered users.length", newRegisteredUsers.length);
+    console.log("New registered users length:", newRegisteredUsers.length);
     console.log(
-      "previous registered users.length",
+      "Previous registered users length:",
       previousRegisteredUsers.length
     );
+
     // Check if a new value was added to the registeredUsers list
     if (newRegisteredUsers.length > previousRegisteredUsers.length) {
       const newUserId = newRegisteredUsers.find(
         (user) => !previousRegisteredUsers.includes(user)
       );
-      console.log("New user added:", newUserId);
+      // get the user's FCM token
+      const userSnapshot = await admin
+        .firestore()
+        .collection("users")
+        .doc(newUserId)
+        .get();
+      const user = userSnapshot.data();
+      const userFCMToken = user.fcmToken;
+
+      // subscription to the tour topic
+      const tourId = context.params.tourId;
+      await admin.messaging().subscribeToTopic(userFCMToken, tourId);
+      console.log("User subscribed to tour topic:", tourId);
 
       const organizerFcmToken = newValue.organizer.fcmToken;
-      console.log("Organizer FCM token:", organizerFcmToken);
 
       if (organizerFcmToken) {
         const message = {
@@ -72,9 +81,9 @@ exports.sendNotificationNewTourEntry = functions.firestore
           },
           token: organizerFcmToken,
         };
-
-        await admin.messaging().send(message);
-        console.log("Notification sent to organizer:", organizerFcmToken);
+        // needs to be fixed
+        // await admin.messaging().send(message);
+        // console.log("Notification sent to organizer:", organizerFcmToken);
       } else {
         console.log("Organizer FCM token not found");
       }
