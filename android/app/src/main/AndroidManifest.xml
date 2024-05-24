@@ -39,13 +39,6 @@
         </activity>
 
         <service
-            android:name="io.flutter.plugins.firebasemessaging.FlutterFirebaseMessagingService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
-        <service
             android:name="io.flutter.plugins.firebasemessaging.FlutterFirebaseInstanceIDService"
             android:exported="true">
             <intent-filter>
@@ -53,15 +46,7 @@
             </intent-filter>
         </service>
 
-        <receiver
-            android:name="io.flutter.plugins.firebasemessaging.FlutterFirebaseMessagingReceiver"
-            android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND">
-            <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
-                <category android:name="${applicationId}"/>
-            </intent-filter>
-        </receiver>
+        
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
