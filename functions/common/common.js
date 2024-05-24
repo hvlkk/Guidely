@@ -22,6 +22,19 @@ async function getUserByUserId(userId) {
   return user;
 }
 
+async function sendNotificationToPendingOrganizer(userId, requestStatus) {
+  try {
+      const notification = constructNotification(
+          uuidv4(),
+          `Request ${requestStatus}`,
+          `A request to become an organizer has been ${requestStatus}.`
+      );
+      await addNotificationToUser(userId, notification);
+  } catch (error) {
+      console.error('Error sending notification to organizer:', error);
+  }
+}
+
 function constructNotification(uid, title, message) {
   return {
     uid: uid || uuidv4(),
@@ -35,4 +48,5 @@ module.exports = {
   addNotificationToUser,
   getUserByUserId,
   constructNotification,
+  sendNotificationToPendingOrganizer,
 };

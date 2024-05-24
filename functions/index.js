@@ -99,3 +99,41 @@ exports.subscribeTourAndNotifyEntry = functions.firestore
       }
     }
   });
+
+exports.handleAuthStatusChange = functions.firestore
+  .document("users/{authState}")
+  .onUpdate(async (change, context) => {
+    const newValue = change.after.data();
+    console.log("New value:", newValue);
+
+    const previousValue = change.before.data();
+    console.log("Previous value:", previousValue);
+
+    const newAuthState = newValue.authState;
+    console.log("New auth state:", newAuthState);
+
+    const previousAuthState = previousValue.authState;
+    console.log("Previous auth state:", previousAuthState);
+
+    const userFCMToken = newValue.fcmToken;
+    console.log("User FCM token:", userFCMToken);
+
+    if (userFCMToken) {
+      const message = {
+        notification: {
+          title: "Auth State Updated",
+          body: `Your authentication state has been updated to ${newAuthState}.`,
+        },
+        token: userFCMToken,
+      };
+      await admin.messaging().send(message);
+    }
+
+    if (previousAuthState === 1 && newAuthState === 2) {
+      await common.sendNotificationToPendingOrganizer(newValue.uid, "approved");
+    }
+
+    if (previousAuthState === 1 && newAuthState === 0) {
+      await common.sendNotificationToPendingOrganizer(newValue.uid, "rejected");
+    }
+  });
