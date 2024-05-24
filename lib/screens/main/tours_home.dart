@@ -11,6 +11,8 @@ import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
+import 'package:guidely/screens/util/tour_details_dialog.dart';
+import 'package:guidely/screens/util/tour_filter_dropdown.dart';
 import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/utils/tour_filter.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
@@ -27,6 +29,7 @@ class ToursHomeScreen extends ConsumerStatefulWidget {
 class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _userStream;
   Position? _currentPosition;
+  String _selectedFilterValue = 'Closest';
 
   @override
   void initState() {
@@ -113,7 +116,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final closestTours = LocationFinder.findClosestToursToPosition(
             tours,
             _currentPosition!,
-            8, // Get the 3 closest tours
+            8, 
           );
           return closestTours;
         } else {
@@ -123,6 +126,32 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
       loading: () => List<Tour>.empty(),
       error: (error, stackTrace) => List<Tour>.empty(),
     );
+
+    // REALLY BAD LOGIC BUT GIVES THE IDEA OF HOW TO FILTER TOURS
+    
+    // if (_selectedFilterValue == 'Closest') {
+        //   if (_currentPosition != null) {
+        //     final closestTours = LocationFinder.findClosestToursToPosition(
+        //       tours,
+        //       _currentPosition!,
+        //       8,
+        //     );
+        //     return closestTours;
+        //   } else {
+        //     return <Tour>[];
+        //   }
+        // } else if (_selectedFilterValue == 'Highest Rated') {
+        //   final highestRatedTours = TourFilter.filterHighestRated(tours);
+        //   return highestRatedTours;
+        // } else if (_selectedFilterValue == 'Matched') {
+        //   final matchedTours = TourFilter.filterMatched(tours);
+        //   return matchedTours;
+        // } else if (_selectedFilterValue == 'Newest') {
+        //   final newestTours = TourFilter.filterNewest(tours);
+        //   return newestTours;
+        // } else {
+        //   return <Tour>[];
+        // }
 
     final startLocations =
         tourDataFiltered.map((tour) => tour.tourDetails.waypoints![0]).toList();
@@ -272,99 +301,12 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                                                 .longitude ==
                                             p0.longitude,
                                   );
-                                  // Display a card with the tour details
+                                  // Display the dialog with the tour details
                                   showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
-                                      return Dialog(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        child: SingleChildScrollView(
-                                          padding: const EdgeInsets.all(20),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              // Image
-                                              const Text(
-                                                'Tour Details',
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Image.asset(
-                                                'assets/images/tours/tour2.jpg',
-                                                width: double.infinity,
-                                                height: 200,
-                                                fit: BoxFit.cover,
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Text(
-                                                'Tour Name: ${selectedTour.tourDetails.title}',
-                                                style: const TextStyle(
-                                                    fontSize: 16),
-                                              ),
-                                              const SizedBox(height: 5),
-                                              Text(
-                                                'Tour Description: ${selectedTour.tourDetails.description}',
-                                                style: const TextStyle(
-                                                    fontSize: 16),
-                                              ),
-                                              const SizedBox(height: 5),
-                                              Text(
-                                                'Tour Duration: ${selectedTour.tourDetails.startTime}',
-                                                style: const TextStyle(
-                                                    fontSize: 16),
-                                              ),
-                                              const SizedBox(height: 5),
-                                              Text(
-                                                'Tour Start Date: ${selectedTour.tourDetails.startDate}',
-                                                style: const TextStyle(
-                                                    fontSize: 16),
-                                              ),
-                                              const SizedBox(height: 15),
-                                              GestureDetector(
-                                                child: const Text(
-                                                  'Learn more',
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: MainColors.accent,
-                                                  ),
-                                                ),
-                                                onTap: () {
-                                                  Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                      builder: (ctx) =>
-                                                          TourDetailsScreen(
-                                                        tour: selectedTour,
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                              const SizedBox(height: 20),
-                                              Align(
-                                                alignment: Alignment.center,
-                                                child: TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: const Text(
-                                                    'Close',
-                                                    style:
-                                                        TextStyle(fontSize: 16),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
+                                      return TourDetailsDialog(
+                                          selectedTour: selectedTour);
                                     },
                                   );
                                 },
@@ -372,21 +314,16 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                       ),
                     ),
                   ),
-                  const Row(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 15),
-                        child: Text(
-                          'Tours Nearby',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
+                  Padding(
+                    padding: EdgeInsets.only(left: 15),
+                    child: TourFilterDropdown(
+                      onValueChanged: (value) {
+                        setState(() {
+                          _selectedFilterValue = value;
+                          
+                        });
+                      },
+                    ),
                   ),
                   const SizedBox(width: 15),
                   SizedBox(

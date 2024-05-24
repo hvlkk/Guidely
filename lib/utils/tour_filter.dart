@@ -43,6 +43,30 @@ class TourFilter {
     }
   }
 
+  // filter by user's favorite activities
+  static filterByActivities(List<String> activities, List<Tour> tours) {
+    return tours.where((tour) {
+      return tour.tourDetails.activities.map((activity) {
+        return activities.contains(activity.name);
+      }).contains(true);
+    }).toList();
+  }
+
+  // filter tours that are created 5 or less days ago
+  static filterByNew(List<Tour> tours) {
+    final fourDaysAgo = DateTime.now().subtract(const Duration(days: 4));
+    return tours.where((tour) {
+      return tour.tourDetails.startDate.isAfter(fourDaysAgo);
+    }).toList();
+  }
+
+
+  // sort by rating
+  static filterByRating(List<Tour> tours) {
+    return tours.sort((a, b) => b.rating.compareTo(a.rating));
+  }
+
+
   static bool _isSameDay(DateTime date1, DateTime date2) {
     return date1.day == date2.day &&
         date1.month == date2.month &&
