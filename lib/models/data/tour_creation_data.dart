@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:guidely/models/data/waypoint.dart';
 import 'package:guidely/models/data/activity.dart';
+import 'package:guidely/models/data/waypoint.dart';
 import 'package:guidely/models/utils/language.dart';
 
 class TourCreationData {
@@ -8,6 +8,7 @@ class TourCreationData {
   final String description;
   final TimeOfDay startTime;
   final DateTime startDate;
+  final TimeOfDay duration;
   final List<Waypoint>? waypoints;
   final String messageToParticipants;
   final List<Activity> activities;
@@ -18,6 +19,7 @@ class TourCreationData {
     this.description = '',
     this.startTime = const TimeOfDay(hour: 0, minute: 0),
     required this.startDate,
+    this.duration = const TimeOfDay(hour: 2, minute: 0),
     this.waypoints,
     this.messageToParticipants = '',
     this.activities = const [],
@@ -36,6 +38,7 @@ class TourCreationData {
     String? description,
     TimeOfDay? startTime,
     DateTime? startDate,
+    TimeOfDay? duration,
     List<Waypoint>? waypoints,
     String? messageToParticipants,
     List<Activity>? activities,
@@ -46,6 +49,7 @@ class TourCreationData {
       description: description ?? this.description,
       startDate: startDate ?? this.startDate,
       startTime: startTime ?? this.startTime,
+      duration: duration ?? this.duration,
       waypoints: waypoints ?? this.waypoints,
       messageToParticipants:
           messageToParticipants ?? this.messageToParticipants,
@@ -61,6 +65,10 @@ class TourCreationData {
       startTime: TimeOfDay(
         hour: int.parse(map['startTime'].split(':')[0]),
         minute: int.parse(map['startTime'].split(':')[1]),
+      ),
+      duration: TimeOfDay(
+        hour: int.parse(map['duration'].split(':')[0]),
+        minute: int.parse(map['duration'].split(':')[1]),
       ),
       startDate: DateTime.parse(map['startDate'] ?? ''),
       waypoints: (map['waypoints'] as List<dynamic>?)
@@ -88,6 +96,7 @@ class TourCreationData {
       'title': title,
       'description': description,
       'startTime': '${startTime.hour}:${startTime.minute}',
+      'duration': '${duration.hour}:${duration.minute}',
       'startDate': startDate.toString(),
       'waypoints': waypoints?.map((waypoint) => waypoint.toMap()).toList(),
       'messageToParticipants': messageToParticipants,

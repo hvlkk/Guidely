@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
@@ -12,6 +13,7 @@ import 'package:guidely/models/utils/location_input.dart';
 import 'package:guidely/screens/util/map_selector.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_third.dart';
+import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/widgets/customs/custom_location_container.dart';
 import 'package:guidely/widgets/customs/custom_text_field.dart';
 import 'package:http/http.dart' as http;
@@ -34,6 +36,7 @@ class TourCreatorSecondScreen extends StatefulWidget {
 class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
   List<Waypoint>? _pickedLocations;
   var _isGettingLocation = false;
+  var _isLoadingImage = false; // Add loading state for the image
   final _messageController = TextEditingController();
 
   final FocusScopeNode _focusScopeNode = FocusScopeNode();
@@ -47,6 +50,10 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
   }
 
   Future<void> _savePlace(List<LatLng> waypoints) async {
+    setState(() {
+      _isLoadingImage = true; // Start loading state
+    });
+
     List<Waypoint> tempLocation = [];
 
     for (final LatLng waypoint in waypoints) {
@@ -58,6 +65,9 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to get location')),
         );
+        setState(() {
+          _isLoadingImage = false; // End loading state
+        });
         return;
       }
 
@@ -74,17 +84,32 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
     setState(() {
       _pickedLocations = tempLocation;
       _isGettingLocation = false;
+      _isLoadingImage = false; // End loading state
       widget.tourData.copyWith(waypoints: _pickedLocations);
     });
   }
 
   void _selectOnMap() async {
+    // Get the current location
+    Position currentPosition = await LocationFinder.getLocation();
+
+    // Pass the current location as the initialLocation parameter to the MapSelectorScreen
     final pickedLocations = await Navigator.of(context).push<List<LatLng>>(
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (ctx) => const MapSelectorScreen(),
+        builder: (ctx) => MapSelectorScreen(
+          initialLocation: TourEventLocation(
+            latitude: currentPosition.latitude,
+            longitude: currentPosition.longitude,
+            address: '',
+            name: '',
+          ),
+          isSelecting: true,
+          maxWaypoints: 50,
+        ),
       ),
     );
+
     if (pickedLocations == null) {
       return;
     }
@@ -115,20 +140,6 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget previewContent;
-
-    if (_pickedLocations != null) {
-      previewContent = Image.network(
-        locationImage,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
-        alignment: Alignment.center,
-      );
-    } else {
-      previewContent = Text('No location chosen', style: poppinsFont);
-    }
-
     return TourCreatorTemplate(
       title: 'Tour Creation',
       body: Column(
@@ -139,9 +150,23 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
                 fontSize: 20.0, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 25),
-          LocationContainer(
-            previewContent: previewContent,
-            isGettingLocation: _isGettingLocation,
+          Stack(
+            children: [
+              LocationContainer(
+                previewContent: _pickedLocations == null
+                    ? _isLoadingImage
+                        ? const CircularProgressIndicator()
+                        : Text('No location chosen', style: poppinsFont)
+                    : Image.network(
+                        locationImage,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        alignment: Alignment.center,
+                      ),
+                isGettingLocation: _isGettingLocation,
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           LocationInput(

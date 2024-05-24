@@ -225,7 +225,6 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       tourDetails: finalData,
       organizer: user,
       images: imageUrl,
-      duration: finalData.startTime,
       reviews: [],
       state: TourState.upcoming,
       registeredUsers: [],
