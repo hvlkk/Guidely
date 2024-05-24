@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
@@ -23,6 +24,14 @@ class ProfileScreen extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
+          )
+        ],
       ),
       body: userDataAsync.when(
         data: (userData) {
@@ -121,7 +130,7 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 25),
               ] else if (userData.authState == TourGuideAuthState.pending) ...[
                 Text(
-                  'Your tour guide status is pending. \nPlease wait for approval. (add styling)' ,
+                  'Your tour guide status is pending. \nPlease wait for approval. (add styling)',
                   style: poppinsFont.copyWith(
                     fontSize: 12,
                     color: MainColors.primary,

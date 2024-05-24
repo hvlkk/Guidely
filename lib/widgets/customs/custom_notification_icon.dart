@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/screens/util/notifications.dart';
 
 class CustomNotificationIcon extends StatelessWidget {
   final int unreadCount;
 
-  CustomNotificationIcon({required this.unreadCount});
+  List<myNoti.Notification> notifications;
+
+  CustomNotificationIcon(
+      {super.key, required this.notifications, required this.unreadCount});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => NotificationsScreen()));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (ctx) => NotificationsScreen(
+              notifications: notifications,
+            ),
+          ),
+        );
       },
       child: Stack(
         children: [
-          const Icon(Icons.notifications, size: 30), // Customize the icon size as needed
+          const Icon(Icons.notifications,
+              size: 30), // Customize the icon size as needed
           if (unreadCount > 0) ...[
             Positioned(
               top: 0,

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
@@ -116,7 +117,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final closestTours = LocationFinder.findClosestToursToPosition(
             tours,
             _currentPosition!,
-            8, 
+            8,
           );
           return closestTours;
         } else {
@@ -128,30 +129,30 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
     );
 
     // REALLY BAD LOGIC BUT GIVES THE IDEA OF HOW TO FILTER TOURS
-    
+
     // if (_selectedFilterValue == 'Closest') {
-        //   if (_currentPosition != null) {
-        //     final closestTours = LocationFinder.findClosestToursToPosition(
-        //       tours,
-        //       _currentPosition!,
-        //       8,
-        //     );
-        //     return closestTours;
-        //   } else {
-        //     return <Tour>[];
-        //   }
-        // } else if (_selectedFilterValue == 'Highest Rated') {
-        //   final highestRatedTours = TourFilter.filterHighestRated(tours);
-        //   return highestRatedTours;
-        // } else if (_selectedFilterValue == 'Matched') {
-        //   final matchedTours = TourFilter.filterMatched(tours);
-        //   return matchedTours;
-        // } else if (_selectedFilterValue == 'Newest') {
-        //   final newestTours = TourFilter.filterNewest(tours);
-        //   return newestTours;
-        // } else {
-        //   return <Tour>[];
-        // }
+    //   if (_currentPosition != null) {
+    //     final closestTours = LocationFinder.findClosestToursToPosition(
+    //       tours,
+    //       _currentPosition!,
+    //       8,
+    //     );
+    //     return closestTours;
+    //   } else {
+    //     return <Tour>[];
+    //   }
+    // } else if (_selectedFilterValue == 'Highest Rated') {
+    //   final highestRatedTours = TourFilter.filterHighestRated(tours);
+    //   return highestRatedTours;
+    // } else if (_selectedFilterValue == 'Matched') {
+    //   final matchedTours = TourFilter.filterMatched(tours);
+    //   return matchedTours;
+    // } else if (_selectedFilterValue == 'Newest') {
+    //   final newestTours = TourFilter.filterNewest(tours);
+    //   return newestTours;
+    // } else {
+    //   return <Tour>[];
+    // }
 
     final startLocations =
         tourDataFiltered.map((tour) => tour.tourDetails.waypoints![0]).toList();
@@ -176,7 +177,12 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
 
           final username = jsonDataMap['username'];
           final imageUrl = jsonDataMap['imageUrl'];
-          final notifications = jsonDataMap['notifications'];
+          final List<myNoti.Notification> notifications =
+              List<myNoti.Notification>.from(jsonDataMap['notifications'].map(
+                  (data) => myNoti.Notification.fromMap(
+                      Map<String, dynamic>.from(data))));
+
+          print("Notifications: $notifications");
           // filter notifications that are unread
           // final unreadNotifications = notifications
           //     .where((notification) => !notification.isRead)
@@ -224,13 +230,16 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         ),
                         const Spacer(),
                         GestureDetector(
-                          child: CustomNotificationIcon(unreadCount: 6),
-                          // child: CustomNotificationIcon(unreadCount: unreadNotifications.length),
+                          child: CustomNotificationIcon(
+                            notifications: notifications,
+                            unreadCount: 0,
+                          ),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (ctx) {
-                                  return NotificationsScreen();
+                                  return NotificationsScreen(
+                                      notifications: notifications);
                                 },
                               ),
                             );
@@ -320,7 +329,6 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                       onValueChanged: (value) {
                         setState(() {
                           _selectedFilterValue = value;
-                          
                         });
                       },
                     ),

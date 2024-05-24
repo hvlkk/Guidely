@@ -4,5 +4,8 @@
   },
   "dependencies": {
     "firebase-functions": "^5.0.1"
+  },
+  "engines": {
+    "node": "20"
   }
 }
