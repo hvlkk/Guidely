@@ -1,4 +1,3 @@
-// TODO: Move the entire sign-up functionality here
 /**
  * Import function triggers from their respective submodules:
  *
@@ -82,8 +81,8 @@ exports.subscribeTourAndNotifyEntry = functions.firestore
           token: organizerFcmToken,
         };
         // needs to be fixed
-        // await admin.messaging().send(message);
-        // console.log("Notification sent to organizer:", organizerFcmToken);
+        await admin.messaging().send(message);
+        console.log("Notification sent to organizer:", organizerFcmToken);
       } else {
         console.log("Organizer FCM token not found");
       }
