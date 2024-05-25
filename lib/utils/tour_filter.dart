@@ -54,8 +54,12 @@ class TourFilter {
 
   // filter tours that are created 5 or less days ago
   static filterByNew(List<Tour> tours) {
+    print('filter by new');
     final fourDaysAgo = DateTime.now().subtract(const Duration(days: 4));
     return tours.where((tour) {
+      print(tour.tourDetails.startDate);
+      print(fourDaysAgo);
+      print (tour.tourDetails.startDate.isAfter(fourDaysAgo));
       return tour.tourDetails.startDate.isAfter(fourDaysAgo);
     }).toList();
   }
@@ -63,6 +67,7 @@ class TourFilter {
 
   // sort by rating
   static filterByRating(List<Tour> tours) {
+    print('filter by rating');
     return tours.sort((a, b) => b.rating.compareTo(a.rating));
   }
 

@@ -110,16 +110,27 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
 
     late List<Tour> tourDataUnfiltered;
 
+    // TO BE MOVED + NEED WORK
     final tourDataFiltered = tourDataAsyncUnfiltered.when(
       data: (tours) {
         tourDataUnfiltered = tours;
-        if (_currentPosition != null) {
+        if (_selectedFilterValue == 'Closest' && _currentPosition != null) {
           final closestTours = LocationFinder.findClosestToursToPosition(
             tours,
             _currentPosition!,
             8,
           );
           return closestTours;
+        } else if (_selectedFilterValue == 'Highest Rated') {
+          // return TourFilter.filterByRating(tours);
+          return <Tour>[];
+        } else if (_selectedFilterValue == 'Matched') {
+          // final matchedTours = TourFilter.filterMatched(tours);
+          // return matchedTours;
+          return <Tour>[];
+        } else if (_selectedFilterValue == 'Newest') {
+          // return TourFilter.filterByNew(tours);
+          return <Tour>[];
         } else {
           return <Tour>[];
         }
@@ -128,31 +139,8 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
       error: (error, stackTrace) => List<Tour>.empty(),
     );
 
-    // REALLY BAD LOGIC BUT GIVES THE IDEA OF HOW TO FILTER TOURS
-
-    // if (_selectedFilterValue == 'Closest') {
-    //   if (_currentPosition != null) {
-    //     final closestTours = LocationFinder.findClosestToursToPosition(
-    //       tours,
-    //       _currentPosition!,
-    //       8,
-    //     );
-    //     return closestTours;
-    //   } else {
-    //     return <Tour>[];
-    //   }
-    // } else if (_selectedFilterValue == 'Highest Rated') {
-    //   final highestRatedTours = TourFilter.filterHighestRated(tours);
-    //   return highestRatedTours;
-    // } else if (_selectedFilterValue == 'Matched') {
-    //   final matchedTours = TourFilter.filterMatched(tours);
-    //   return matchedTours;
-    // } else if (_selectedFilterValue == 'Newest') {
-    //   final newestTours = TourFilter.filterNewest(tours);
-    //   return newestTours;
-    // } else {
-    //   return <Tour>[];
-    // }
+    print("--------------------------");
+    print(_selectedFilterValue);
 
     final startLocations =
         tourDataFiltered.map((tour) => tour.tourDetails.waypoints![0]).toList();
@@ -184,9 +172,9 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
 
           print("Notifications: $notifications");
           // filter notifications that are unread
-          // final unreadNotifications = notifications
-          //     .where((notification) => !notification.isRead)
-          //     .toList();
+          final unreadNotifications = notifications
+              .where((notification) => !notification.isRead)
+              .toList();
 
           final searchScreenController = TextEditingController();
           return Scaffold(
@@ -232,14 +220,15 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         GestureDetector(
                           child: CustomNotificationIcon(
                             notifications: notifications,
-                            unreadCount: 0,
+                            unreadCount: unreadNotifications.length,
                           ),
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (ctx) {
                                   return NotificationsScreen(
-                                      notifications: notifications);
+                                    notifications: notifications,
+                                  );
                                 },
                               ),
                             );
@@ -324,7 +313,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.only(left: 15),
+                    padding: const EdgeInsets.only(left: 15),
                     child: TourFilterDropdown(
                       onValueChanged: (value) {
                         setState(() {
