@@ -41,6 +41,7 @@ function constructNotification(uid, title, message) {
     title: title || "",
     message: message || "",
     date: new Date(),
+    isRead: false,
   };
 }
 

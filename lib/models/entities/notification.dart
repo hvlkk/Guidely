@@ -6,14 +6,14 @@ class Notification {
     required this.message,
     required this.date,
     required this.uid,
+    this.isRead = false,
   });
 
   final String title;
   final String message;
   final String date;
   final String uid;
-  // final String senderUid;
-  bool isRead = false;
+  bool isRead;
 
   Map<String, dynamic> toMap() {
     return {
@@ -21,6 +21,7 @@ class Notification {
       'message': message,
       'date': date,
       'uid': uid,
+      'isRead': isRead,
     };
   }
 
@@ -33,6 +34,7 @@ class Notification {
       title: map['title'] ?? '',
       message: map['message'] ?? '',
       date: dateTime.toString(),
+      isRead: map['isRead'] ?? false,
     );
   }
 }
