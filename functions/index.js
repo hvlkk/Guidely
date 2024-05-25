@@ -118,7 +118,8 @@ exports.handleAuthStatusChange = functions.firestore
     const userFCMToken = newValue.fcmToken;
     console.log("User FCM token:", userFCMToken);
 
-    if (userFCMToken) {
+    if (previousAuthState === 1 && newAuthState === 2) {
+      await common.sendNotificationToPendingOrganizer(newValue.uid, "approved");
       const message = {
         notification: {
           title: "Auth State Updated",
@@ -129,11 +130,15 @@ exports.handleAuthStatusChange = functions.firestore
       await admin.messaging().send(message);
     }
 
-    if (previousAuthState === 1 && newAuthState === 2) {
-      await common.sendNotificationToPendingOrganizer(newValue.uid, "approved");
-    }
-
     if (previousAuthState === 1 && newAuthState === 0) {
       await common.sendNotificationToPendingOrganizer(newValue.uid, "rejected");
+      const message = {
+        notification: {
+          title: "Auth State Updated",
+          body: `Your authentication state has been updated to ${newAuthState}.`,
+        },
+        token: userFCMToken,
+      };
+      await admin.messaging().send(message);
     }
   });

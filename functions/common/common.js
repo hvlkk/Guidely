@@ -1,4 +1,5 @@
 const admin = require("firebase-admin");
+const { v4: uuidv4 } = require("uuid");
 
 async function addNotificationToUser(userId, notification) {
   console.log("Adding notification to user:", userId, notification);
