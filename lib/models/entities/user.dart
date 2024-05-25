@@ -136,7 +136,7 @@ class User {
       lastName: lastName ?? this.lastName,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       dateJoined: dateJoined ?? this.dateJoined,
-      phoneNumber: phoneNumber,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
       languages: languages ?? this.languages,
       preferredTourCategories:
           preferredTourCategories ?? this.preferredTourCategories,
@@ -145,6 +145,6 @@ class User {
 
   @override
   String toString() {
-    return 'User{uid: $uid, username: $username, email: $email, tourGuideAuthState: $authState, bookedTours: $bookedTours, organizedTours: $organizedTours, registrationData: $registrationData}';
+    return 'User{uid: $uid, username: $username, email: $email, firstName: $firstName, lastName: $lastName, dateOfBirth: $dateOfBirth, phoneNumber: $phoneNumber, languages: $languages, preferredTourCategories: $preferredTourCategories, imageUrl: $imageUrl, tourGuideAuthState: $authState, bookedTours: $bookedTours, organizedTours: $organizedTours, registrationData: $registrationData}';
   }
 }

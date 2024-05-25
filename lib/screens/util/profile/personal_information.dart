@@ -39,6 +39,7 @@ class _PersonalInformationScreenState
   Future<void> _fetchUser() async {
     final user = ref.read(userDataProvider);
     user.whenData((userData) {
+      print(userData);
       setState(
         () {
           _uid = userData.uid;

@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:guidely/models/entities/notification.dart';
 import 'package:guidely/models/entities/user.dart' as myuser;
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
+import 'package:guidely/models/utils/language.dart';
+import 'package:guidely/models/utils/tour_category.dart';
 
 // reponsible for crud operations on user data
 class UserRepository {
@@ -27,6 +29,22 @@ class UserRepository {
         data['notifications']?.map((item) => Notification.fromMap(item)) ?? [],
       ),
       fcmToken: data['fcmToken'] ?? '',
+      firstName: data['firstName'] ?? '',
+      lastName: data['lastName'] ?? '',
+      dateOfBirth: data['dateOfBirth'] != null
+          ? (data['dateOfBirth'] as Timestamp).toDate()
+          : null,
+      phoneNumber: data['phoneNumber'],
+      languages: List<Language>.from(
+        (data['languages'] ?? []).map(
+          (language) => Language.fromMap(language),
+        ),
+      ),
+      preferredTourCategories: List<TourCategory>.from(
+        (data['preferredTourCategories'] ?? []).map(
+          (category) => tourCategoryFromString[category],
+        ),
+      ),
     );
     return newUser;
   }
@@ -65,6 +83,22 @@ class UserRepository {
         data['notifications']?.map((item) => Notification.fromMap(item)) ?? [],
       ),
       fcmToken: data['fcmToken'] ?? '',
+      firstName: data['firstName'] ?? '',
+      lastName: data['lastName'] ?? '',
+      dateOfBirth: data['dateOfBirth'] != null
+          ? (data['dateOfBirth'] as Timestamp).toDate()
+          : null,
+      phoneNumber: data['phoneNumber'],
+      languages: List<Language>.from(
+        (data['languages'] ?? []).map(
+          (language) => Language.fromMap(language),
+        ),
+      ),
+      preferredTourCategories: List<TourCategory>.from(
+        (data['preferredTourCategories'] ?? []).map(
+          (category) => tourCategoryFromString[category],
+        ),
+      ),
     );
     return newUser;
   }
