@@ -33,6 +33,7 @@ class UserRepository {
 
   Future<Map<String, dynamic>> updateUserData(
       String uid, Map<String, dynamic> data) async {
+    print("Data is $data");
     try {
       await _firestore.collection('users').doc(uid).set(
             data,
@@ -40,6 +41,7 @@ class UserRepository {
           );
       return {'success': true};
     } catch (e) {
+      print("Yeah, I'm here");
       print(e);
       return {'success': false, 'error': e};
     }

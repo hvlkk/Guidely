@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Notification {
   Notification({
     required this.title,
@@ -26,15 +24,16 @@ class Notification {
   }
 
   factory Notification.fromMap(Map<String, dynamic> map) {
-    Timestamp timestamp = map['date'] ?? Timestamp(0, 0);
-    DateTime dateTime = timestamp.toDate();
+    String dateTime = map['date'].toString();
 
     return Notification(
       uid: map['uid'] ?? '',
       title: map['title'] ?? '',
       message: map['message'] ?? '',
-      date: dateTime.toString(),
+      date: dateTime,
       isRead: map['isRead'] ?? false,
     );
   }
+
+  Map<String, dynamic> toJson() => toMap();
 }

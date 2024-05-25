@@ -24,14 +24,14 @@ async function getUserByUserId(userId) {
 
 async function sendNotificationToPendingOrganizer(userId, requestStatus) {
   try {
-      const notification = constructNotification(
-          uuidv4(),
-          `Request ${requestStatus}`,
-          `A request to become an organizer has been ${requestStatus}.`
-      );
-      await addNotificationToUser(userId, notification);
+    const notification = constructNotification(
+      uuidv4(),
+      `Request ${requestStatus}`,
+      `A request to become an organizer has been ${requestStatus}.`
+    );
+    await addNotificationToUser(userId, notification);
   } catch (error) {
-      console.error('Error sending notification to organizer:', error);
+    console.error("Error sending notification to organizer:", error);
   }
 }
 
@@ -40,7 +40,7 @@ function constructNotification(uid, title, message) {
     uid: uid || uuidv4(),
     title: title || "",
     message: message || "",
-    date: new Date(),
+    date: new Date().toString(),
     isRead: false,
   };
 }
