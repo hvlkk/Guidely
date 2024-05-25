@@ -37,17 +37,21 @@ class _PersonalInformationScreenState
   }
 
   Future<void> _fetchUser() async {
-    final user = await ref.read(userDataProvider.future);
-    setState(() {
-      _uid = user.uid;
-      _firstName = user.firstName;
-      _lastName = user.lastName;
-      _dateOfBirth = user.dateOfBirth;
-      _phoneNumber = user.phoneNumber != null
-          ? PhoneNumber(phoneNumber: user.phoneNumber)
-          : PhoneNumber(isoCode: 'GR');
-      _selectedLanguages.addAll(user.languages);
-      _selectedCategories.addAll(user.preferredTourCategories);
+    final user = ref.read(userDataProvider);
+    user.whenData((userData) {
+      setState(
+        () {
+          _uid = userData.uid;
+          _firstName = userData.firstName;
+          _lastName = userData.lastName;
+          _dateOfBirth = userData.dateOfBirth;
+          _phoneNumber = userData.phoneNumber != null
+              ? PhoneNumber(phoneNumber: userData.phoneNumber)
+              : PhoneNumber(isoCode: 'GR');
+          _selectedLanguages.addAll(userData.languages);
+          _selectedCategories.addAll(userData.preferredTourCategories);
+        },
+      );
     });
   }
 
@@ -245,10 +249,14 @@ class _PersonalInformationScreenState
                             decimal: true,
                           ),
                           validator: (value) {
-                            if (value == null) {
+                            if (value == null || value.isEmpty) {
                               return null;
                             }
-                            return null;
+                            value = value.trim();
+                            if (value.length >= 4 && value.length <= 15) {
+                              return null;
+                            }
+                            return 'Invalid phone number';
                           },
                         ),
                         const SizedBox(height: 10),
