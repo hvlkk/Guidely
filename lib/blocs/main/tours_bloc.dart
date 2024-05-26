@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
-import 'package:guidely/services/session_service.dart';
-import 'package:guidely/services/tour_service.dart';
-import 'package:guidely/services/user_service.dart';
+import 'package:guidely/services/business_layer/session_service.dart';
+import 'package:guidely/services/business_layer/tour_service.dart';
+import 'package:guidely/services/business_layer/user_service.dart';
 import 'package:guidely/utils/tour_filter.dart';
 
 abstract class TourState {}

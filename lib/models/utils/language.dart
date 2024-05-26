@@ -1,12 +1,3 @@
-const List<Language> languages = [
-  Language(name: 'English', code: 'gb'),
-  Language(name: 'Greek', code: 'gr'),
-  Language(name: 'German', code: 'de'),
-  Language(name: 'Spanish', code: 'es'),
-  Language(name: 'French', code: 'fr'),
-  Language(name: 'Italian', code: 'it'),
-];
-
 class Language {
   const Language({required this.name, required this.code});
 
@@ -27,3 +18,12 @@ class Language {
     );
   }
 }
+
+const List<Language> languages = [
+  Language(name: 'English', code: 'gb'),
+  Language(name: 'Greek', code: 'gr'),
+  Language(name: 'German', code: 'de'),
+  Language(name: 'Spanish', code: 'es'),
+  Language(name: 'French', code: 'fr'),
+  Language(name: 'Italian', code: 'it'),
+];

@@ -11,7 +11,7 @@ import 'package:guidely/models/entities/user.dart' as myuser;
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/util/tour_guide_registration/tour_registration_template.dart';
-import 'package:guidely/services/http_post_service.dart';
+import 'package:guidely/services/general/http_post_service.dart';
 import 'package:guidely/widgets/models/user_image_picker_widget.dart';
 import 'package:image_picker/image_picker.dart'; // alias to avoid conflicts
 

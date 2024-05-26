@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/providers/user_data_provider.dart';
-import 'package:guidely/services/user_service.dart';
+import 'package:guidely/services/business_layer/user_service.dart';
 
 class NotificationListItem extends ConsumerStatefulWidget {
   const NotificationListItem({

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guidely/repositories/user_repository.dart';
-import 'package:guidely/services/firestore_service.dart';
+import 'package:guidely/services/general/firestore_service.dart';
 
 class UserService extends FirestoreService {
   @override

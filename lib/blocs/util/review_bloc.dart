@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
-import 'package:guidely/services/review_service.dart';
+import 'package:guidely/services/business_layer/review_service.dart';
 
 abstract class ReviewState {}
 

@@ -1,5 +1,3 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/blocs/main/tours_bloc.dart' as toursBloc;
@@ -11,13 +9,13 @@ import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
-import 'package:guidely/screens/main/tour_session.dart';
+import 'package:guidely/screens/session/tour_session.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/review_creator/review_creator_screen.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
 import 'package:guidely/screens/util/waitingforhost.dart';
+import 'package:guidely/utils/util.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ToursScreen extends ConsumerStatefulWidget {
   const ToursScreen({super.key});
@@ -343,14 +341,5 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         ),
       ),
     ];
-  }
-
-  Future<void> openGoogleMaps(double latitude, double longitude) async {
-    final googleMapsUrl = Uri.parse(
-        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude');
-
-    await canLaunchUrl(googleMapsUrl)
-        ? await launchUrl(googleMapsUrl)
-        : throw 'Could not launch $googleMapsUrl';
   }
 }

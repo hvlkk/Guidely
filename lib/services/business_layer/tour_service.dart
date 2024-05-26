@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:guidely/repositories/tour_repository.dart';
-import 'package:guidely/services/firestore_service.dart';
+import 'package:guidely/services/general/firestore_service.dart';
 
 class TourService extends FirestoreService {
   @override

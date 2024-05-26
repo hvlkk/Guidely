@@ -4,6 +4,8 @@ import 'package:guidely/models/utils/tour_category.dart';
 import 'package:guidely/models/entities/notification.dart';
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 
+// TODO: Decompose the personal information of the user into a separate entity
+
 class User {
   final String uid;
   final String username;

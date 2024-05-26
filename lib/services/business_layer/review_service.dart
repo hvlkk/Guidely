@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:guidely/models/entities/review.dart';
-import 'package:guidely/services/tour_service.dart';
+import 'package:guidely/services/business_layer/tour_service.dart';
 
 class ReviewService {
   static Future<void> addReview(String tourId, Review review) async {

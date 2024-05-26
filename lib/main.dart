@@ -12,7 +12,7 @@ import 'package:guidely/screens/main/tours_home.dart';
 import 'package:guidely/widgets/customs/custom_navigator.dart';
 
 import 'firebase_messaging_service.dart';
-import 'firebase_options.dart';
+import 'config/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

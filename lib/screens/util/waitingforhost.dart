@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart';
-import 'package:guidely/screens/main/tour_session.dart';
+import 'package:guidely/screens/session/tour_session.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
-import 'package:guidely/services/tour_service.dart';
+import 'package:guidely/services/business_layer/tour_service.dart';
 
 // TODO: Maybe we could chance the name of this screen to better reflect its purpose
 // since it also has a some business logic in it

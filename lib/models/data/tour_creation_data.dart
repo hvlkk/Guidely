@@ -26,11 +26,6 @@ class TourCreationData {
     this.languages = const [],
   });
 
-  @override
-  String toString() {
-    return 'TourCreationData{title: $title, description: $description, startTime: $startTime, startDate: $startDate, waypoints: $waypoints, messageToParticipants: $messageToParticipants, activities: $activities, languages: $languages}';
-  }
-
   get startingLocation => waypoints?.first;
 
   TourCreationData copyWith({
@@ -103,5 +98,10 @@ class TourCreationData {
       'activities': activities.map((activity) => activity.name).toList(),
       'languages': languages.map((language) => language.toMap()).toList(),
     };
+  }
+
+  @override
+  String toString() {
+    return 'TourCreationData{title: $title, description: $description, startTime: $startTime, startDate: $startDate, waypoints: $waypoints, messageToParticipants: $messageToParticipants, activities: $activities, languages: $languages}';
   }
 }

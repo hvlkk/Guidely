@@ -5,8 +5,8 @@ import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
-import 'package:guidely/services/tour_service.dart';
-import 'package:guidely/services/user_service.dart';
+import 'package:guidely/services/business_layer/tour_service.dart';
+import 'package:guidely/services/business_layer/user_service.dart';
 
 class TourDetailsBloc {
   final Tour tour;

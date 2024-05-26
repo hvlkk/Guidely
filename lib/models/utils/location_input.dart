@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// ignore: must_be_immutable
 class LocationInput extends StatefulWidget {
   LocationInput({
     super.key,

@@ -110,6 +110,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
 
     late List<Tour> tourDataUnfiltered;
 
+    // TODO: We could separate the filtering logic into a separate component
     // WILL REPLACE CONDITIONAL LOGIC WITH TOUR FILTER.FILTERTOURS FUNCTION
     final tourDataFiltered = tourDataAsyncUnfiltered.when(
       data: (tours) {
