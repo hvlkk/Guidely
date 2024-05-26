@@ -1,8 +1,10 @@
 import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
+import 'package:guidely/services/session_service.dart';
 import 'package:guidely/services/tour_service.dart';
 import 'package:guidely/services/user_service.dart';
 import 'package:guidely/utils/tour_filter.dart';
@@ -76,8 +78,9 @@ class TourBloc {
     }
   }
 
-  void startTour(Tour tour) {
-    TourService.updateTourData(tour.uid, {'state': 'live'});
+  void startTour(Tour tour) async {
+    String id = await SessionService.createSession(tour);
+    TourService.updateTourData(tour.uid, {'state': 'live', 'sessionId': id});
   }
 
   Future<void> cancelTour(Tour tour, BuildContext context) async {

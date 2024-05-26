@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/widgets/entities/notification_list_item.dart';
 
+
 @immutable
 class NotificationsScreen extends StatelessWidget {
   NotificationsScreen({super.key, required this.notifications});

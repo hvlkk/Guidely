@@ -26,7 +26,6 @@ class Tour {
   final List<String> images;
   final User organizer;
   final String uid;
-
   List<String> registeredUsers;
   final List<Review> reviews;
   final List<TourCategory> categories;
@@ -99,6 +98,8 @@ class Tour {
     );
     return tour;
   }
+
+  get sessionId => uid + organizer.uid + tourDetails.startDate.toString() + tourDetails.startTime.toString();
 
   @override
   String toString() {

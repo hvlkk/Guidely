@@ -19,6 +19,7 @@ class _TourSessionScreenState extends State<TourSessionScreen> {
       ),
       body: Column(
         children: [
+          Text(widget.tour.sessionId),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
