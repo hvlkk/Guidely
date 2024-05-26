@@ -8,11 +8,12 @@ enum SessionStatus {
 }
 
 class Session {
-  
   final String sessionId;
   final String tourId;
-  final List<User> participants; // List of participants at the session != registered users
-  final List<String> mediaUrls; // List of media files (images) at are associated with the session // save to storage
+  final List<User>
+      participants; // List of participants at the session != registered users
+  final List<String>
+      mediaUrls; // List of media files (images) at are associated with the session // save to storage
   final List<String> chatMessages;
 
   SessionStatus status = SessionStatus.active;
@@ -42,9 +43,22 @@ class Session {
     return Session(
       sessionId: doc['sessionId'],
       tourId: doc['tourId'],
-      participants: (doc['participants'] as List).map((e) => User.fromMap(e)).toList(),
+      participants:
+          (doc['participants'] as List).map((e) => User.fromMap(e)).toList(),
       mediaUrls: doc['mediaUrls'],
       chatMessages: doc['chatMessages'],
+    );
+  }
+
+  static Session fromMap(Map<String, dynamic> sessionData) {
+    return Session(
+      sessionId: sessionData['sessionId'],
+      tourId: sessionData['tourId'],
+      participants: (sessionData['participants'] as List)
+          .map((e) => User.fromMap(e))
+          .toList(),
+      mediaUrls: List<String>.from(sessionData['mediaUrls']),
+      chatMessages: List<String>.from(sessionData['chatMessages']),
     );
   }
 }

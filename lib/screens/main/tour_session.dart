@@ -1,66 +1,95 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guidely/models/entities/session.dart';
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/services/session_service.dart';
 
-class TourSessionScreen extends StatefulWidget {
+class TourSessionScreen extends ConsumerStatefulWidget {
   const TourSessionScreen({super.key, required this.tour});
 
   final Tour tour;
 
   @override
-  State<TourSessionScreen> createState() => _TourSessionScreenState();
+  ConsumerState<TourSessionScreen> createState() => _TourSessionScreenState();
 }
 
-class _TourSessionScreenState extends State<TourSessionScreen> {
+class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
   @override
+
+  // We could keep it like this, where we have a centralized way to fetch the session data
+  // and re-fetch when needed or make listeners for every component that needs to know about the session data
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tour Session'),
       ),
-      body: Column(
-        children: [
-          Text(widget.tour.sessionId),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              widget.tour.tourDetails.title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 181, 161, 160),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          mapSection(),
-          mediaWithActionCarousel(),
-          Expanded(child: sessionChatSection()),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-                  child: const Text(
-                    'Back to Main',
-                    style: TextStyle(color: Colors.white),
+      body: StreamBuilder<Object>(
+          stream: SessionService.getSession(widget.tour.sessionId),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData ||
+                snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+            if (snapshot.data == null) {
+              return const Center(
+                child: Text('Session not found'),
+              );
+            }
+            if (snapshot.hasData && snapshot.data != null) {
+              print("Re-read session data");
+              var documentSnapshot = snapshot.data as DocumentSnapshot;
+              var sessionData = documentSnapshot.data() as Map<String, dynamic>;
+              Session session = Session.fromMap(sessionData);
+
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      widget.tour.tourDetails.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 181, 161, 160),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                  child: const Text(
-                    'End Session',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
+                  mapSection(),
+                  mediaWithActionCarousel(),
+                  Expanded(child: sessionChatSection()),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey),
+                          child: const Text(
+                            'Back to Main',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red),
+                          child: const Text(
+                            'End Session',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              );
+            }
+            return const CircularProgressIndicator();
+          }),
     );
   }
 
