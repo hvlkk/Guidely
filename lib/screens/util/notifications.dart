@@ -12,6 +12,8 @@ class NotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    notifications.sort((a, b) => b.date.compareTo(a.date));
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),

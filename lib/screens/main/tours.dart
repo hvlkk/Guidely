@@ -187,6 +187,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
               child: const Text('Announce'),
             )
           : const SizedBox(),
+      const SizedBox(width: 5),
       OutlinedButton(
         onPressed: () {
           Navigator.of(context).push(
@@ -197,6 +198,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         },
         child: const Text('Get Info'),
       ),
+      const SizedBox(width: 5),
       isAHoster
           ? TextButton(
               onPressed: () {
@@ -286,8 +288,9 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
             );
           }
         },
-        child: const Text('Join Now'),
+        child: Text(isAHoster ? 'Start Session' : 'Join Now'),
       ),
+      const SizedBox(width: 5),
       OutlinedButton(
         onPressed: () {
           final startingLocationWaypoints = tour.tourDetails.startingLocation;

@@ -17,14 +17,12 @@ class Tour {
     required this.organizer,
     required this.reviews,
     required this.state,
-    // this.duration = const TimeOfDay(hour: 2, minute: 0),
     this.images = const [],
     this.categories = const [],
     this.registeredUsers = const [],
   });
 
   final TourCreationData tourDetails;
-  // final TimeOfDay duration;
   final List<String> images;
   final User organizer;
   final String uid;
@@ -34,7 +32,6 @@ class Tour {
   final List<TourCategory> categories;
 
   TourState state = TourState.upcoming;
-  // final double rating = 4.0;
 
   get country => tourDetails.waypoints![0].address.split(',').last;
   get location => tourDetails.waypoints![0].address.split(',').first;
@@ -49,7 +46,6 @@ class Tour {
       'tourDetails': tourDetails.toMap(),
       'location': location,
       'country': country,
-      // 'duration': duration.hour,
       'images': images,
       'organizer': organizer.toMap(),
       'state': state.toString().split('.').last,
@@ -63,7 +59,6 @@ class Tour {
   factory Tour.fromMap(Map<String, dynamic> map) {
     return Tour(
       tourDetails: TourCreationData.fromMap(map['tourDetails']),
-      // duration: TimeOfDay(hour: map['duration'] ?? 0, minute: 0),
       images: List<String>.from(map['images'] ?? []),
       organizer: User.fromMap(map['organizer']),
       uid: map['uid'],
@@ -91,7 +86,6 @@ class Tour {
         (element) => element.toString() == 'TourState.${data['state']}',
       ),
       tourDetails: TourCreationData.fromMap(data['tourDetails']),
-      // duration: TimeOfDay(hour: data['duration'] ?? 0, minute: 0),
       images: List<String>.from(data['images'] ?? []),
       organizer: User.fromMap(data['organizer']),
       reviews: List<Review>.from(
