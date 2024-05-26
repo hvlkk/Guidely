@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:guidely/blocs/main/auth_bloc.dart';
-import 'package:guidely/widgets/models/user_image_picker_widget.dart';
 import 'package:guidely/misc/common.dart';
+import 'package:guidely/widgets/models/user_image_picker_widget.dart';
 
 enum AuthMode { login, signup }
 
@@ -61,6 +61,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ? Column(
                                     children: [
                                       UserImagePickerWidget(
+                                        onTourSession: false,
                                         onImagePicked: _authBloc.setUserImage,
                                       ),
                                       const SizedBox(height: 10),

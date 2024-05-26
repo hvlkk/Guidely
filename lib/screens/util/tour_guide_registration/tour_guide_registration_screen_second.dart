@@ -175,6 +175,7 @@ class _TourGuideRegistrationScreenSecondState
               ),
               const SizedBox(height: 10),
               UserImagePickerWidget(
+                onTourSession: false,
                 onImagePicked: (pickedImage) {
                   // Handle the picked image here
                 },

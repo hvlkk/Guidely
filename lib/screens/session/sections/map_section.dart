@@ -9,14 +9,14 @@ class MapSection extends StatelessWidget {
         Container(
           height: 200,
           color: Colors.grey,
-          child: Center(child: Text('Map Placeholder')),
+          child: const Center(child: Text('Map Placeholder')),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Guide\'s Current Location'),
+            const Text('Guide\'s Current Location'),
             IconButton(
-              icon: Icon(Icons.location_on),
+              icon: const Icon(Icons.location_on),
               onPressed: () {},
             ),
           ],

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guidely/blocs/main/session_bloc.dart';
 import 'package:guidely/models/entities/session.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/screens/session/sections/chat_section.dart';
@@ -19,6 +20,8 @@ class TourSessionScreen extends ConsumerStatefulWidget {
 }
 
 class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
+  final SessionBloc _sessionBloc = SessionBloc();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +57,7 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                   ),
                 ),
                 MapSection(),
-                MediaCarousel(mediaUrlsStream: Stream.value(session.mediaUrls)),
+                MediaCarousel(mediaUrlsStream: Stream.value(session.mediaUrls), sessionBloc: _sessionBloc, sessionId: widget.tour.sessionId),
                 Expanded(
                   child: ChatSection(
                       chatMessagesStream: Stream.value(session.chatMessages)),
