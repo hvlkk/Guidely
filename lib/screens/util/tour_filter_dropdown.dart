@@ -16,8 +16,8 @@ class _TourFilterDropdownState extends State<TourFilterDropdown> {
     'Nearby',
     'Highest Rated',
     // 'Most Popular', // SOMETHING CREATIVE (EXTRA)
-    'Matched',
-    'Newest',
+    'Activities',
+    'Starting Soon',
   ];
 
   @override

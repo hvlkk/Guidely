@@ -43,6 +43,21 @@ class TourFilter {
     }
   }
 
+  static filterTours(List<Tour> tours, String filterBy) {
+    switch (filterBy) {
+      case 'Activities':
+        // TO DO
+        return tours;
+      case 'Highest Rated':
+        print('sorting by rating');
+        return sortByRating(tours);
+      case 'Starting Soon':
+        return filterByStartingSoon(tours);
+      default:
+        return tours;
+    }
+  }
+
   // filter by user's favorite activities
   static filterByActivities(List<String> activities, List<Tour> tours) {
     return tours.where((tour) {
@@ -52,25 +67,21 @@ class TourFilter {
     }).toList();
   }
 
-  // filter tours that are created 5 or less days ago
-  static filterByNew(List<Tour> tours) {
-    print('filter by new');
-    final fourDaysAgo = DateTime.now().subtract(const Duration(days: 4));
+  // tours that are starting soon (within 3 days)
+  static filterByStartingSoon(List<Tour> tours) {
+    final threeDaysAgo = DateTime.now().add(const Duration(days: 3));
+
     return tours.where((tour) {
-      print(tour.tourDetails.startDate);
-      print(fourDaysAgo);
-      print (tour.tourDetails.startDate.isAfter(fourDaysAgo));
-      return tour.tourDetails.startDate.isAfter(fourDaysAgo);
+      bool isToday = _isSameDay(tour.tourDetails.startDate, DateTime.now());
+      return isToday || (tour.tourDetails.startDate.isAfter(DateTime.now()) && tour.tourDetails.startDate.isBefore(threeDaysAgo));
     }).toList();
   }
 
-
   // sort by rating
-  static filterByRating(List<Tour> tours) {
-    print('filter by rating');
-    return tours.sort((a, b) => b.rating.compareTo(a.rating));
+  static sortByRating(List<Tour> tours) {
+    tours.sort((a, b) => b.rating.compareTo(a.rating));
+    return tours;
   }
-
 
   static bool _isSameDay(DateTime date1, DateTime date2) {
     return date1.day == date2.day &&

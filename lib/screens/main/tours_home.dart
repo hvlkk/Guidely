@@ -30,7 +30,7 @@ class ToursHomeScreen extends ConsumerStatefulWidget {
 class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _userStream;
   Position? _currentPosition;
-  String _selectedFilterValue = 'Closest';
+  String _selectedFilterValue = 'Nearby';
 
   @override
   void initState() {
@@ -110,11 +110,11 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
 
     late List<Tour> tourDataUnfiltered;
 
-    // TO BE MOVED + NEED WORK
+    // WILL REPLACE CONDITIONAL LOGIC WITH TOUR FILTER.FILTERTOURS FUNCTION
     final tourDataFiltered = tourDataAsyncUnfiltered.when(
       data: (tours) {
         tourDataUnfiltered = tours;
-        if (_selectedFilterValue == 'Closest' && _currentPosition != null) {
+        if (_selectedFilterValue == 'Nearby' && _currentPosition != null) {
           final closestTours = LocationFinder.findClosestToursToPosition(
             tours,
             _currentPosition!,
@@ -122,15 +122,16 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           );
           return closestTours;
         } else if (_selectedFilterValue == 'Highest Rated') {
-          // return TourFilter.filterByRating(tours);
-          return <Tour>[];
+          print("Highest Rated");
+          List<Tour> highRatedTours = TourFilter.sortByRating(tours);
+          return highRatedTours;
         } else if (_selectedFilterValue == 'Matched') {
-          // final matchedTours = TourFilter.filterMatched(tours);
+          // final matchedTours = TourFilter.filterByActivities(, tours);
           // return matchedTours;
           return <Tour>[];
-        } else if (_selectedFilterValue == 'Newest') {
-          // return TourFilter.filterByNew(tours);
-          return <Tour>[];
+        } else if (_selectedFilterValue == 'Starting Soon') {
+          List<Tour> startingSoonTours = TourFilter.filterByStartingSoon(tours);
+          return startingSoonTours;
         } else {
           return <Tour>[];
         }
