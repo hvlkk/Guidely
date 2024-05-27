@@ -7,6 +7,7 @@ class CustomMap extends StatelessWidget {
   final List<Waypoint> waypoints;
   final bool withTrail;
   final bool currentLocation;
+  final bool onTourSession;
 
   const CustomMap({
     super.key,
@@ -14,6 +15,7 @@ class CustomMap extends StatelessWidget {
     required this.onTapWaypoint,
     this.withTrail = false,
     this.currentLocation = false,
+    this.onTourSession = false,
   });
 
   final void Function(LatLng p0) onTapWaypoint;
@@ -25,11 +27,31 @@ class CustomMap extends StatelessWidget {
       polylineCoordinates.add(LatLng(waypoint.latitude, waypoint.longitude));
     }
 
+    // TODO: Implement custom marker icon
+    //   BitmapDescriptor organizerIcon = BitmapDescriptor.defaultMarker;
+
+    //   Future<Uint8List> _getBytesFromNetworkImage(String url) async {
+    //   final http.Response response = await http.get(Uri.parse(url));
+    //   final Uint8List bytes = response.bodyBytes;
+    //   final ui.Codec codec = await ui.instantiateImageCodec(bytes, targetWidth: 100);
+    //   final ui.FrameInfo frame = await codec.getNextFrame();
+    //   final ByteData? byteData = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+    //   return byteData!.buffer.asUint8List();
+    // }
+
+    //   Future<void> _setCustomMarkerIcon() async {
+    //   final Uint8List markerIcon = await _getBytesFromNetworkImage();
+    //     organizerIcon = BitmapDescriptor.fromBytes(markerIcon);
+    // }
+
     return Column(
       children: [
         Expanded(
           child: FutureBuilder<LatLng?>(
-            future: currentLocation ? LocationFinder.getLocation().then((position) => LatLng(position.latitude, position.longitude)) : Future.value(null),
+            future: currentLocation
+                ? LocationFinder.getLocation().then(
+                    (position) => LatLng(position.latitude, position.longitude))
+                : Future.value(null),
             builder: (context, snapshot) {
               LatLng? userLocation = snapshot.data;
               return GoogleMap(
@@ -45,15 +67,46 @@ class CustomMap extends StatelessWidget {
                               BitmapDescriptor.hueRed),
                         ),
                   if (userLocation != null)
-                    Marker(
-                      markerId: MarkerId('currentLocation'),
-                      position: userLocation,
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                          BitmapDescriptor.hueBlue),
-                      infoWindow: InfoWindow(title: "Your Location"),
+                    _buildCustomMarker(
+                      "currentLocation",
+                      userLocation,
+                      BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueBlue,
+                      ),
+                      "Your Location",
                     ),
+                  // TEMPORARY: For testing purposes
+                  if (onTourSession) ...{
+                    _buildCustomMarker(
+                      "organizerLiveLocation",
+                      LatLng(waypoints[0].latitude, waypoints[0].longitude),
+                      BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueGreen,
+                      ),
+                      "Guide's Location",
+                    ),
+                    _buildCustomMarker(
+                      "tourStartingPoint",
+                      LatLng(waypoints[1].latitude,
+                          waypoints[1].longitude),
+                      BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueRed,
+                      ),
+                      "Tour Starting Point",
+                    ),
+                    _buildCustomMarker(
+                      "tourEndingPoint",
+                      LatLng(waypoints[waypoints.length - 1].latitude,
+                          waypoints[waypoints.length - 1].longitude),
+                      BitmapDescriptor.defaultMarkerWithHue(
+                        BitmapDescriptor.hueBlue,
+                      ),
+                      "Tour Ending Point",
+                    ),
+                  }
                 },
-                polylines: withTrail ? _buildPolylines(polylineCoordinates) : {},
+                polylines:
+                    withTrail ? _buildPolylines(polylineCoordinates) : {},
                 onMapCreated: (GoogleMapController controller) {
                   // Controller is ready
                 },
@@ -81,6 +134,20 @@ class CustomMap extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+
+  Marker _buildCustomMarker(
+    String markerId,
+    LatLng position,
+    BitmapDescriptor icon,
+    String title,
+  ) {
+    return Marker(
+      markerId: MarkerId(markerId),
+      position: position,
+      icon: icon,
+      infoWindow: InfoWindow(title: title),
     );
   }
 

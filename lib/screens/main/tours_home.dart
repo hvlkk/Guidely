@@ -141,9 +141,6 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
       error: (error, stackTrace) => List<Tour>.empty(),
     );
 
-    print("--------------------------");
-    print(_selectedFilterValue);
-
     final startLocations =
         tourDataFiltered.map((tour) => tour.tourDetails.waypoints![0]).toList();
 
