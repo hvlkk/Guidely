@@ -15,6 +15,7 @@ import 'package:guidely/screens/util/review_creator/review_creator_screen.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
 import 'package:guidely/screens/util/waitingforhost.dart';
 import 'package:guidely/utils/util.dart';
+import 'package:guidely/widgets/customs/custom_text_field.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 
 class ToursScreen extends ConsumerStatefulWidget {
@@ -180,7 +181,42 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
       isAHoster
           ? OutlinedButton(
               onPressed: () {
-                // Action for announcing the tour
+                // define a controller for the announcement
+                final announcementController = TextEditingController();
+                // ask user to announce the tour
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Announce Tour'),
+                      content: Column(
+                        children: [
+                          const Text('You can announce the tour here:'),
+                          const SizedBox(height: 10),
+                          CustomTextField(
+                              controller: announcementController,
+                              header: 'Announcement'),
+                        ],
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          child: const Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        TextButton(
+                          child: const Text('Announce'),
+                          onPressed: () {
+                            _tourBloc.announceTour(
+                                tour, announcementController.text);
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
               child: const Text('Announce'),
             )

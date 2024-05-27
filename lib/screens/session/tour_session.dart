@@ -7,6 +7,7 @@ import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/screens/session/sections/chat_section.dart';
 import 'package:guidely/screens/session/sections/map_section.dart';
 import 'package:guidely/screens/session/sections/media_carousel_section.dart';
+import 'package:guidely/screens/session/sections/voice_chat_section/voice_chat_section.dart';
 import 'package:guidely/services/business_layer/session_service.dart';
 
 // Tour Session Screen
@@ -27,6 +28,20 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tour Session'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.call),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => VoiceChatSection(
+                    sessionId: widget.tour.sessionId,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<Object>(
         stream: SessionService.getSession(widget.tour.sessionId),
@@ -57,7 +72,10 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                   ),
                 ),
                 MapSection(),
-                MediaCarousel(mediaUrlsStream: Stream.value(session.mediaUrls), sessionBloc: _sessionBloc, sessionId: widget.tour.sessionId),
+                MediaCarousel(
+                    mediaUrlsStream: Stream.value(session.mediaUrls),
+                    sessionBloc: _sessionBloc,
+                    sessionId: widget.tour.sessionId),
                 Expanded(
                   child: ChatSection(
                       chatMessagesStream: Stream.value(session.chatMessages)),

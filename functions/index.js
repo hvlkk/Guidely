@@ -9,8 +9,6 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
-const { v4: uuidv4 } = require("uuid");
-
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const common = require("./common/common");
@@ -46,10 +44,9 @@ exports.subscribeTourAndNotifyEntry = functions.firestore
     const tourId = context.params.tourId;
 
     const newValue = change.after.data();
-    const previousValue = change.before.data();
 
-    const newRegisteredUsers = newValue.registeredUsers;
-    const previousRegisteredUsers = previousValue.registeredUsers;
+    const newRegisteredUsers = change.after.data().registeredUsers;
+    const previousRegisteredUsers = change.before.data().registeredUsers;
 
     // Check if a new value was added to the registeredUsers list
     if (newRegisteredUsers.length > previousRegisteredUsers.length) {
@@ -65,37 +62,72 @@ exports.subscribeTourAndNotifyEntry = functions.firestore
       console.log("User subscribed to tour topic:", tourId);
 
       const organizerFcmToken = newValue.organizer.fcmToken;
-
-      if (organizerFcmToken) {
-        const message = {
-          notification: {
-            title: "New Tour Registration",
-            body: `A new user has registered for your tour.`,
-          },
-          token: organizerFcmToken,
-        };
+      console.log("Organizer FCM token:", organizerFcmToken);
+      const message = {
+        notification: {
+          title: "New Tour Registration",
+          body: "A new user has registered for your tour.",
+        },
+        token: organizerFcmToken,
+      };
+      try {
         await admin.messaging().send(message);
+        console.log("Notification sent to organizer:", newValue.organizer.uid);
+      } catch (error) {
+        console.error("Error sending notification to organizer:", error);
+      }
 
-        const notificationHoster = common.constructNotification(
-          uuidv4(),
-          "New Tour Registration",
-          `User ${user.username} has registered for your tour.`
-        );
+      await common.addNotificationToUser(
+        newValue.organizer.uid,
+        "New Tour Registration",
+        `User ${user.username} has registered for your tour.`
+      );
 
-        await common.addNotificationToUser(
-          newValue.organizer.uid,
-          notificationHoster
-        );
+      await common.addNotificationToUser(
+        newUserId,
+        "Tour Registration Successful",
+        "You have successfully registered for the tour."
+      );
+    }
+  });
 
-        const notificationUser = common.constructNotification(
-          uuidv4(),
-          "Tour Registration Successful",
-          `You have successfully registered for the tour.`
-        );
+exports.sendTourAnnouncementNotification = functions.firestore
+  .document("tours/{tourId}")
+  .onUpdate(async (change, context) => {
+    const tourId = context.params.tourId;
 
-        await common.addNotificationToUser(newUserId, notificationUser);
-      } else {
-        console.log("Organizer FCM token not found");
+    const newValue = change.after.data();
+
+    const newAnnouncement = change.after.data().recentAnnouncement;
+    const previousAnnouncement = change.before.data();
+
+    if (newAnnouncement !== previousAnnouncement) {
+      const message = {
+        notification: {
+          title: "New Announcement for Tour",
+          body: newAnnouncement,
+        },
+        topic: tourId,
+      };
+      try {
+        await admin.messaging().send(message);
+        console.log("Announcement notification sent to topic:", tourId);
+      } catch (error) {
+        console.error("Error sending notification:", error);
+      }
+
+      const registeredUsers = newValue.registeredUsers;
+      for (const userId of registeredUsers) {
+        try {
+          await common.addNotificationToUser(
+            userId,
+            "New Announcement",
+            newAnnouncement
+          );
+          console.log(`Notification added to user ${userId}`);
+        } catch (error) {
+          console.error(`Error adding notification to user ${userId}:`, error);
+        }
       }
     }
   });

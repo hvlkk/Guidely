@@ -72,8 +72,8 @@ class _MediaCarouselState extends State<MediaCarousel> {
                   const SizedBox(width: 10),
                   GestureDetector(
                     onTap: () async {
-                      final pickedFile = await ImagePicker()
-                          .pickImage(source: ImageSource.gallery, maxWidth: 150);
+                      final pickedFile = await ImagePicker().pickImage(
+                          source: ImageSource.gallery, maxWidth: 150);
                       if (pickedFile != null) {
                         File image = File(pickedFile.path);
                         setState(() {
@@ -86,7 +86,8 @@ class _MediaCarouselState extends State<MediaCarousel> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.lightBlue, // Background color
-                        borderRadius: BorderRadius.circular(8), // Rounded corners
+                        borderRadius:
+                            BorderRadius.circular(8), // Rounded corners
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,

@@ -96,6 +96,10 @@ class TourBloc {
     _loadTours(); // Reload tours after cancelling
   }
 
+  void announceTour(Tour tour, String text) {
+    TourService.updateTourData(tour.uid, {'recentAnnouncement': text});
+  }
+
   void dispose() {
     _stateController.close();
   }

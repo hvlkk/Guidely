@@ -1,8 +1,8 @@
 const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 
-async function addNotificationToUser(userId, notification) {
-  console.log("Adding notification to user:", userId, notification);
+async function addNotificationToUser(userId, title, message) {
+  const notification = constructNotification(title, message);
   try {
     const userRef = admin.firestore().collection("users").doc(userId);
     await userRef.update({
@@ -11,6 +11,16 @@ async function addNotificationToUser(userId, notification) {
   } catch (error) {
     console.error("Error adding notification:", error);
   }
+}
+
+function constructNotification(title, message) {
+  return {
+    uid: uuidv4(),
+    title: title || "",
+    message: message || "",
+    date: new Date().toString(),
+    isRead: false,
+  };
 }
 
 async function getUserByUserId(userId) {
@@ -36,19 +46,8 @@ async function sendNotificationToPendingOrganizer(userId, requestStatus) {
   }
 }
 
-function constructNotification(uid, title, message) {
-  return {
-    uid: uid || uuidv4(),
-    title: title || "",
-    message: message || "",
-    date: new Date().toString(),
-    isRead: false,
-  };
-}
-
 module.exports = {
   addNotificationToUser,
   getUserByUserId,
-  constructNotification,
   sendNotificationToPendingOrganizer,
 };
