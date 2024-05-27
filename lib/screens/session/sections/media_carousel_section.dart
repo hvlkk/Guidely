@@ -40,20 +40,54 @@ class _MediaCarouselState extends State<MediaCarousel> {
         return Column(
           children: [
             Container(
-              height: 120,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: mediaUrls
-                    .map((url) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0), // Add horizontal padding here
-                          child: Image.network(url),
-                        ))
-                    .toList(),
-              ),
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: mediaUrls.isEmpty
+                  ? Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: const Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.photo_camera,
+                              size: 30,
+                              color: Colors.grey,
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              'No media available yet. \nUpload a picture!',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : SizedBox(
+                      height: 125,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: mediaUrls
+                            .map((url) => Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal:
+                                          8.0), // Add horizontal padding here
+                                  child: Image.network(url),
+                                ))
+                            .toList(),
+                      ),
+                    ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 8.0),
+              padding: const EdgeInsets.only(top: 2.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -61,8 +95,8 @@ class _MediaCarouselState extends State<MediaCarousel> {
                     onTourSession: true,
                     onImagePicked: (pickedImage) {
                       // upload picture logic
-                      _mediaCarouselBloc
-                          .addMedia(context, pickedImage, widget.sessionId);
+                      _mediaCarouselBloc.addMedia(
+                          context, pickedImage, widget.sessionId);
                       setState(() {
                         takenImage = pickedImage;
                       });
@@ -78,8 +112,8 @@ class _MediaCarouselState extends State<MediaCarousel> {
                         setState(() {
                           uploadedImage = image;
                         });
-                        _mediaCarouselBloc
-                            .addMedia(context, image, widget.sessionId);
+                        _mediaCarouselBloc.addMedia(
+                            context, image, widget.sessionId);
                       }
                     },
                     child: Container(
@@ -90,7 +124,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16.0,
-                        vertical: 12.0,
+                        vertical: 8.0,
                       ),
                       child: const Text(
                         'Upload Picture',

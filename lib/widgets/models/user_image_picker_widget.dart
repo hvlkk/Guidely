@@ -49,7 +49,7 @@ class _UserImagePickerWidgetState extends State<UserImagePickerWidget> {
                   ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
-                    vertical: 12.0,
+                    vertical: 8.0,
                   ),
                   child: const Text(
                     'Take Picture',
