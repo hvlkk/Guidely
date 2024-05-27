@@ -74,7 +74,6 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                 MapSection(),
                 MediaCarousel(
                     mediaUrlsStream: Stream.value(session.mediaUrls),
-                    sessionBloc: _sessionBloc,
                     sessionId: widget.tour.sessionId),
                 Expanded(
                   child: ChatSection(

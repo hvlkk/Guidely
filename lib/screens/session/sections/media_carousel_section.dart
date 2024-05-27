@@ -4,19 +4,17 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:guidely/blocs/main/session_bloc.dart';
+import 'package:guidely/blocs/session/media_carousel_bloc.dart';
 import 'package:guidely/widgets/models/user_image_picker_widget.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MediaCarousel extends StatefulWidget {
   final Stream<List<String>> mediaUrlsStream;
-  final SessionBloc sessionBloc;
   final String sessionId;
 
   const MediaCarousel({
     super.key,
     required this.mediaUrlsStream,
-    required this.sessionBloc,
     required this.sessionId,
   });
 
@@ -25,6 +23,7 @@ class MediaCarousel extends StatefulWidget {
 }
 
 class _MediaCarouselState extends State<MediaCarousel> {
+  MediaCarouselBloc _mediaCarouselBloc = MediaCarouselBloc();
   File? uploadedImage;
   File? takenImage;
 
@@ -62,7 +61,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
                     onTourSession: true,
                     onImagePicked: (pickedImage) {
                       // upload picture logic
-                      widget.sessionBloc
+                      _mediaCarouselBloc
                           .addMedia(context, pickedImage, widget.sessionId);
                       setState(() {
                         takenImage = pickedImage;
@@ -79,7 +78,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
                         setState(() {
                           uploadedImage = image;
                         });
-                        widget.sessionBloc
+                        _mediaCarouselBloc
                             .addMedia(context, image, widget.sessionId);
                       }
                     },
