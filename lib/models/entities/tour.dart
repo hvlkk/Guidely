@@ -99,7 +99,15 @@ class Tour {
     return tour;
   }
 
-  get sessionId => uid + organizer.uid + tourDetails.startDate.toString() + tourDetails.startTime.toString();
+  get sessionId =>
+      uid +
+      organizer.uid +
+      tourDetails.startDate.toString() +
+      tourDetails.startTime.toString();
+
+  bool isTourGuide(String uid) {
+    return organizer.uid == uid;
+  }
 
   @override
   String toString() {

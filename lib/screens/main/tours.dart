@@ -5,6 +5,7 @@ import 'package:guidely/blocs/main/tours_bloc.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/tour.dart' as toursModel;
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/models/entities/user.dart' as usersModel;
 import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/tours_provider.dart';

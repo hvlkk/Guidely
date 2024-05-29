@@ -149,4 +149,26 @@ class User {
   String toString() {
     return 'User{uid: $uid, username: $username, email: $email, firstName: $firstName, lastName: $lastName, dateOfBirth: $dateOfBirth, phoneNumber: $phoneNumber, languages: $languages, preferredTourCategories: $preferredTourCategories, imageUrl: $imageUrl, tourGuideAuthState: $authState, bookedTours: $bookedTours, organizedTours: $organizedTours, registrationData: $registrationData}';
   }
+
+  static fromUser(User user) {
+    return User(
+      uid: user.uid,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      dateOfBirth: user.dateOfBirth,
+      phoneNumber: user.phoneNumber,
+      languages: user.languages,
+      preferredTourCategories: user.preferredTourCategories,
+      dateJoined: user.dateJoined,
+      imageUrl: user.imageUrl,
+      authState: user.authState,
+      bookedTours: user.bookedTours,
+      organizedTours: user.organizedTours,
+      notifications: user.notifications,
+      registrationData: user.registrationData,
+      fcmToken: user.fcmToken,
+    );
+  }
 }
