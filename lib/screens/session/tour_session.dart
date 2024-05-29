@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guidely/blocs/main/session_bloc.dart';
 import 'package:guidely/models/entities/session.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/user_data_provider.dart';

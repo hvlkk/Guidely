@@ -99,7 +99,7 @@ exports.sendTourAnnouncementNotification = functions.firestore
     const newValue = change.after.data();
 
     const newAnnouncement = change.after.data().recentAnnouncement;
-    const previousAnnouncement = change.before.data();
+    const previousAnnouncement = change.before.data().recentAnnouncement;
 
     if (newAnnouncement !== previousAnnouncement) {
       const message = {
