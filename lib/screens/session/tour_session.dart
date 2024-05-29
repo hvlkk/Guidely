@@ -35,7 +35,7 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
     super.initState();
     // Start periodic location updates
     _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      // _locationService.updateLocation(widget.tour.organizer.uid);
+      _locationService.updateLocation(widget.tour.organizer.uid);
     });
   }
 

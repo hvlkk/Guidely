@@ -20,7 +20,6 @@ class _MapSectionState extends State<MapSection> {
   @override
   void initState() {
     super.initState();
-    // Initialize the location stream for the tour guide
     _locationStream = _firestore
         .collection('locations')
         .doc(widget.tour.organizer.uid)
