@@ -1,55 +1,63 @@
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:photo_view/photo_view.dart';
 
 class MediaCarouselBloc {
-  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+  // void showImageDialog(BuildContext context, String url) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return Dialog(
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Image.network(url),
+  //             TextButton(
+  //               onPressed: () => _downloadImage(context, url),
+  //               child: Text('Download Image'),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
-  Future<String> uploadImage(File pickedImage, String sessionId) async {
-    try {
-      // Generate a unique identifier for the image
-      final String uuid = const Uuid().v4();
-
-      // Define the path for the image in Firebase Storage
-      final String imagePath = 'session_images/$sessionId/$uuid.jpg';
-
-      // Upload the image file to Firebase Storage
-      final UploadTask uploadTask = _firebaseStorage.ref().child(imagePath).putFile(pickedImage);
-      
-      // Get the download URL for the uploaded image
-      final TaskSnapshot taskSnapshot = await uploadTask;
-      final String imageURL = await taskSnapshot.ref.getDownloadURL();
-      
-      return imageURL;
-    } catch (error) {
-      // Handle errors here, if any
-      print('Error uploading image: $error');
-      return '';
-    }
+  void showImageDialog(BuildContext context, String url) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          body: PhotoView(
+            imageProvider: NetworkImage(url),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => downloadImage(url),
+            child: const Icon(Icons.download),
+          ),
+        ),
+      ),
+    );
   }
 
-  Future<void> addMedia(BuildContext context, File pickedImage, String sessionId) async {
+  Future<void> downloadImage(String url) async {
     try {
-      // Upload the image and get its URL
-      final String imageURL = await uploadImage(pickedImage, sessionId);
-
-      // Add the image URL to the Firestore document
-      await FirebaseFirestore.instance.collection('sessions').doc(sessionId).update({
-        'mediaUrls': FieldValue.arrayUnion([imageURL]),
-      });
-      
-      print('Media added successfully');
-    } catch (error) {
-      // Handle errors here, if any
-      print('Error adding media: $error');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An error occurred. Please try again later.'),
-        ),
+      final taskId = await FlutterDownloader.enqueue(
+        url: url,
+        savedDir: (await getApplicationDocumentsDirectory()).path,
+        fileName: url.split('/').last,
+        headers: {"network-type": "ANY"},
       );
+
+      // Introduce a delay between update calls
+      await Future.delayed(
+          Duration(seconds: 100)); // Adjust delay duration as needed
+
+      print('Download task ID: $taskId');
+    } catch (error, stackTrace) {
+      print('Error downloading image: $error');
+      print('Stack trace: $stackTrace');
     }
   }
 }

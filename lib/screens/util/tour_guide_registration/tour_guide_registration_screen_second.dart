@@ -11,6 +11,7 @@ import 'package:guidely/models/entities/user.dart' as myuser;
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/util/tour_guide_registration/tour_registration_template.dart';
+import 'package:guidely/services/general/firebase_storage_service.dart';
 import 'package:guidely/services/general/http_post_service.dart';
 import 'package:guidely/widgets/models/user_image_picker_widget.dart';
 import 'package:image_picker/image_picker.dart'; // alias to avoid conflicts
@@ -31,13 +32,50 @@ class TourGuideRegistrationScreenSecond extends ConsumerStatefulWidget {
 
 class _TourGuideRegistrationScreenSecondState
     extends ConsumerState<TourGuideRegistrationScreenSecond> {
-  XFile? selectedImage;
+  FirebaseStorageService _firebaseStorageService = FirebaseStorageService();
+  File? selectedImage;
+  String? selectedImageFirebaseUrl;
+
+  void _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 150,
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  void getImageURL(String userId) async {
+  try {
+    // Call addMedia function and await the imageURL
+    String imageURL = await _firebaseStorageService.addMedia(context, selectedImage!, 'users', userId, true);
+
+    // Use the imageURL here
+    print('Received imageURL: $imageURL');
+
+    setState(() {
+      selectedImageFirebaseUrl = imageURL;
+    });
+
+    // Call fetchImage function to fetch the image using the received imageURL
+    // fetchImage(imageURL);
+
+    // Perform other actions with the imageURL
+  } catch (error) {
+    // Handle errors here
+    print('Error: $error');
+  }
+}
 
   void _submitRegistration(BuildContext context, myuser.User user) async {
     RegistrationData registrationData = RegistrationData(
       uid: user.uid,
       description: widget.description,
-      uploadedIdURL: '',
+      uploadedIdURL: selectedImageFirebaseUrl!,
     );
 
     final updatedUser = user.copyWith(
@@ -49,6 +87,9 @@ class _TourGuideRegistrationScreenSecondState
     );
 
     try {
+      print('Registration data: ');
+      print(registrationData.toJson());
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(updatedUser.uid)
@@ -59,6 +100,18 @@ class _TourGuideRegistrationScreenSecondState
         },
         SetOptions(merge: true), // Merge with existing data
       );
+
+      // Construct the body of the POST request
+      final Map<String, dynamic> requestBody = {
+        'uid': user.uid,
+        'username': user.username,
+        'email': user.email,
+        'registrationData': registrationData.toJson(),
+        // Add other user data fields as needed
+      };
+
+      final userDataService = HttpPostService();
+      await userDataService.postUserData('/submit-user-data', requestBody);
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -66,18 +119,6 @@ class _TourGuideRegistrationScreenSecondState
         ),
       );
     }
-
-    // Construct the body of the POST request
-    final Map<String, dynamic> requestBody = {
-      'uid': user.uid,
-      'username': user.username,
-      'email': user.email,
-      'registrationData': registrationData.toJson(),
-      // Add other user data fields as needed
-    };
-
-    final userDataService = HttpPostService();
-    await userDataService.postUserData('/submit-user-data', requestBody);
 
     Navigator.of(context).popUntil(
       (route) => route.isFirst,
@@ -114,11 +155,7 @@ class _TourGuideRegistrationScreenSecondState
                           ),
                         ),
                         onTap: () async => {
-                          selectedImage = await ImagePicker().pickImage(
-                              source: ImageSource.gallery, maxWidth: 150),
-                          setState(() {
-                            selectedImage = selectedImage;
-                          })
+                          _pickImage(),
                         },
                       )
                     : Card(
@@ -178,6 +215,11 @@ class _TourGuideRegistrationScreenSecondState
                 onTourSession: false,
                 onImagePicked: (pickedImage) {
                   // Handle the picked image here
+                  if (selectedImage == null) {
+                    setState(() {
+                      selectedImage = pickedImage;
+                    });
+                  }
                 },
                 radius: 80,
               ),
@@ -191,6 +233,9 @@ class _TourGuideRegistrationScreenSecondState
                   final user = ref.read(userDataProvider);
                   user.when(
                     data: (userData) {
+                      String userId = userData.uid;
+                      // Call the getImageURL function to get the imageURL
+                      getImageURL(userId);
                       _submitRegistration(context, userData);
                     },
                     loading: () {},

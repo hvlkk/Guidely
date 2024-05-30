@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:guidely/blocs/session/media_carousel_bloc.dart';
+import 'package:guidely/services/general/firebase_storage_service.dart';
 import 'package:guidely/widgets/models/user_image_picker_widget.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -23,6 +24,7 @@ class MediaCarousel extends StatefulWidget {
 }
 
 class _MediaCarouselState extends State<MediaCarousel> {
+  FirebaseStorageService _firebaseStorageService = FirebaseStorageService();
   MediaCarouselBloc _mediaCarouselBloc = MediaCarouselBloc();
   File? uploadedImage;
   File? takenImage;
@@ -78,9 +80,16 @@ class _MediaCarouselState extends State<MediaCarousel> {
                         children: mediaUrls
                             .map((url) => Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal:
-                                          8.0), // Add horizontal padding here
-                                  child: Image.network(url),
+                                      horizontal: 8.0),
+                                  child: GestureDetector(
+                                    onTap: () => _mediaCarouselBloc.showImageDialog(context, url),
+                                    child: Stack(
+                                      alignment: Alignment.topRight,
+                                      children: [
+                                        Image.network(url),
+                                      ],
+                                    ),
+                                  ),
                                 ))
                             .toList(),
                       ),
@@ -95,8 +104,8 @@ class _MediaCarouselState extends State<MediaCarousel> {
                     onTourSession: true,
                     onImagePicked: (pickedImage) {
                       // upload picture logic
-                      _mediaCarouselBloc.addMedia(
-                          context, pickedImage, widget.sessionId);
+                      _firebaseStorageService.addMedia(context, pickedImage,
+                          'sessions', widget.sessionId, false);
                       setState(() {
                         takenImage = pickedImage;
                       });
@@ -112,8 +121,8 @@ class _MediaCarouselState extends State<MediaCarousel> {
                         setState(() {
                           uploadedImage = image;
                         });
-                        _mediaCarouselBloc.addMedia(
-                            context, image, widget.sessionId);
+                        _firebaseStorageService.addMedia(context, image,
+                            'sessions', widget.sessionId, false);
                       }
                     },
                     child: Container(

@@ -36,11 +36,10 @@ async function getUserByUserId(userId) {
 async function sendNotificationToPendingOrganizer(userId, requestStatus) {
   try {
     const notification = constructNotification(
-      uuidv4(),
       `Request ${requestStatus}`,
       `A request to become an organizer has been ${requestStatus}.`
     );
-    await addNotificationToUser(userId, notification);
+    await addNotificationToUser(userId, notification.title, notification.message);
   } catch (error) {
     console.error("Error sending notification to organizer:", error);
   }

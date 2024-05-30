@@ -3,16 +3,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/screens/main/auth.dart';
 import 'package:guidely/screens/main/profile.dart';
 import 'package:guidely/screens/main/tours.dart';
 import 'package:guidely/screens/main/tours_home.dart';
+import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/widgets/customs/custom_navigator.dart';
 
-import 'firebase_messaging_service.dart';
 import 'config/firebase_options.dart';
+import 'firebase_messaging_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,8 @@ void main() async {
   // Request location permission
   await LocationFinder.requestLocationPermission();
   FirebaseMessagingService().init();
+
+  await FlutterDownloader.initialize(debug: true);
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(

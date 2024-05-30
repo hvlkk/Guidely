@@ -366,6 +366,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_downloader:
+    dependency: "direct main"
+    description:
+      name: flutter_downloader
+      sha256: "188d921f78471cb28ec2346bcf4045a27a516e384e2bfc9b4be12ae12d3ff8c8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.11.7"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -841,7 +849,7 @@ packages:
     source: hosted
     version: "1.0.1"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: c9e7d3a4cd1410877472158bee69963a4579f78b68c65a2b7d40d1a7a88bb161
@@ -944,6 +952,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.2"
+  photo_view:
+    dependency: "direct main"
+    description:
+      name: photo_view
+      sha256: "1fc3d970a91295fbd1364296575f854c9863f225505c28c46e0a03e48960c75e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.15.0"
   platform:
     dependency: transitive
     description:
