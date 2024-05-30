@@ -4,11 +4,21 @@ import 'package:guidely/models/entities/session.dart';
 class SessionRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> updateSession(Session session) async {
+  Future<void> createSession(Session session) async {
     await _firestore.collection('sessions').doc(session.sessionId).set(
           session.toMap(),
           SetOptions(merge: true),
         );
+  }
+
+  Future<void> updateSession(
+      String sessionId, Map<String, dynamic> data) async {
+    print("Now updating session");
+    print("The data is: $data");
+    await _firestore
+        .collection('sessions')
+        .doc(sessionId)
+        .set(data, SetOptions(merge: true));
   }
 
   Stream<DocumentSnapshot> getSessionStream(String sessionId) {
@@ -17,8 +27,9 @@ class SessionRepository {
 
   Stream<List<Session>> getSessionsStream() {
     return _firestore.collection('sessions').snapshots().map(
-          (snapshot) =>
-              snapshot.docs.map((doc) => Session.fromFirestore(doc)).toList() as List<Session>,
+          (snapshot) => snapshot.docs
+              .map((doc) => Session.fromFirestore(doc))
+              .toList() as List<Session>,
         );
   }
 }

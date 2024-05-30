@@ -14,7 +14,6 @@ import 'package:guidely/screens/session/sections/voice_chat_section/voice_chat_s
 import 'package:guidely/services/business_layer/session_service.dart';
 import 'package:guidely/services/general/live_location_service.dart';
 
-// Tour Session Screen
 class TourSessionScreen extends ConsumerStatefulWidget {
   TourSessionScreen({super.key, required this.tour});
 

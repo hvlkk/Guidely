@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:guidely/blocs/session/voice_chat_bloc.dart';
-
-enum VoiceChatState {
-  idle,
-  connecting,
-  connected,
-}
+import 'package:guidely/models/enums/voice_chat_state.dart';
+import 'package:guidely/services/business_layer/session_service.dart';
 
 class VoiceChatSection extends StatefulWidget {
   VoiceChatSection({
@@ -19,7 +15,7 @@ class VoiceChatSection extends StatefulWidget {
   final bool isTourGuide;
   final String hostIconURL;
   final String sessionId;
-  VoiceChatState voiceChatState = VoiceChatState.idle;
+  VoiceChatState voiceChatState = VoiceChatState.connecting;
 
   @override
   _VoiceChatSectionState createState() => _VoiceChatSectionState();
@@ -36,6 +32,14 @@ class _VoiceChatSectionState extends State<VoiceChatSection> {
     _voiceChatBloc.signaling.onAddRemoteStream = (MediaStream stream) {
       setState(() {});
     };
+    _voiceChatBloc.listenToVoiceChatSession(widget.sessionId, (String state) {
+      if (state == VoiceChatState.connected.toString()) {
+        setState(() {
+          widget.voiceChatState = VoiceChatState.connected;
+        });
+        return;
+      }
+    });
   }
 
   @override
@@ -44,6 +48,8 @@ class _VoiceChatSectionState extends State<VoiceChatSection> {
     super.dispose();
   }
 
+  // todo: here, when the voice chat session will begin, we will update the value on the database
+  // we will setup a listener on the database to listen to the changes and update the UI accordingly
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,9 +90,12 @@ class _VoiceChatSectionState extends State<VoiceChatSection> {
                     setState(() {
                       widget.voiceChatState = VoiceChatState.connected;
                     });
+                    SessionService().updateSession(widget.sessionId,
+                        {"voiceChatState": widget.voiceChatState.toString()});
                   } else {
                     _voiceChatBloc.joinRoom(
                         textEditingController.text.trim(), widget.sessionId);
+                    setState(() {});
                   }
                 },
                 child: Text(widget.isTourGuide ? "Start room" : "Join room"),
@@ -94,7 +103,16 @@ class _VoiceChatSectionState extends State<VoiceChatSection> {
               const SizedBox(width: 20),
               ElevatedButton(
                 onPressed: () {
-                  _voiceChatBloc.hangUp();
+                  if (widget.isTourGuide) {
+                    setState(() {
+                      widget.voiceChatState = VoiceChatState.ended;
+                    });
+                    _voiceChatBloc.hangUp(widget.sessionId, true,
+                        deleteSession: true);
+                    clean();
+                    return;
+                  }
+                  _voiceChatBloc.hangUp(widget.sessionId, false);
                 },
                 child: const Text(
                   "End Voice Chat",
@@ -137,5 +155,9 @@ class _VoiceChatSectionState extends State<VoiceChatSection> {
         ],
       ),
     );
+  }
+
+  void clean() {
+    textEditingController.clear();
   }
 }

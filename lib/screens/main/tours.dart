@@ -12,6 +12,7 @@ import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/screens/session/tour_session.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
+import 'package:guidely/screens/util/quiz_creator/quiz_creator_screen.dart';
 import 'package:guidely/screens/util/review_creator/review_creator_screen.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator.dart';
 import 'package:guidely/screens/util/waitingforhost.dart';
@@ -70,6 +71,19 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                       ),
                     );
                     // re-render the screen after the user has created a tour
+                    setState(() {});
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.quiz),
+                  onPressed: () {
+                    // todo: change this to a dialog where a user
+                    // can select a tour to add a quiz to
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => QuizCreatorScreen(),
+                      ),
+                    );
                     setState(() {});
                   },
                 ),
@@ -301,8 +315,13 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                       child: const Text('Start'),
                       onPressed: () {
                         _tourBloc.startTour(tour);
-                        Navigator.of(context).pop();
-                        setState(() {});
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => TourSessionScreen(
+                              tour: tour,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   ],
