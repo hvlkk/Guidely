@@ -37,15 +37,18 @@ def submit_user_data():
     email = data.get('email')
     auth_state = data.get('authState')
     registration_data = data.get('registrationData')
+    print('registration_data: ', registration_data)
     
     description = registration_data.get('description')
-    uploaded_url = registration_data.get('uploadedUrl')
+    uploaded_url = registration_data.get('uploadedIdURL')
+    print('uploaded_url: ', uploaded_url)
 
     new_request = {
         "user_id": uid,
         "name": username,
         "email": email,
-        "message": description
+        "description": description,
+        "uploaded_url": uploaded_url,
     }
 
     print('new_request: ', new_request)
@@ -169,4 +172,4 @@ def send_static(path):
     return send_file(os.path.join('static', path))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='192.168.17.241', port=5000)
