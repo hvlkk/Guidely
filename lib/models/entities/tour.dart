@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:guidely/models/data/quiz/quiz.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/user.dart';
@@ -20,6 +21,7 @@ class Tour {
     this.images = const [],
     this.categories = const [],
     this.registeredUsers = const [],
+    this.quizzes = const [],
   });
 
   final TourCreationData tourDetails;
@@ -29,6 +31,7 @@ class Tour {
   List<String> registeredUsers;
   final List<Review> reviews;
   final List<TourCategory> categories;
+  final List<Quiz> quizzes;
 
   TourState state = TourState.upcoming;
 
@@ -52,6 +55,7 @@ class Tour {
       'categories':
           categories.map((category) => tourCategoryToString[category]).toList(),
       'registeredUsers': registeredUsers,
+      'quizzes': quizzes.map((quiz) => quiz.toMap()).toList(),
     };
   }
 
@@ -72,6 +76,9 @@ class Tour {
       ),
       state: TourState.values.firstWhere(
         (element) => element.toString() == 'TourState.${map['state']}',
+      ),
+      quizzes: List<Quiz>.from(
+        map['quizzes']?.map((quiz) => Quiz.fromMap(quiz)) ?? [],
       ),
     );
   }
@@ -95,6 +102,9 @@ class Tour {
             [],
       ),
       registeredUsers: List<String>.from(data['registeredUsers'] ?? []),
+      quizzes: List<Quiz>.from(
+        data['quizzes']?.map((quiz) => Quiz.fromMap(quiz)) ?? [],
+      ),
     );
     return tour;
   }

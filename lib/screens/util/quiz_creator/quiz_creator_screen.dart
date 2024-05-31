@@ -1,16 +1,20 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:guidely/misc/common.dart';
-import 'package:guidely/screens/util/quiz_creator/components/multiple_choice_component.dart';
-import 'package:guidely/screens/util/quiz_creator/components/single_choice_component.dart';
+import 'package:guidely/models/data/quiz/quiz.dart';
+import 'package:guidely/models/data/quiz/quiz_item.dart';
+import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/widgets/customs/custom_switch.dart';
 import 'package:image_picker/image_picker.dart';
 
 class QuizCreatorScreen extends StatefulWidget {
-  QuizCreatorScreen({super.key});
+  QuizCreatorScreen({
+    super.key,
+    required this.tour,
+  });
 
-  List<String> answers = [];
+  final Tour tour;
 
   @override
   State<QuizCreatorScreen> createState() => _QuizCreatorScreenState();
@@ -19,23 +23,49 @@ class QuizCreatorScreen extends StatefulWidget {
 class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
   var selectedImage;
   final _tourTitleController = TextEditingController();
-
   bool _isMultipleChoice = false;
+  List<String> answers = [];
+  String answerLimitMessage = '';
+  bool isTrueCorrect = false;
+  bool isFalseCorrect = false;
+  int correctAnswerIndex = -1;
+
+  List<QuizItem> quizItems = [];
+
+  void _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 150,
+    );
+
+    if (pickedFile != null && mounted) {
+      setState(() {
+        selectedImage = File(pickedFile.path);
+      });
+    }
+  }
 
   void _handleSwitchChange(bool value) {
-    setState(() {
-      _isMultipleChoice = value;
-    });
+    if (mounted) {
+      setState(() {
+        _isMultipleChoice = value;
+        // Update answers based on switch change
+        if (!_isMultipleChoice) {
+          answers = ['True', 'False'];
+          correctAnswerIndex = isTrueCorrect ? 0 : (isFalseCorrect ? 1 : -1);
+        } else {
+          answers.clear();
+          isTrueCorrect = false; // Reset True as correct answer
+          isFalseCorrect = false; // Reset False as correct answer
+          correctAnswerIndex =
+              -1; // Reset correct answer index for multiple-choice
+        }
+        answerLimitMessage = '';
+      });
+    }
   }
 
-  void _addCustomAnswer(String name) {
-    // this will need to update to allow for custom answers names
-    setState(() {
-      widget.answers.add(name);
-    });
-  }
-
-  void _showInputDialog() {
+  void _addCustomAnswer() {
     TextEditingController _answerController = TextEditingController();
 
     showDialog(
@@ -51,11 +81,112 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
             ElevatedButton(
               child: const Text('OK'),
               onPressed: () {
-                setState(() {
-                  _addCustomAnswer(_answerController.text);
-                });
-                Navigator.of(context).pop();
+                if (mounted) {
+                  _addAnswer(_answerController.text);
+                  Navigator.of(context).pop();
+                }
               },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _addAnswer(String name) {
+    // Ensure there are no more than 4 answers for multiple-choice questions
+    if (_isMultipleChoice && answers.length < 4 && mounted) {
+      setState(() {
+        answers.add(name);
+        if (answers.length == 4) {
+          answerLimitMessage =
+              'You have added the maximum number of answers (4).';
+        }
+      });
+    } else if (_isMultipleChoice && answers.length >= 4 && mounted) {
+      setState(() {
+        answerLimitMessage = 'You can only add up to 4 answers.';
+      });
+    }
+  }
+
+  void _addQuizToFirebase(Quiz quiz) async {
+    await FirebaseFirestore.instance.collection('tours').doc(widget.tour.uid).update({
+      'quizzes': FieldValue.arrayUnion([quiz.toMap()])
+    });
+  }
+
+  void _handleNext() {
+    String question = _tourTitleController.text;
+    if (question.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a question')),
+      );
+      return;
+    }
+
+    if (correctAnswerIndex == -1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a correct answer')),
+      );
+      return;
+    }
+
+    QuizItem newQuizItem = QuizItem(
+      question: question,
+      options: answers,
+      correctAnswer: correctAnswerIndex,
+      photoURL: selectedImage?.path ?? '',
+      isTrueOrFalse: _isMultipleChoice,
+    );
+
+    setState(() {
+      print("Adding quiz item");
+      quizItems.add(newQuizItem);
+      print(quizItems.length);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Quiz item added successfully')),
+    );
+
+    // Show dialog to ask if user wants to add more quiz items
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Quiz Item Added'),
+          content: const Text('Do you want to add another quiz item?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                // create a quiz 
+                Quiz quiz = Quiz(quizItems: quizItems);
+                // add this quiz to firebase 
+                _addQuizToFirebase(quiz);
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Reset the form
+                if (mounted) {
+                  setState(() {
+                    _tourTitleController.clear();
+                    selectedImage = null;
+                    _isMultipleChoice = false;
+                    answers = ['True', 'False'];
+                    answerLimitMessage = '';
+                    isTrueCorrect = false;
+                    isFalseCorrect = false;
+                    correctAnswerIndex = -1;
+                  });
+                }
+              },
+              child: const Text('Yes'),
             ),
           ],
         );
@@ -65,9 +196,6 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // make a form to create a quiz, this will have
-    // the title of the quiz, a questions, a set of options and the correct answer
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create a Quiz"),
@@ -75,14 +203,13 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
       body: Center(
         child: Column(
           children: [
-            const Text(
-              'Title', // create a quiz for this tour text
-              style: TextStyle(fontSize: 20),
+            Text(
+              widget.tour.tourDetails.title,
+              style: const TextStyle(fontSize: 20),
             ),
-            // image input
+            // Image input
             Padding(
               padding: const EdgeInsets.all(15.0),
-              // todo : separate to image picker component
               child: selectedImage == null
                   ? GestureDetector(
                       child: const Card(
@@ -90,13 +217,11 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
                           padding: EdgeInsets.all(25.0),
                           child: Text(
                             'Upload an image to be shown to the quiz',
-                            style: TextStyle(color: MainColors.textHint),
+                            style: TextStyle(color: Colors.grey),
                           ),
                         ),
                       ),
-                      onTap: () async => {
-                        _pickImage(),
-                      },
+                      onTap: _pickImage,
                     )
                   : Card(
                       child: Padding(
@@ -104,7 +229,7 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
                         child: Column(
                           children: [
                             Image.file(
-                              File(selectedImage!.path),
+                              File(selectedImage.path),
                               width: 150,
                               height: 150,
                               fit: BoxFit.cover,
@@ -112,7 +237,7 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
                             const SizedBox(height: 10),
                             const Text(
                               'Uploaded Image',
-                              style: TextStyle(color: MainColors.textHint),
+                              style: TextStyle(color: Colors.grey),
                             ),
                           ],
                         ),
@@ -130,42 +255,93 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
                 controller: _tourTitleController,
               ),
             ),
-            // format input
+            // Format input
             CustomSwitch(onChanged: _handleSwitchChange),
-            // _isMultipleChoice
-            //     ? MultipleChoiceComponent()
-            //     : SingleChoiceComponent(),
-            ElevatedButton(
-              onPressed: _showInputDialog,
-              child: const Text('Add Answer'),
-            ),
+            // Show add answer button only for multiple-choice questions
+            if (_isMultipleChoice && answers.length < 4)
+              ElevatedButton(
+                onPressed: _addCustomAnswer,
+                child: const Text('Add Answer'),
+              ),
+            if (answerLimitMessage.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  answerLimitMessage,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
             // Displaying the answers
             Expanded(
               child: ListView.builder(
-                itemCount: widget.answers.length,
+                itemCount: answers.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(widget.answers[index]),
-                  );
+                  if (!_isMultipleChoice) {
+                    return ListTile(
+                      title: Row(
+                        children: [
+                          Radio(
+                            value: index,
+                            groupValue: isTrueCorrect ? 0 : 1,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == 0) {
+                                  isTrueCorrect = true;
+                                  isFalseCorrect = false;
+                                  correctAnswerIndex = 0;
+                                } else {
+                                  isTrueCorrect = false;
+                                  isFalseCorrect = true;
+                                  correctAnswerIndex = 1;
+                                }
+                              });
+                            },
+                          ),
+                          Text(answers[index]),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return ListTile(
+                      title: Row(
+                        children: [
+                          Radio(
+                            value: index,
+                            groupValue: correctAnswerIndex,
+                            onChanged: (value) {
+                              setState(() {
+                                correctAnswerIndex = value as int;
+                              });
+                            },
+                          ),
+                          Text(answers[index]),
+                        ],
+                      ),
+                    );
+                  }
                 },
+              ),
+            ),
+            // Show message for adding answers
+            if (_isMultipleChoice && answers.length < 4)
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'You can add up to 4 possible answers.',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ),
+            // Next button
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: _handleNext,
+                child: const Text('Next'),
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  void _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 150,
-    );
-
-    if (pickedFile != null) {
-      setState(() {
-        selectedImage = File(pickedFile.path);
-      });
-    }
   }
 }
