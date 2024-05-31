@@ -10,8 +10,11 @@ class Signaling {
     'iceServers': [
       {
         'urls': [
+          'stun:stun.l.google.com:19302',
           'stun:stun1.l.google.com:19302',
           'stun:stun2.l.google.com:19302',
+          'stun:stun3.l.google.com:19302',
+          'stun:stun4.l.google.com:19302'
         ]
       },
     ]
@@ -43,7 +46,6 @@ class Signaling {
     DocumentReference sessionRef =
         _firestore.collection('sessions').doc(sessionId);
     DocumentReference roomRef = sessionRef.collection('rooms').doc();
-    print("Hellloooo????");
 
     peerConnection = await createPeerConnection(configuration);
     _registerPeerConnectionListeners();
@@ -54,15 +56,20 @@ class Signaling {
     });
 
     var callerCandidatesCollection = roomRef.collection('callerCandidates');
+
     peerConnection!.onIceCandidate = (candidate) {
       if (candidate.candidate != null) {
+        print("Sending ICE candidate: ${candidate.candidate}");
         callerCandidatesCollection.add(candidate.toMap());
+      } else {
+        print("ICE candidate is null");
       }
     };
 
     // creates an offer and set local description
-    RTCSessionDescription offer = await peerConnection!.createOffer({});
+    RTCSessionDescription offer = await peerConnection!.createOffer();
     await peerConnection!.setLocalDescription(offer);
+    print("created offer: ${offer.sdp}");
 
     // storing the offer in the room document
     var roomWithOffer = {'offer': offer.toMap()};
@@ -71,6 +78,7 @@ class Signaling {
 
     // Set up handling of remote tracks
     peerConnection!.onTrack = (RTCTrackEvent event) {
+      print("Got remote track: ${event.streams[0]}");
       event.streams[0].getTracks().forEach((track) {
         remoteStream!.addTrack(track);
       });
@@ -87,6 +95,7 @@ class Signaling {
           data['answer']['sdp'],
           data['answer']['type'],
         );
+        print("Someone tried to connect");
         peerConnection!.setRemoteDescription(description);
       }
     });
@@ -96,11 +105,13 @@ class Signaling {
       for (var change in event.docChanges) {
         if (change.type == DocumentChangeType.added) {
           Map<String, dynamic> data = change.doc.data() as Map<String, dynamic>;
+          print("Got new ICE candidate from callee: ${data['candidate']}");
           RTCIceCandidate candidate = RTCIceCandidate(
             data['candidate'],
             data['sdpMid'],
             data['sdpMLineIndex'],
           );
+          print("Adding ICE candidate from callee: ${candidate.candidate}");
           peerConnection!.addCandidate(candidate);
         }
       }
@@ -127,7 +138,10 @@ class Signaling {
       var calleeCandidatesCollection = roomRef.collection('calleeCandidates');
       peerConnection!.onIceCandidate = (candidate) {
         if (candidate.candidate != null) {
+          print("Sending ICE candidate: ${candidate.candidate}");
           calleeCandidatesCollection.add(candidate.toMap());
+        } else {
+          print("ICE candidate is null");
         }
       };
 
@@ -147,23 +161,24 @@ class Signaling {
       var answer = await peerConnection!.createAnswer();
       await peerConnection!.setLocalDescription(answer);
 
-      // upades the room document with the answer
+      // updates the room document with the answer
       Map<String, dynamic> roomWithAnswer = {
         'answer': {'type': answer.type, 'sdp': answer.sdp}
       };
       await roomRef.update(roomWithAnswer);
     }
+
     // listens for changes in the room document
     roomRef.collection('callerCandidates').snapshots().listen((snapshot) {
       snapshot.docChanges.forEach((document) {
         var data = document.doc.data() as Map<String, dynamic>;
-        peerConnection!.addCandidate(
-          RTCIceCandidate(
-            data['candidate'],
-            data['sdpMid'],
-            data['sdpMLineIndex'],
-          ),
+        var candidate = RTCIceCandidate(
+          data['candidate'],
+          data['sdpMid'],
+          data['sdpMLineIndex'],
         );
+        print("Adding ICE candidate from caller: ${candidate.candidate}");
+        peerConnection!.addCandidate(candidate);
       });
     });
   }
@@ -205,6 +220,12 @@ class Signaling {
 
     peerConnection!.onSignalingState = (state) {
       print('Signaling state change: $state');
+    };
+
+    peerConnection!.onIceCandidate = (candidate) {
+      if (candidate != null) {
+        print('ICE candidate: ${candidate.candidate}');
+      }
     };
   }
 }
