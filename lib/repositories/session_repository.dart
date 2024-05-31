@@ -32,4 +32,17 @@ class SessionRepository {
               .toList() as List<Session>,
         );
   }
+
+  Future<void> deleteSession(String sessionId) async {
+    await _firestore.collection('sessions').doc(sessionId).delete();
+  }
+
+  Future<void> deleteSessionRoom(String sessionId, String roomId) {
+    return _firestore
+        .collection('sessions')
+        .doc(sessionId)
+        .collection('rooms')
+        .doc(roomId)
+        .delete();
+  }
 }

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:guidely/models/enums/voice_chat_state.dart';
 import 'package:guidely/screens/session/sections/voice_chat_section/signaling.dart';
 import 'package:guidely/services/business_layer/session_service.dart';
 
@@ -15,11 +14,11 @@ class VoiceChatBloc {
     signaling.joinRoom(sessionId, roomId);
   }
 
-  void hangUp(String sessionId, bool bool, {bool deleteSession = false}) {
+  void hangUp(String sessionId, String roomId, {bool deleteRoom = false}) {
     signaling.hangUp();
 
-    if (deleteSession) {
-      SessionService().deleteSession(sessionId);
+    if (deleteRoom) {
+      SessionService().deleteSessionRoom(sessionId, roomId);
     }
   }
 
@@ -38,11 +37,8 @@ class VoiceChatBloc {
         .doc(sessionId)
         .snapshots()
         .listen((event) {
-      print("I am listening to the voice chat session");
       if (event.data() != null) {
-        print("I received some data from the voice chat session");
         final data = event.data()!;
-        print("i am about to call the callback");
         callBack(data['voiceChatState']);
       }
     });

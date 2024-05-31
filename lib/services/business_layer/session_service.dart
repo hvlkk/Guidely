@@ -35,5 +35,11 @@ class SessionService {
   // delete session operation
   Future<void> deleteSession(String sessionId) async {
     // call repository to delete session
+    return SessionRepository().deleteSession(sessionId);
+  }
+
+  Future<void> deleteSessionRoom(String sessionId, String roomId) async {
+    // call repository to delete session room
+    return SessionRepository().deleteSessionRoom(sessionId, roomId);
   }
 }

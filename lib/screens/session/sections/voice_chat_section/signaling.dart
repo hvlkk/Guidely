@@ -43,6 +43,7 @@ class Signaling {
     DocumentReference sessionRef =
         _firestore.collection('sessions').doc(sessionId);
     DocumentReference roomRef = sessionRef.collection('rooms').doc();
+    print("Hellloooo????");
 
     peerConnection = await createPeerConnection(configuration);
     _registerPeerConnectionListeners();
