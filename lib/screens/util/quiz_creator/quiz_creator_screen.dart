@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:guidely/models/data/quiz/quiz.dart';
 import 'package:guidely/models/data/quiz/quiz_item.dart';
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/services/general/firebase_storage_service.dart';
 import 'package:guidely/widgets/customs/custom_switch.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -21,6 +22,7 @@ class QuizCreatorScreen extends StatefulWidget {
 }
 
 class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
+  FirebaseStorageService _storageService = FirebaseStorageService();
   var selectedImage;
   final _tourTitleController = TextEditingController();
   bool _isMultipleChoice = false;
@@ -29,6 +31,7 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
   bool isTrueCorrect = false;
   bool isFalseCorrect = false;
   int correctAnswerIndex = -1;
+  var imageUrl;
 
   List<QuizItem> quizItems = [];
 
@@ -116,6 +119,15 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
     });
   }
 
+  void _getImageUrl() async {
+      print("Uploading image");
+      String tempimageUrl = await _storageService.uploadImage(selectedImage, "quiz_images", widget.tour.uid);
+      setState(() {
+        imageUrl = tempimageUrl;
+        print("Image URL in State: " + imageUrl);
+      });
+  }
+
   void _handleNext() {
     String question = _tourTitleController.text;
     if (question.isEmpty) {
@@ -132,18 +144,19 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
       return;
     }
 
+    _getImageUrl();
+    print("Image URL: " + imageUrl);
+
     QuizItem newQuizItem = QuizItem(
       question: question,
       options: answers,
       correctAnswer: correctAnswerIndex,
-      photoURL: selectedImage?.path ?? '',
-      isTrueOrFalse: _isMultipleChoice,
+      photoURL: imageUrl,
+      isTrueOrFalse: !_isMultipleChoice,
     );
 
     setState(() {
-      print("Adding quiz item");
       quizItems.add(newQuizItem);
-      print(quizItems.length);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -230,7 +243,7 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
                           children: [
                             Image.file(
                               File(selectedImage.path),
-                              width: 150,
+                              width: 250,
                               height: 150,
                               fit: BoxFit.cover,
                             ),

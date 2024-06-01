@@ -32,4 +32,9 @@ class QuizItem {
       isTrueOrFalse: map['isTrueOrFalse'],
     );
   }
+
+  @override
+  String toString() {
+    return 'QuizItem{question: $question, options: $options, correctAnswer: $correctAnswer, photoURL: $photoURL, isTrueOrFalse: $isTrueOrFalse}';
+  }
 }
