@@ -210,11 +210,14 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                           backgroundImage: NetworkImage(imageUrl),
                         ),
                         const SizedBox(width: 10),
-                        Text(
-                          'Welcome, $username!',
-                          style: TextStyle(
-                            fontFamily: poppinsFont.fontFamily,
-                            fontSize: 20,
+                        Container(
+                          constraints: const BoxConstraints(maxWidth: 240),
+                          child: Text(
+                            'Welcome, $username!',
+                            style: TextStyle(
+                              fontFamily: poppinsFont.fontFamily,
+                              fontSize: 20,
+                            ),
                           ),
                         ),
                         const Spacer(),

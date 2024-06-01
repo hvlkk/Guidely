@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/user_data_provider.dart';
@@ -142,7 +141,7 @@ class ProfileScreen extends ConsumerWidget {
                       children: [
                         Icon(
                           Icons.info_outline,
-                          color: const Color.fromARGB(255, 31, 30, 30),
+                          color: Color.fromARGB(255, 31, 30, 30),
                           size: 24,
                         ),
                         SizedBox(width: 10),
