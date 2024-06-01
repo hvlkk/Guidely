@@ -6,17 +6,18 @@ typedef void StreamStateCallback(MediaStream stream);
 
 class Signaling {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  Map<String, dynamic> configuration = {
+  final Map<String, dynamic> configuration = {
     'iceServers': [
+      {'urls': 'stun:stun.l.google.com:19302'},
+      {'urls': 'stun:stun1.l.google.com:19302'},
+      {'urls': 'stun:stun2.l.google.com:19302'},
+      {'urls': 'stun:stun3.l.google.com:19302'},
+      {'urls': 'stun:stun4.l.google.com:19302'},
       {
-        'urls': [
-          'stun:stun.l.google.com:19302',
-          'stun:stun1.l.google.com:19302',
-          'stun:stun2.l.google.com:19302',
-          'stun:stun3.l.google.com:19302',
-          'stun:stun4.l.google.com:19302'
-        ]
-      },
+        'urls': 'turn:turn.anyfirewall.com:443?transport=tcp',
+        'username': 'webrtc',
+        'credential': 'webrtc'
+      }
     ]
   };
 
@@ -24,11 +25,6 @@ class Signaling {
   RTCPeerConnection? peerConnection;
   MediaStream? localStream;
   MediaStream? remoteStream;
-
-  // Stream subscriptions
-  StreamSubscription? sessionSubscription;
-  StreamSubscription? candidateSubscription;
-  StreamStateCallback? onAddRemoteStream;
 
   Future<void> openUserMedia() async {
     localStream = await navigator.mediaDevices.getUserMedia({
@@ -43,9 +39,15 @@ class Signaling {
 
   // Creates a new room for the given session ID.
   Future<String> createRoom(String sessionId) async {
-    DocumentReference sessionRef =
-        _firestore.collection('sessions').doc(sessionId);
-    DocumentReference roomRef = sessionRef.collection('rooms').doc();
+    DocumentReference roomRef;
+    try {
+      DocumentReference sessionRef =
+          _firestore.collection('sessions').doc(sessionId);
+      roomRef = sessionRef.collection('rooms').doc();
+    } catch (e) {
+      print("Error, failed to create room because of $e\n");
+      rethrow;
+    }
 
     peerConnection = await createPeerConnection(configuration);
     _registerPeerConnectionListeners();
@@ -55,9 +57,17 @@ class Signaling {
       peerConnection!.addTrack(track, localStream!);
     });
 
-    var callerCandidatesCollection = roomRef.collection('callerCandidates');
+    var callerCandidatesCollection;
 
-    peerConnection!.onIceCandidate = (candidate) {
+    try {
+      callerCandidatesCollection = roomRef.collection('callerCandidates');
+    } catch (e) {
+      print(
+          "Error, failed to create callerCandidatesCollection because of $e\n");
+      rethrow;
+    }
+
+    peerConnection?.onIceCandidate = (RTCIceCandidate candidate) {
       if (candidate.candidate != null) {
         print("Sending ICE candidate: ${candidate.candidate}");
         callerCandidatesCollection.add(candidate.toMap());
@@ -73,16 +83,15 @@ class Signaling {
 
     // storing the offer in the room document
     var roomWithOffer = {'offer': offer.toMap()};
-    await roomRef.set(roomWithOffer, SetOptions(merge: true));
+    await roomRef.set(roomWithOffer);
     var roomId = roomRef.id;
 
     // Set up handling of remote tracks
-    peerConnection!.onTrack = (RTCTrackEvent event) {
+    peerConnection?.onTrack = (RTCTrackEvent event) {
       print("Got remote track: ${event.streams[0]}");
       event.streams[0].getTracks().forEach((track) {
-        remoteStream!.addTrack(track);
+        remoteStream?.addTrack(track);
       });
-      onAddRemoteStream?.call(event.streams[0]);
     };
 
     // listens for changes in the room document
@@ -91,12 +100,12 @@ class Signaling {
 
       if (peerConnection?.getRemoteDescription() != null &&
           data['answer'] != null) {
-        RTCSessionDescription description = RTCSessionDescription(
+        RTCSessionDescription answer = RTCSessionDescription(
           data['answer']['sdp'],
           data['answer']['type'],
         );
         print("Someone tried to connect");
-        peerConnection!.setRemoteDescription(description);
+        peerConnection!.setRemoteDescription(answer);
       }
     });
 
@@ -132,24 +141,33 @@ class Signaling {
       _registerPeerConnectionListeners();
 
       localStream?.getTracks().forEach((track) {
-        peerConnection!.addTrack(track, localStream!);
+        peerConnection?.addTrack(track, localStream!);
       });
 
-      var calleeCandidatesCollection = roomRef.collection('calleeCandidates');
-      peerConnection!.onIceCandidate = (candidate) {
-        if (candidate.candidate != null) {
-          print("Sending ICE candidate: ${candidate.candidate}");
+      var calleeCandidatesCollection;
+
+      try {
+        calleeCandidatesCollection = roomRef.collection('calleeCandidates');
+      } catch (e) {
+        print(
+            "Error, failed to create calleeCandidatesCollection because of $e\n");
+        rethrow;
+      }
+
+      peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
+        if (candidate != null) {
+          print("Sending ICE candidate: ${candidate}");
           calleeCandidatesCollection.add(candidate.toMap());
         } else {
-          print("ICE candidate is null");
+          print("onIceCandidate: complete");
+          return;
         }
       };
 
       peerConnection!.onTrack = (RTCTrackEvent event) {
         event.streams[0].getTracks().forEach((track) {
-          remoteStream!.addTrack(track);
+          remoteStream?.addTrack(track);
         });
-        onAddRemoteStream?.call(event.streams[0]);
       };
 
       var data = roomSnapshot.data() as Map<String, dynamic>;

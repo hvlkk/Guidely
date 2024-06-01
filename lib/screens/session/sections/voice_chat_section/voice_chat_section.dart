@@ -33,9 +33,7 @@ class _VoiceChatSectionState extends State<VoiceChatSection> {
   void initState() {
     super.initState();
     _voiceChatBloc = VoiceChatBloc();
-    _voiceChatBloc.signaling.onAddRemoteStream = (MediaStream stream) {
-      setState(() {});
-    };
+
     _voiceChatBloc.listenToVoiceChatSession(widget.sessionId, (String state) {
       if (state == VoiceChatState.connected.toString()) {
         setState(() {
