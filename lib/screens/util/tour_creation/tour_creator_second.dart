@@ -124,6 +124,11 @@ class _TourCreatorSecondScreenState extends State<TourCreatorSecondScreen> {
 
     final firstMarker =
         'markers=color:red%7Clabel:A%7C${_pickedLocations!.first.latitude},${_pickedLocations!.first.longitude}';
+
+    if (_pickedLocations!.length == 1) {
+      return 'https://maps.googleapis.com/maps/api/staticmap?center=${_pickedLocations!.first.latitude},${_pickedLocations!.first.longitude}&zoom=16&size=600x300&maptype=roadmap&$firstMarker&key=$apiKey';
+    }
+
     final lastMarker =
         'markers=color:black%7Clabel:S%7C${_pickedLocations!.last.latitude},${_pickedLocations!.last.longitude}';
 

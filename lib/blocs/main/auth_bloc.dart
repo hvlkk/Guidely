@@ -17,6 +17,8 @@ class AuthBloc {
   final FirebaseFunctions _firebaseFunctions = FirebaseFunctions.instance;
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
+  bool _isLoading = false;
+
   AuthMode authMode = AuthMode.login;
   File? _userImageFile;
   final TextEditingController _emailController = TextEditingController();
@@ -30,6 +32,7 @@ class AuthBloc {
   get _enteredEmail => _emailController.text;
   get _enteredUsername => _usernameController.text;
   get _enteredPassword => _passwordController.text;
+  get isLoading => _isLoading;
 
   final StreamController<bool> _isLoadingController = StreamController<bool>();
   Stream<bool> get isLoadingStream => _isLoadingController.stream;

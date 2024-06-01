@@ -28,80 +28,58 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       backgroundColor: MainColors.background,
       body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Guidely',
-                style: poppinsFont.copyWith(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              SvgPicture.asset(
-                'assets/images/login_screen_logo.svg',
-                height: 150,
-              ),
-              Card(
-                margin: const EdgeInsets.all(20),
-                color: MainColors.background,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Form(
-                    key: _formKey,
-                    child: StreamBuilder<bool>(
-                      stream: _authBloc.isLoadingStream,
-                      builder: (context, snapshot) {
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _authBloc.authMode == AuthMode.signup
-                                ? Column(
-                                    children: [
-                                      UserImagePickerWidget(
-                                        onTourSession: false,
-                                        onImagePicked: _authBloc.setUserImage,
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        'Profile Picture',
-                                        style: poppinsFont.copyWith(
-                                          color: MainColors.textHint,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : Container(),
-                            TextFormField(
-                              decoration: InputDecoration(
-                                labelText: 'Email',
-                                labelStyle: poppinsFont,
-                                focusedBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: MainColors.accent,
-                                  ),
-                                ),
-                              ),
-                              keyboardType: TextInputType.emailAddress,
-                              autocorrect: false,
-                              textCapitalization: TextCapitalization.none,
-                              validator: (value) {
-                                if (value == null ||
-                                    value.isEmpty ||
-                                    !value.contains('@') ||
-                                    !_isValidEmail(value)) {
-                                  return 'Please enter a valid email address.';
-                                }
-                                return null;
-                              },
-                              controller: _authBloc.emailController,
-                            ),
-                            _authBloc.authMode == AuthMode.signup
-                                ? TextFormField(
+        child: _authBloc.isLoading
+            ? const CircularProgressIndicator()
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Guidely',
+                      style: poppinsFont.copyWith(
+                        fontSize: 35,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SvgPicture.asset(
+                      'assets/images/login_screen_logo.svg',
+                      height: 150,
+                    ),
+                    Card(
+                      margin: const EdgeInsets.all(20),
+                      color: MainColors.background,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Form(
+                          key: _formKey,
+                          child: StreamBuilder<bool>(
+                            stream: _authBloc.isLoadingStream,
+                            builder: (context, snapshot) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _authBloc.authMode == AuthMode.signup
+                                      ? Column(
+                                          children: [
+                                            UserImagePickerWidget(
+                                              onTourSession: false,
+                                              onImagePicked:
+                                                  _authBloc.setUserImage,
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              'Profile Picture',
+                                              style: poppinsFont.copyWith(
+                                                color: MainColors.textHint,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Container(),
+                                  TextFormField(
                                     decoration: InputDecoration(
-                                      labelText: 'Username',
+                                      labelText: 'Email',
                                       labelStyle: poppinsFont,
                                       focusedBorder: const UnderlineInputBorder(
                                         borderSide: BorderSide(
@@ -109,92 +87,121 @@ class _AuthScreenState extends State<AuthScreen> {
                                         ),
                                       ),
                                     ),
+                                    keyboardType: TextInputType.emailAddress,
+                                    autocorrect: false,
+                                    textCapitalization: TextCapitalization.none,
                                     validator: (value) {
                                       if (value == null ||
                                           value.isEmpty ||
-                                          value.length < 3) {
-                                        return 'Username must be at least 3 characters long.';
+                                          !value.contains('@') ||
+                                          !_isValidEmail(value)) {
+                                        return 'Please enter a valid email address.';
                                       }
                                       return null;
                                     },
-                                    controller: _authBloc.usernameController,
-                                  )
-                                : Container(),
-                            TextFormField(
-                              decoration: InputDecoration(
-                                labelText: 'Password',
-                                labelStyle: poppinsFont,
-                                focusedBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                    color: MainColors.accent,
-                                  ), // Change color to whatever you want
-                                  // Change color to whatever you want
-                                ),
-                              ),
-                              enableSuggestions: true,
-                              obscureText: true,
-                              validator: (value) {
-                                if (value == null ||
-                                    value.isEmpty ||
-                                    value.length < 6) {
-                                  return 'Password must be at least 6 characters long.';
-                                }
-                                return null;
-                              },
-                              controller: _authBloc.passwordController,
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: _authBloc.submit,
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(
-                                    ButtonColors.primary),
-                              ),
-                              child: Text(
-                                _authBloc.authMode == AuthMode.login
-                                    ? 'Login'
-                                    : 'Sign Up',
-                                style: const TextStyle(
-                                  color: Color.fromARGB(255, 0, 0, 0),
-                                ),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                _authBloc.toggleAuthMode();
-                                setState(() {});
-                              },
-                              child: Text(
-                                _authBloc.authMode == AuthMode.login
-                                    ? 'Create new account'
-                                    : 'Already have an account?',
-                                style: poppinsFont.copyWith(
-                                  color: MainColors.accent,
-                                ),
-                              ),
-                            ),
-                            StreamBuilder<String>(
-                              stream: _authBloc.errorStream,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return Text(
-                                    snapshot.data!,
-                                    style: const TextStyle(color: Colors.red),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                          ],
-                        );
-                      },
+                                    controller: _authBloc.emailController,
+                                  ),
+                                  _authBloc.authMode == AuthMode.signup
+                                      ? TextFormField(
+                                          decoration: InputDecoration(
+                                            labelText: 'Username',
+                                            labelStyle: poppinsFont,
+                                            focusedBorder:
+                                                const UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                color: MainColors.accent,
+                                              ),
+                                            ),
+                                          ),
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty ||
+                                                value.length < 3) {
+                                              return 'Username must be at least 3 characters long.';
+                                            }
+                                            return null;
+                                          },
+                                          controller:
+                                              _authBloc.usernameController,
+                                        )
+                                      : Container(),
+                                  TextFormField(
+                                    decoration: InputDecoration(
+                                      labelText: 'Password',
+                                      labelStyle: poppinsFont,
+                                      focusedBorder: const UnderlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: MainColors.accent,
+                                        ), // Change color to whatever you want
+                                        // Change color to whatever you want
+                                      ),
+                                    ),
+                                    enableSuggestions: true,
+                                    obscureText: true,
+                                    validator: (value) {
+                                      if (value == null ||
+                                          value.isEmpty ||
+                                          value.length < 6) {
+                                        return 'Password must be at least 6 characters long.';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _authBloc.passwordController,
+                                  ),
+                                  const SizedBox(height: 20),
+                                  ElevatedButton(
+                                    onPressed: _authBloc.submit,
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              ButtonColors.primary),
+                                    ),
+                                    child: Text(
+                                      _authBloc.authMode == AuthMode.login
+                                          ? 'Login'
+                                          : 'Sign Up',
+                                      style: const TextStyle(
+                                        color: Color.fromARGB(255, 0, 0, 0),
+                                      ),
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      _authBloc.toggleAuthMode();
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      _authBloc.authMode == AuthMode.login
+                                          ? 'Create new account'
+                                          : 'Already have an account?',
+                                      style: poppinsFont.copyWith(
+                                        color: MainColors.accent,
+                                      ),
+                                    ),
+                                  ),
+                                  StreamBuilder<String>(
+                                    stream: _authBloc.errorStream,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        return Text(
+                                          snapshot.data!,
+                                          style: const TextStyle(
+                                              color: Colors.red),
+                                        );
+                                      }
+                                      return const SizedBox.shrink();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }

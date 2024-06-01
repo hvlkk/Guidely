@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:guidely/blocs/session/voice_chat_bloc.dart';
 import 'package:guidely/models/enums/voice_chat_state.dart';
 import 'package:guidely/services/business_layer/session_service.dart';

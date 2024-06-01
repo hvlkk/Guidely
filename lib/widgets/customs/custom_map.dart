@@ -75,7 +75,6 @@ class CustomMap extends StatelessWidget {
                       ),
                       "Your Location",
                     ),
-                  // TEMPORARY: For testing purposes
                   if (onTourSession) ...{
                     _buildCustomMarker(
                       "organizerLiveLocation",
@@ -87,8 +86,7 @@ class CustomMap extends StatelessWidget {
                     ),
                     _buildCustomMarker(
                       "tourStartingPoint",
-                      LatLng(waypoints[1].latitude,
-                          waypoints[1].longitude),
+                      LatLng(waypoints[1].latitude, waypoints[1].longitude),
                       BitmapDescriptor.defaultMarkerWithHue(
                         BitmapDescriptor.hueRed,
                       ),
@@ -107,15 +105,11 @@ class CustomMap extends StatelessWidget {
                 },
                 polylines:
                     withTrail ? _buildPolylines(polylineCoordinates) : {},
-                onMapCreated: (GoogleMapController controller) {
-                  // Controller is ready
-                },
                 scrollGesturesEnabled: true,
                 zoomGesturesEnabled: true,
                 rotateGesturesEnabled: true,
                 tiltGesturesEnabled: true,
                 onTap: (LatLng latLng) {
-                  // Handle taps
                   onTapWaypoint(latLng);
                 },
               );

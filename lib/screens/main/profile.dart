@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/providers/user_data_provider.dart';
@@ -59,7 +60,7 @@ class ProfileScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 5),
               if (userData.authState == TourGuideAuthState.authenticated) ...[
                 Text(
                   'Thank you for being a tour guide! (to be removed)',
@@ -69,7 +70,7 @@ class ProfileScreen extends ConsumerWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 5),
               ] else if (userData.authState ==
                   TourGuideAuthState.unauthenticated) ...[
                 Padding(
@@ -127,17 +128,53 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 25),
               ] else if (userData.authState == TourGuideAuthState.pending) ...[
-                Text(
-                  'Your tour guide status is pending. \nPlease wait for approval. (add styling)',
-                  style: poppinsFont.copyWith(
-                    fontSize: 12,
-                    color: MainColors.primary,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 96, 94, 94)
+                          .withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: const Color.fromARGB(255, 31, 30, 30),
+                          size: 24,
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Your tour guide status is pending',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: MainColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Please wait for approval.',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: MainColors.textHint,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 12),
               ],
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),

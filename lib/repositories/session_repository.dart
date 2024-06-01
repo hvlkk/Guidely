@@ -13,8 +13,6 @@ class SessionRepository {
 
   Future<void> updateSession(
       String sessionId, Map<String, dynamic> data) async {
-    print("Now updating session");
-    print("The data is: $data");
     await _firestore
         .collection('sessions')
         .doc(sessionId)

@@ -7,14 +7,14 @@ import 'package:guidely/models/data/activity.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/models/entities/tour.dart';
-import 'package:guidely/models/entities/user.dart'
-    // ignore: library_prefixes
-    as TourUser; // Renamed to avoid conflict with FirebaseAuth
+import 'package:guidely/models/entities/user.dart' as TourUser;
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
 import 'package:guidely/models/utils/language.dart';
 import 'package:guidely/screens/util/tour_creation/tour_creator_template.dart';
 import 'package:guidely/services/general/image_retrieval_service.dart';
 import 'package:uuid/uuid.dart';
+
+// TODO: Clean
 
 class TourCreatorThirdScreen extends StatefulWidget {
   TourCreatorThirdScreen({super.key, required this.tourData});
@@ -212,9 +212,6 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
     }
 
     ImageRetrievalService imageRetrievalService = ImageRetrievalService();
-    // final imageUrl = await imageRetrievalService.fetchCityImages(
-    //   finalData.title,
-    // );
 
     final imageUrl = await imageRetrievalService.fetchCityImagesList(
       finalData.title,
@@ -244,6 +241,13 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
 
     Navigator.of(context).popUntil(
       (route) => route.isFirst,
+    );
+
+    // add a snackbar to show that the tour has been created
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Tour has been created'),
+      ),
     );
   }
 }

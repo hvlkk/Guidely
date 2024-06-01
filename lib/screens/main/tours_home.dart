@@ -20,6 +20,8 @@ import 'package:guidely/widgets/customs/custom_map.dart';
 import 'package:guidely/widgets/customs/custom_notification_icon.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
 
+// todo: clean
+
 class ToursHomeScreen extends ConsumerStatefulWidget {
   const ToursHomeScreen({super.key});
 
@@ -265,7 +267,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                             _buildSearchResultsScreen(
                               context,
                               filteredTours,
-                              searchScreenController.text,
+                              searchScreenController.text.trim(),
                             );
                           },
                         ),
