@@ -12,6 +12,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const common = require("./common/common");
+const { getRecommendationScore } = require("./recommendation_system");
 
 admin.initializeApp();
 
@@ -136,19 +137,12 @@ exports.handleAuthStatusChange = functions.firestore
   .document("users/{authState}")
   .onUpdate(async (change, context) => {
     const newValue = change.after.data();
-    console.log("New value:", newValue);
-
     const previousValue = change.before.data();
-    console.log("Previous value:", previousValue);
 
     const newAuthState = newValue.authState;
-    console.log("New auth state:", newAuthState);
-
     const previousAuthState = previousValue.authState;
-    console.log("Previous auth state:", previousAuthState);
 
     const userFCMToken = newValue.fcmToken;
-    console.log("User FCM token:", userFCMToken);
 
     if (previousAuthState === 1 && newAuthState === 2) {
       await common.sendNotificationToPendingOrganizer(newValue.uid, "approved");
@@ -173,4 +167,55 @@ exports.handleAuthStatusChange = functions.firestore
       };
       await admin.messaging().send(message);
     }
+  });
+
+// tour recommender
+// this will need to listen on the tours collection,
+// once a new tour is added, it will recommend the tour to users
+// based on their preferences
+
+exports.recommendTour = functions.firestore
+  .document("tours/{tourId}")
+  .onCreate(async (snapshot, context) => {
+    const tourData = snapshot.data();
+
+    const usersSnapshot = await admin.firestore().collection("users").get();
+
+    usersSnapshot.forEach(async (userDoc) => {
+      const userData = userDoc.data();
+      const userFCMToken = userData.fcmToken;
+      // call recommender function with tourData and userData as argument
+      // const score = getRecommendationScore(userData, tourData);
+
+      const score = Math.random(); // test score
+
+      const threshold = 0.5;
+
+      if (score < threshold) {
+        return;
+      }
+      console.log("Recommendation score above threshold: ", score);
+
+      const message = {
+        notification: {
+          title: "New Tour Recommendation",
+          body: `We recommend you to check out the new tour: ${tourData.title}.`,
+        },
+        token: userFCMToken,
+      };
+
+      try {
+        console.log("About to send tour recommendation to user:", userData.uid);
+        await admin.messaging().send(message);
+        console.log("Tour recommendation sent to user:", userData.uid);
+
+        await common.addNotificationToUser(
+          userData.uid,
+          "New Tour Recommendation",
+          `We recommend you to check out the new tour: ${tourData.tourDetails.title}.`
+        );
+      } catch (error) {
+        console.error("Error sending tour recommendation:", error);
+      }
+    });
   });
