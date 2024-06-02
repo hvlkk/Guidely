@@ -50,5 +50,6 @@ Map<String, TourCategory> tourCategoryFromString = {
   'Adventure': TourCategory.adventure,
   'Nature': TourCategory.nature,
   'Religion': TourCategory.religion,
-  'Children Friendly': TourCategory.family,
+  'Family': TourCategory.family,
+  'Sports': TourCategory.sports,
 };
