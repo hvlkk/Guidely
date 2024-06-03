@@ -2,16 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/screens/util/notifications.dart';
 
+// TODO: Change the class name to something more descriptive maybe
 class CustomNotificationIcon extends StatelessWidget {
-  final int unreadCount;
+  final List<myNoti.Notification> notifications;
 
-  List<myNoti.Notification> notifications;
-
-  CustomNotificationIcon(
-      {super.key, required this.notifications, required this.unreadCount});
+  const CustomNotificationIcon({super.key, required this.notifications});
 
   @override
   Widget build(BuildContext context) {
+    notifications.sort((a, b) => b.date.compareTo(a.date));
+
+    // Get the newest 10 notifications
+    final newestNotifications = notifications.take(10).toList();
+
+    final unreadCount = (newestNotifications
+            .where((notification) => !notification.isRead)
+            .toList())
+        .length;
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(

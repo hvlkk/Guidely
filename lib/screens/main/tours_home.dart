@@ -173,9 +173,6 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
 
           print("Notifications: $notifications");
           // filter notifications that are unread
-          final unreadNotifications = notifications
-              .where((notification) => !notification.isRead)
-              .toList();
 
           final searchScreenController = TextEditingController();
           return Scaffold(
@@ -224,7 +221,6 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         GestureDetector(
                           child: CustomNotificationIcon(
                             notifications: notifications,
-                            unreadCount: unreadNotifications.length,
                           ),
                           onTap: () {
                             Navigator.of(context).push(
