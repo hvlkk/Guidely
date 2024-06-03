@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/notification.dart' as myNoti;
+import 'package:guidely/models/entities/notification.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/services/business_layer/user_service.dart';
 
@@ -60,35 +62,7 @@ class _NotificationListItemState extends ConsumerState<NotificationListItem> {
               GestureDetector(
                 onTap: () {
                   _markAsRead(userData.uid, userData.notifications);
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text(widget.notification.title),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(widget.notification.message),
-                            const SizedBox(height: 8),
-                            Text(
-                              widget.notification.date.toString(),
-                              style: TextStyle(
-                                  color: Colors.grey[600], fontSize: 12),
-                            ),
-                          ],
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Close'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  showNotificationDialog(context, widget.notification);
                 },
                 child: ListTile(
                   contentPadding:
@@ -112,7 +86,7 @@ class _NotificationListItemState extends ConsumerState<NotificationListItem> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        widget.notification.date.toString(),
+                        CommonUtils.formatDate(widget.notification.date),
                         style: TextStyle(color: Colors.grey[400], fontSize: 12),
                       ),
                     ],

@@ -1,29 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
 class MediaCarouselBloc {
-  // void showImageDialog(BuildContext context, String url) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return Dialog(
-  //         child: Column(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             Image.network(url),
-  //             TextButton(
-  //               onPressed: () => _downloadImage(context, url),
-  //               child: Text('Download Image'),
-  //             ),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   void showImageDialog(BuildContext context, String url) {
     Navigator.push(
       context,
@@ -43,16 +24,22 @@ class MediaCarouselBloc {
 
   Future<void> downloadImage(String url) async {
     try {
+      var status = await Permission.storage.request();
+      if (status.isDenied) {
+        // ask for permission again
+        print('Storage permission denied');
+        return;
+      }
+
+      final savedDir = await getApplicationDocumentsDirectory();
       final taskId = await FlutterDownloader.enqueue(
         url: url,
-        savedDir: (await getApplicationDocumentsDirectory()).path,
+        savedDir: savedDir.path,
         fileName: url.split('/').last,
-        headers: {"network-type": "ANY"},
+        showNotification: true,
+        openFileFromNotification:
+            true, // Open file when the notification is tapped
       );
-
-      // Introduce a delay between update calls
-      await Future.delayed(
-          Duration(seconds: 100)); // Adjust delay duration as needed
 
       print('Download task ID: $taskId');
     } catch (error, stackTrace) {
