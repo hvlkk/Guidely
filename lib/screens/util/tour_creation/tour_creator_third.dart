@@ -51,13 +51,6 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
     ];
   }
 
-  // void addCustomActivity(String name) {
-  //   // this will need to update to allow for custom activity names
-  //   setState(() {
-  //     widget.activities.add(Activity(name: name));
-  //   });
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -101,17 +94,6 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
                 );
               },
             ),
-          // TextButton(
-          //   onPressed: () {
-          //     addCustomActivity('New Activity');
-          //   },
-          //   child: Text(
-          //     'Add a new activity',
-          //     style: poppinsFont.copyWith(
-          //       color: MainColors.accent,
-          //     ),
-          //   ),
-          // ),
           const SizedBox(height: 10),
           const Center(
             child: Text(
@@ -138,27 +120,32 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
                       }
                     });
                   },
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: widget.activeLanguages.contains(language)
-                            ? Colors.blue
-                            : Colors.transparent,
-                        width: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 2), // Adjust padding as needed
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: widget.activeLanguages.contains(language)
+                              ? Colors.blue
+                              : Colors.transparent,
+                          width: 1, // Adjust the border width if needed
+                        ),
+                        borderRadius: BorderRadius.circular(
+                            15), // Adjust the border radius
                       ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: CircleAvatar(
-                      radius: 25,
-                      backgroundImage: AssetImage(
-                        'icons/flags/png250px/${language.code}.png',
-                        package: 'country_icons',
+                      child: CircleAvatar(
+                        radius:
+                            20, // Adjust the radius to make the avatar smaller
+                        backgroundImage: AssetImage(
+                          'icons/flags/png250px/${language.code}.png',
+                          package: 'country_icons',
+                        ),
                       ),
                     ),
                   ),
                 ),
-              const SizedBox(width: 15),
             ],
           ),
         ],
