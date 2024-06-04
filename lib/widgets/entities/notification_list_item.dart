@@ -61,8 +61,8 @@ class _NotificationListItemState extends ConsumerState<NotificationListItem> {
             children: [
               GestureDetector(
                 onTap: () {
-                  _markAsRead(userData.uid, userData.notifications);
                   showNotificationDialog(context, widget.notification);
+                  _markAsRead(userData.uid, userData.notifications);
                 },
                 child: ListTile(
                   contentPadding:

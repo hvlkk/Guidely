@@ -17,6 +17,16 @@ class Language {
       code: map['code'] ?? '',
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other.runtimeType != runtimeType) return false;
+    return other is Language && other.name == name && other.code == code;
+  }
+
+  @override
+  int get hashCode => name.hashCode ^ code.hashCode;
 }
 
 const List<Language> languages = [
@@ -27,3 +37,4 @@ const List<Language> languages = [
   Language(name: 'French', code: 'fr'),
   Language(name: 'Italian', code: 'it'),
 ];
+

@@ -13,6 +13,7 @@ class User {
   final String? firstName;
   final String? lastName;
   final String? phoneNumber;
+  final String? isoCode;
   final DateTime? dateOfBirth;
   List<Language> languages;
   List<TourCategory> preferredTourCategories;
@@ -40,6 +41,7 @@ class User {
     this.firstName = '',
     this.lastName = '',
     this.phoneNumber,
+    this.isoCode,
     this.dateOfBirth,
     this.dateJoined,
     this.languages = const [],
@@ -55,6 +57,7 @@ class User {
       'lastName': lastName,
       'dateOfBirth': dateOfBirth?.toString(),
       'phoneNumber': phoneNumber,
+      'isoCode': isoCode,
       'languages': languages.map((language) => language.toMap()).toList(),
       'preferredTourCategories': preferredTourCategories.map(
         (tourCategory) => tourCategoryToString[tourCategory],
@@ -81,6 +84,7 @@ class User {
           ? DateTime.parse(map['dateOfBirth'])
           : null,
       phoneNumber: map['phoneNumber'],
+      isoCode: map['isoCode'],
       languages: List<Language>.from(
         (map['languages'] ?? []).map(
           (language) => Language.fromMap(language),
@@ -114,6 +118,7 @@ class User {
     DateTime? dateOfBirth,
     DateTime? dateJoined,
     String? phoneNumber,
+    String? isoCode,
     List<Language>? languages,
     List<TourCategory>? preferredTourCategories,
     String? imageUrl,
@@ -139,6 +144,7 @@ class User {
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       dateJoined: dateJoined ?? this.dateJoined,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      isoCode: isoCode ?? this.isoCode,
       languages: languages ?? this.languages,
       preferredTourCategories:
           preferredTourCategories ?? this.preferredTourCategories,
@@ -159,6 +165,7 @@ class User {
       lastName: user.lastName,
       dateOfBirth: user.dateOfBirth,
       phoneNumber: user.phoneNumber,
+      isoCode: user.isoCode,
       languages: user.languages,
       preferredTourCategories: user.preferredTourCategories,
       dateJoined: user.dateJoined,

@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/models/entities/session.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/user_data_provider.dart';
-import 'package:guidely/screens/secondary/quiz_screen.dart';
 import 'package:guidely/screens/session/sections/chat_section.dart';
 import 'package:guidely/screens/session/sections/map_section.dart';
 import 'package:guidely/screens/session/sections/media_carousel_section.dart';
@@ -130,7 +129,10 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // pop 
+                            Navigator.of(context).pop();
+                          },
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.grey),
                           child: const Text(
