@@ -4,7 +4,10 @@ import 'package:guidely/misc/common.dart';
 class TourFilterDropdown extends StatefulWidget {
   final void Function(String) onValueChanged;
 
-  const TourFilterDropdown({super.key, required this.onValueChanged});
+  const TourFilterDropdown(
+      {super.key,
+      required this.onValueChanged,
+      required Null Function(String? newValue) onChanged});
 
   @override
   _TourFilterDropdownState createState() => _TourFilterDropdownState();

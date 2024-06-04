@@ -65,7 +65,7 @@ class TourFilter {
       case 'Highest Rated':
         return TourFilter.sortByRating(tours);
       case 'Activities':
-        return TourFilter.filterByActivities([TourCategory.family], tours);
+        return TourFilter.filterByActivities([TourCategory.religion], tours);
       case 'Starting Soon':
         return TourFilter.filterByStartingSoon(tours);
       default:

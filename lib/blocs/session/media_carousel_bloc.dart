@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
@@ -11,10 +13,12 @@ class MediaCarouselBloc {
       MaterialPageRoute(
         builder: (_) => Scaffold(
           body: PhotoView(
-            imageProvider: NetworkImage(url),
+            imageProvider: NetworkImage(
+              url,
+            ),
           ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => downloadImage(context, url),
+            onPressed: () => downloadImage(url),
             child: const Icon(Icons.download),
           ),
         ),
@@ -22,14 +26,20 @@ class MediaCarouselBloc {
     );
   }
 
-  Future<void> downloadImage(BuildContext context, String url) async {
+  Future<void> downloadImage(String url) async {
     try {
-      final savedDir = await getDownloadsDirectory();
+      // Get the downloads directory
+      Directory? downloadsDir = await getDownloadsDirectory();
+      if (downloadsDir == null) {
+        throw Exception("Unable to get downloads directory");
+      }
+      final savedDir = downloadsDir.path;
       print("Saved directory: $savedDir");
+
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
       await FlutterDownloader.enqueue(
         url: url,
-        savedDir: savedDir!.path,
+        savedDir: savedDir,
         fileName: fileName,
         showNotification: true,
         openFileFromNotification: true,
@@ -38,11 +48,5 @@ class MediaCarouselBloc {
       print('Error downloading image: $error');
       print('Stack trace: $stackTrace');
     }
-    // show a snackbar to inform the user that the download is complete
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Download complete!'),
-      ),
-    );
   }
 }

@@ -24,7 +24,7 @@ class _UserImagePickerWidgetState extends State<UserImagePickerWidget> {
 
   void _takeImage() async {
     final takenImage = await ImagePicker()
-        .pickImage(source: ImageSource.camera, maxWidth: 150);
+        .pickImage(source: ImageSource.camera, imageQuality: 100);
 
     if (takenImage == null) return;
 
@@ -44,8 +44,8 @@ class _UserImagePickerWidgetState extends State<UserImagePickerWidget> {
           child: widget.onTourSession
               ? Container(
                   decoration: BoxDecoration(
-                    color: Colors.lightBlueAccent, 
-                    borderRadius: BorderRadius.circular(8), 
+                    color: Colors.lightBlueAccent,
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
@@ -55,7 +55,7 @@ class _UserImagePickerWidgetState extends State<UserImagePickerWidget> {
                     'Take Picture',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16, 
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

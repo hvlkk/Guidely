@@ -24,8 +24,9 @@ class MediaCarousel extends StatefulWidget {
 }
 
 class _MediaCarouselState extends State<MediaCarousel> {
-  FirebaseStorageService _firebaseStorageService = FirebaseStorageService();
-  MediaCarouselBloc _mediaCarouselBloc = MediaCarouselBloc();
+  final FirebaseStorageService _firebaseStorageService =
+      FirebaseStorageService();
+  final MediaCarouselBloc _mediaCarouselBloc = MediaCarouselBloc();
   File? uploadedImage;
   File? takenImage;
 
@@ -82,7 +83,8 @@ class _MediaCarouselState extends State<MediaCarousel> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8.0),
                                   child: GestureDetector(
-                                    onTap: () => _mediaCarouselBloc.showImageDialog(context, url),
+                                    onTap: () => _mediaCarouselBloc
+                                        .showImageDialog(context, url),
                                     child: Stack(
                                       alignment: Alignment.topRight,
                                       children: [
@@ -115,7 +117,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
                   GestureDetector(
                     onTap: () async {
                       final pickedFile = await ImagePicker().pickImage(
-                          source: ImageSource.gallery, maxWidth: 150);
+                          source: ImageSource.gallery, imageQuality: 100);
                       if (pickedFile != null) {
                         File image = File(pickedFile.path);
                         setState(() {
