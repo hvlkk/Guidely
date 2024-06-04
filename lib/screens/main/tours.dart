@@ -77,7 +77,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 IconButton(
                   icon: const Icon(Icons.quiz),
                   onPressed: () {
-                      _showQuizDialog(context, userData.organizedTours);
+                    _showQuizDialog(context, userData.organizedTours);
                   },
                 ),
               ];
@@ -177,12 +177,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildUpcomingActions(Tour tour) {
-    print("User data is $_userData");
-    print("Organized tours are ${_userData?.organizedTours}");
-    print("Tour uid is ${tour.uid}");
-
     final isAHoster = _userData?.organizedTours.contains(tour.uid) ?? false;
-    print('isAHoster: $isAHoster');
 
     return [
       isAHoster
@@ -284,9 +279,6 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
     final isAHoster = _userData?.organizedTours.contains(tour.uid) ?? false;
     final tourHasStarted = tour.hasStarted;
 
-    print('isAHoster: $isAHoster');
-    print('tourHasStarted: $tourHasStarted');
-
     return [
       OutlinedButton(
         onPressed: () {
@@ -310,8 +302,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                       child: const Text('Start'),
                       onPressed: () {
                         _tourBloc.startTour(tour);
-                        Navigator.pop(
-                            context); 
+                        Navigator.pop(context);
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => TourSessionScreen(
@@ -327,15 +318,14 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
             );
           } else {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => tourHasStarted
-                    ? TourSessionScreen(
-                        tour: tour,
-                      )
-                    : WaitingForHostScreen(
-                        tour: tour,
-                      ),
-              ),
+              MaterialPageRoute(builder: (context) {
+                if (!tourHasStarted) {
+                  print("Waiting for host");
+                  return WaitingForHostScreen(tour: tour);
+                }
+                print("Did not wait for host");
+                return TourSessionScreen(tour: tour);
+              }),
             );
           }
         },
@@ -478,5 +468,4 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
       return null;
     }
   }
-
 }

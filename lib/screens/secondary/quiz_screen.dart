@@ -21,11 +21,12 @@ class _QuizScreenState extends State<QuizScreen> {
     setState(() {
       if (_currentQuestionIndex < widget.quiz.quizItems.length - 1) {
         _currentQuestionIndex++;
-        _selectedOption = null; // Reset selected option for the next question
-        _correctOption = null; // Reset correct option for the next question
-        _isCorrect = null; // Reset correctness state
+        _selectedOption = null;
+        _correctOption = null;
+        _isCorrect = null;
       } else {
         // Handle end of quiz
+        Navigator.of(context).pop();
       }
     });
   }

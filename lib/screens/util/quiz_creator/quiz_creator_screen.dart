@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:guidely/models/data/quiz/quiz.dart';
 import 'package:guidely/models/data/quiz/quiz_item.dart';
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/services/business_layer/tour_service.dart';
 import 'package:guidely/services/general/firebase_storage_service.dart';
 import 'package:guidely/widgets/customs/custom_switch.dart';
 import 'package:image_picker/image_picker.dart';
 
-// TODO: Fix UI of quiz creator
 class QuizCreatorScreen extends StatefulWidget {
   QuizCreatorScreen({
     super.key,
@@ -115,18 +115,17 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
   }
 
   void _addQuizToFirebase(Quiz quiz) async {
-    await FirebaseFirestore.instance.collection('tours').doc(widget.tour.uid).update({
+    TourService.updateTourData(widget.tour.uid, {
       'quizzes': FieldValue.arrayUnion([quiz.toMap()])
     });
   }
 
   void _getImageUrl() async {
-      print("Uploading image");
-      String tempimageUrl = await _storageService.uploadImage(selectedImage, "quiz_images", widget.tour.uid);
-      setState(() {
-        imageUrl = tempimageUrl;
-        print("Image URL in State: " + imageUrl);
-      });
+    String tempimageUrl = await _storageService.uploadImage(
+        selectedImage, "quiz_images", widget.tour.uid);
+    setState(() {
+      imageUrl = tempimageUrl;
+    });
   }
 
   void _handleNext() {
@@ -176,9 +175,9 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
-                // create a quiz 
+                // create a quiz
                 Quiz quiz = Quiz(quizItems: quizItems);
-                // add this quiz to firebase 
+                // add this quiz to firebase
                 _addQuizToFirebase(quiz);
               },
               child: const Text('No'),

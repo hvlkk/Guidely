@@ -6,7 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/blocs/main/tours_home_bloc.dart';
 import 'package:guidely/misc/common.dart';
-import 'package:guidely/models/entities/notification.dart' as myNoti;
+import 'package:guidely/models/entities/notification.dart' as my_noti;
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
@@ -82,9 +82,9 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final jsonDataMap = Map<String, dynamic>.fromEntries(finalJsonData);
           final username = jsonDataMap['username'];
           final imageUrl = jsonDataMap['imageUrl'];
-          final List<myNoti.Notification> notifications =
-              List<myNoti.Notification>.from(jsonDataMap['notifications'].map(
-                  (data) => myNoti.Notification.fromMap(
+          final List<my_noti.Notification> notifications =
+              List<my_noti.Notification>.from(jsonDataMap['notifications'].map(
+                  (data) => my_noti.Notification.fromMap(
                       Map<String, dynamic>.from(data))));
 
           return Scaffold(

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-typedef void StreamStateCallback(MediaStream stream);
+typedef StreamStateCallback = void Function(MediaStream stream);
 
 class Signaling {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -58,7 +58,7 @@ class Signaling {
       peerConnection!.addTrack(track, localStream!);
     });
 
-    var callerCandidatesCollection;
+    CollectionReference<Map<String, dynamic>> callerCandidatesCollection;
 
     try {
       callerCandidatesCollection = roomRef.collection('callerCandidates');
@@ -159,13 +159,8 @@ class Signaling {
       }
 
       peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
-        if (candidate != null) {
-          print("Sending ICE candidate: ${candidate}");
-          calleeCandidatesCollection.add(candidate.toMap());
-        } else {
-          print("onIceCandidate: complete");
-          return;
-        }
+        print("Sending ICE candidate: ${candidate}");
+        calleeCandidatesCollection.add(candidate.toMap());
       };
 
       peerConnection!.onTrack = (RTCTrackEvent event) {
@@ -245,9 +240,7 @@ class Signaling {
     };
 
     peerConnection!.onIceCandidate = (candidate) {
-      if (candidate != null) {
-        print('ICE candidate: ${candidate.candidate}');
-      }
+      print('ICE candidate: ${candidate.candidate}');
     };
   }
 }

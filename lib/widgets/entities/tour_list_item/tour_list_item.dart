@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item_template.dart';
@@ -12,6 +14,7 @@ class TourListItem extends StatelessWidget {
   final Tour tour;
   final bool displayRemainingTime;
 
+  @override
   Widget build(BuildContext context) {
     return TourListItemTemplate(
       tour: tour,
@@ -37,8 +40,8 @@ class TourListItem extends StatelessWidget {
               ),
               if (displayRemainingTime)
                 Text(
-                  _getRemainingTimeText(
-                      tour.tourDetails.startTime, tour.tourDetails.startDate),
+                  _getRemainingTimeText(tour.tourDetails.startTime,
+                      tour.tourDetails.startDate, tour),
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.green,
@@ -72,9 +75,9 @@ class TourListItem extends StatelessWidget {
     );
   }
 
-  String _getRemainingTimeText(TimeOfDay startTime, DateTime startDate) {
+  String _getRemainingTimeText(
+      TimeOfDay startTime, DateTime startDate, Tour tour) {
     final now = DateTime.now();
-
     DateTime startDateTime = DateTime(
       startDate.year,
       startDate.month,
@@ -83,27 +86,26 @@ class TourListItem extends StatelessWidget {
       startTime.minute,
     );
 
+    var startDateTimeModified = startDateTime;
     // If the start time is earlier in the day than the current time, consider it the next day
     if (startDateTime.isBefore(now)) {
-      startDateTime = startDateTime.add(const Duration(days: 1));
+      var startDateTimeModified = startDateTime.add(const Duration(days: 1));
+    }
+    final differenceInMinutes = startDateTimeModified.difference(now).inMinutes;
+
+    if (differenceInMinutes <= 0) {
+      return 'Tour has started';
     }
 
-    final differenceInMinutes = startDateTime.difference(now).inMinutes;
-
-    if (differenceInMinutes > 0) {
-      if (differenceInMinutes >= 1440) {
-        // 24 hours * 60 minutes
-        final days = differenceInMinutes ~/ 1440;
-        return 'Starts in $days day${days > 1 ? 's' : ''}';
-      } else if (differenceInMinutes >= 60) {
-        final hours = differenceInMinutes ~/ 60;
-        final minutes = differenceInMinutes % 60;
-        return 'Starts in $hours hour${hours > 1 ? 's' : ''} and $minutes minute${minutes > 1 ? 's' : ''}';
-      } else {
-        return 'Starts in $differenceInMinutes minute${differenceInMinutes > 1 ? 's' : ''}';
-      }
+    if (differenceInMinutes >= 1440) {
+      final days = differenceInMinutes ~/ 1440;
+      return 'Starts in $days day${days > 1 ? 's' : ''}';
+    } else if (differenceInMinutes >= 60) {
+      final hours = differenceInMinutes ~/ 60;
+      final minutes = differenceInMinutes % 60;
+      return 'Starts in $hours hour${hours > 1 ? 's' : ''} and $minutes minute${minutes > 1 ? 's' : ''}';
     } else {
-      return 'Tour has started';
+      return 'Starts in $differenceInMinutes minute${differenceInMinutes > 1 ? 's' : ''}';
     }
   }
 }

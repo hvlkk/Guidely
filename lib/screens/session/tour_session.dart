@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/models/entities/session.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/screens/main/tours_home.dart';
 import 'package:guidely/screens/secondary/quiz_screen.dart';
 import 'package:guidely/screens/session/sections/chat_section.dart';
 import 'package:guidely/screens/session/sections/map_section.dart';
@@ -93,10 +94,30 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
               var documentSnapshot = snapshot.data as DocumentSnapshot;
               var sessionData = documentSnapshot.data() as Map<String, dynamic>;
               Session session = Session.fromMap(sessionData);
+
               if (session.status == SessionStatus.completed) {
-                return const Center(
-                  child: Text('Session has ended'),
-                );
+                showDialog(
+                  context: context,
+                  barrierDismissible:
+                      false, // this prevents the user from dismissing
+                  // the dialog by tapping outside it
+                  builder: (BuildContext context) {
+                    return const AlertDialog(
+                      title: Text('Session has ended'),
+                      content: Text('Thank you for joining!'),
+                    );
+                  },
+                ).then((value) {
+                  Future.delayed(const Duration(seconds: 5), () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ToursHomeScreen(),
+                      ),
+                    );
+                  });
+                });
               }
               if (session.status == SessionStatus.inQuiz) {
                 return Center(
@@ -122,7 +143,8 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                   ),
                   Expanded(
                     child: ChatSection(
-                        chatMessagesStream: Stream.value(session.chatMessages)),
+                      chatMessagesStream: Stream.value(session.chatMessages),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -131,7 +153,6 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            // pop 
                             Navigator.of(context).pop();
                           },
                           style: ElevatedButton.styleFrom(
@@ -151,11 +172,19 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                                   return AlertDialog(
                                     title: const Text('Give Quiz?'),
                                     content: const Text(
-                                        'Would you like to give the quiz?'),
+                                      'Would you like to give the quiz?',
+                                    ),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context).pop();
+                                          // end session
+                                          session.status =
+                                              SessionStatus.completed;
+                                          SessionService().updateSession(
+                                              session.sessionId, {
+                                            "status": session.status.toString(),
+                                          });
                                         },
                                         child: const Text('No'),
                                       ),

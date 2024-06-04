@@ -26,7 +26,7 @@ class WaitingForHostScreen extends StatelessWidget {
               return const CircularProgressIndicator();
             } else if (snapshot.data!.exists) {
               var tourData = snapshot.data!.data() as Map<String, dynamic>;
-              bool isLive = tourData['state'] == 'live';
+              bool isLive = tourData['hasStarted'] ?? false;
 
               if (isLive) {
                 // If tour session is live, navigate to TourSessionScreen
