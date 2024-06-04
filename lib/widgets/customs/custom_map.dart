@@ -16,6 +16,7 @@ class CustomMap extends StatelessWidget {
     this.withTrail = false,
     this.currentLocation = false,
     this.onTourSession = false,
+    required String organizerIcon,
   });
 
   final void Function(LatLng p0) onTapWaypoint;

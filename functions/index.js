@@ -219,3 +219,54 @@ exports.recommendTour = functions.firestore
       }
     });
   });
+
+// send notification if a new review is added to a tour
+exports.sendReviewNotification = functions.firestore
+  .document("tours/{tourId}/reviews/{reviewId}")
+  .onCreate(async (snapshot, context) => {
+    const tourId = context.params.tourId;
+    console.log("Cloud Function triggered by review creation:", snapshot.id);
+
+    const tourSnapshot = await admin
+      .firestore()
+      .collection("tours")
+      .doc(tourId)
+      .get();
+
+    // find the review added
+    const tourReviews = tourSnapshot.data().reviews;
+    const review = tourReviews.find((r) => r.id === snapshot.id);
+
+    const tourData = tourSnapshot.data();
+
+    const tourOrganizerUid = tourData.organizer.uid;
+
+    const tourTitle = tourData.tourDetails.title;
+
+    console.log("Now creating message for organizer:", tourOrganizerUid);
+    const message = {
+      notification: {
+        title: "New Review Added",
+        body: `A new review has been added to your tour: ${tourTitle}.`,
+      },
+      token: tourData.organizer.fcmToken,
+    };
+
+    console.log(
+      "About to send review notification to organizer:",
+      tourOrganizerUid
+    );
+
+    try {
+      await admin.messaging().send(message);
+      console.log("Review notification sent to organizer:", tourOrganizerUid);
+
+      await common.addNotificationToUser(
+        tourOrganizerUid,
+        "New Review Added",
+        `A new review has been added to your tour: ${tourTitle} with rating ${review.grade} and comment: ${review.comment}`
+      );
+    } catch (error) {
+      console.error("Error sending review notification:", error);
+    }
+  });

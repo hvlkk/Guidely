@@ -21,6 +21,16 @@
 
         <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyDKQj67ZoqcZ-UPXO1cnmGdYQ9wpKAoltI"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.guidely.flutter_downloader.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/flutter_downloader_paths" />
+        </provider>
         <activity
             android:name=".MainActivity"
             android:exported="true"
