@@ -5,6 +5,7 @@ enum SessionStatus {
   cancelled,
   active,
   completed,
+  inQuiz,
 }
 
 class Session {
@@ -25,6 +26,7 @@ class Session {
     required this.participants,
     required this.mediaUrls,
     required this.chatMessages,
+    this.status = SessionStatus.active,
   });
 
   Map<String, dynamic> toMap() {
@@ -59,6 +61,8 @@ class Session {
           .toList(),
       mediaUrls: List<String>.from(sessionData['mediaUrls']),
       chatMessages: List<String>.from(sessionData['chatMessages']),
+      status: SessionStatus.values
+          .firstWhere((e) => e.toString() == sessionData['status']),
     );
   }
 }

@@ -21,7 +21,7 @@ class SessionService {
   }
 
   // get session operation
-  static Stream<DocumentSnapshot> getSession(String sessionId) {
+  static Stream<DocumentSnapshot> getSessionStream(String sessionId) {
     // call repository to get session
     return SessionRepository().getSessionStream(sessionId);
   }

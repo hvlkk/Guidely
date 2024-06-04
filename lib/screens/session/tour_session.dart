@@ -16,7 +16,7 @@ import 'package:guidely/services/business_layer/session_service.dart';
 import 'package:guidely/services/general/live_location_service.dart';
 
 class TourSessionScreen extends ConsumerStatefulWidget {
-  TourSessionScreen({super.key, required this.tour});
+  const TourSessionScreen({super.key, required this.tour});
 
   final Tour tour;
 
@@ -45,6 +45,7 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
     super.dispose();
   }
 
+// todo: do we need to pass the streams to the sections?
   @override
   Widget build(BuildContext context) {
     final userDataAsync = ref.watch(userDataProvider);
@@ -79,7 +80,7 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
           ],
         ),
         body: StreamBuilder<Object>(
-          stream: SessionService.getSession(widget.tour.sessionId),
+          stream: SessionService.getSessionStream(widget.tour.sessionId),
           builder: (context, snapshot) {
             if (!snapshot.hasData ||
                 snapshot.connectionState == ConnectionState.waiting) {
@@ -92,6 +93,16 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
               var documentSnapshot = snapshot.data as DocumentSnapshot;
               var sessionData = documentSnapshot.data() as Map<String, dynamic>;
               Session session = Session.fromMap(sessionData);
+              if (session.status == SessionStatus.completed) {
+                return const Center(
+                  child: Text('Session has ended'),
+                );
+              }
+              if (session.status == SessionStatus.inQuiz) {
+                return const Center(
+                  child: Text('Quiz is in progress'),
+                );
+              }
               return Column(
                 children: [
                   MapSection(
@@ -130,13 +141,35 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                         if (isGuide)
                           ElevatedButton(
                             onPressed: () {
-                              // Navigate to the quiz screen
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => QuizScreen(
-                                    quiz: widget.tour.quizzes.first,
-                                  ),
-                                ),
+                              // this will need to be shown only if the tour has a quiz
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('Give Quiz?'),
+                                    content: const Text(
+                                        'Would you like to give the quiz?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('No'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          session.status = SessionStatus.inQuiz;
+                                          SessionService().updateSession(
+                                              session.sessionId, {
+                                            "status": session.status.toString(),
+                                          });
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('Yes'),
+                                      ),
+                                    ],
+                                  );
+                                },
                               );
                             },
                             style: ElevatedButton.styleFrom(

@@ -1,5 +1,1 @@
-
-
-class SessionBloc {
-  
-}
+class SessionBloc {}
