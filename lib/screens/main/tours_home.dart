@@ -1,11 +1,10 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:guidely/blocs/main/tours_home_bloc.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/models/entities/tour.dart';
@@ -14,12 +13,9 @@ import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
 import 'package:guidely/screens/util/tour_details_dialog.dart';
 import 'package:guidely/screens/util/tour_filter_dropdown.dart';
-import 'package:guidely/utils/tour_filter.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
 import 'package:guidely/widgets/customs/custom_notification_icon.dart';
 import 'package:guidely/widgets/entities/tour_list_item/tour_list_item.dart';
-
-// todo: clean
 
 class ToursHomeScreen extends ConsumerStatefulWidget {
   const ToursHomeScreen({super.key});
@@ -29,96 +25,37 @@ class ToursHomeScreen extends ConsumerStatefulWidget {
 }
 
 class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
-  late Stream<DocumentSnapshot<Map<String, dynamic>>> _userStream;
+  final ToursHomeBloc _toursHomeBloc = ToursHomeBloc();
   Position? _currentPosition;
   String _selectedFilterValue = 'Nearby';
+  late List<Tour> tourDataUnfiltered;
+  final TextEditingController _searchController = TextEditingController();
+
+  bool _isLoading = true;
+  bool _showNoToursMessage = false;
 
   @override
   void initState() {
     super.initState();
-    final user = FirebaseAuth.instance.currentUser;
-    _userStream = FirebaseFirestore.instance
-        .collection('users')
-        .doc(user?.uid)
-        .snapshots();
-
-    // get user's location
-    Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
-        .then((Position position) {
-      setState(() {
-        _currentPosition = position;
-      });
-    }).catchError((e) {
-      SnackBar(content: Text('Error: $e'));
-    });
+    _initialize();
+    _waitIndicator(); // Start the wait indicator
   }
 
-  Future _buildSearchResultsScreen(
-    BuildContext context,
-    List<Tour> filteredTours,
-    String searchQuery,
-  ) {
-    return Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(
-                'Search Results for: $searchQuery',
-                style: TextStyle(
-                  fontFamily: poppinsFont.fontFamily,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            body: ListView.builder(
-              itemCount: filteredTours.length,
-              itemBuilder: (BuildContext context, int index) {
-                final tour = filteredTours[index];
-                return Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: GestureDetector(
-                    onTap: () {
-                      // Navigate to a new page when the TourListItem is tapped
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TourDetailsScreen(
-                            tour: tour,
-                          ),
-                        ),
-                      );
-                    },
-                    child: TourListItem(
-                      tour: tour,
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
-    );
+  Future<void> _initialize() async {
+    _currentPosition = await _toursHomeBloc.getCurrentPosition();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    final tourDataAsyncUnfiltered = ref.watch(
-        toursStreamProvider); // listens for changes in the toursStreamProvider,
-    // this will not re-fetch the data from the database if the data is already available
-
-    late List<Tour> tourDataUnfiltered;
-
+    final tourDataAsyncUnfiltered = ref.watch(toursStreamProvider);
     final tourDataFiltered = tourDataAsyncUnfiltered.when<List<Tour>>(
       data: (List<Tour> tours) {
-        // Explicitly specify the type of tours
         tourDataUnfiltered = tours;
-        return TourFilter.filterTours(
-          tours: tours,
-          selectedFilterValue: _selectedFilterValue,
-          currentPosition: _currentPosition,
+        return _toursHomeBloc.filterTours(
+          tours,
+          _selectedFilterValue,
+          _currentPosition,
         );
       },
       loading: () => [],
@@ -129,7 +66,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
         tourDataFiltered.map((tour) => tour.tourDetails.waypoints![0]).toList();
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: _userStream,
+      stream: _toursHomeBloc.userStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -138,14 +75,11 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
         if (snapshot.hasData) {
           final userData = snapshot.data!;
           final finalJsonData = userData.data()?.entries;
-
           if (finalJsonData == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
           final jsonDataMap = Map<String, dynamic>.fromEntries(finalJsonData);
-          print(jsonDataMap);
-
           final username = jsonDataMap['username'];
           final imageUrl = jsonDataMap['imageUrl'];
           final List<myNoti.Notification> notifications =
@@ -153,10 +87,6 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                   (data) => myNoti.Notification.fromMap(
                       Map<String, dynamic>.from(data))));
 
-          print("Notifications: $notifications");
-          // filter notifications that are unread
-
-          final searchScreenController = TextEditingController();
           return Scaffold(
             appBar: AppBar(
               title: Text(
@@ -226,7 +156,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                       children: [
                         Expanded(
                           child: TextField(
-                            controller: searchScreenController,
+                            controller: _searchController,
                             decoration: InputDecoration(
                               hintText: 'Search for tours',
                               border: OutlineInputBorder(
@@ -239,16 +169,15 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         GestureDetector(
                           child: const Icon(Icons.search),
                           onTap: () {
-                            // Search for tours based on the search bar input
-                            final filteredTours = TourFilter.filterSearchBar(
-                              searchScreenController.text,
+                            final filteredTours =
+                                _toursHomeBloc.filterSearchBar(
+                              _searchController.text,
                               tourDataUnfiltered,
                             );
-                            // navigate to a new page with the filtered tours
-                            _buildSearchResultsScreen(
+                            _navigateToSearchResultsScreen(
                               context,
                               filteredTours,
-                              searchScreenController.text.trim(),
+                              _searchController.text.trim(),
                             );
                           },
                         ),
@@ -263,35 +192,35 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                       child: SizedBox(
                         width: 335,
                         height: 300,
-                        child: tourDataFiltered.isEmpty
+                        child: _isLoading
                             ? const Center(child: CircularProgressIndicator())
-                            : CustomMap(
-                                organizerIcon: "",
-                                waypoints: startLocations,
-                                withTrail: false,
-                                currentLocation: true,
-                                onTapWaypoint: (LatLng p0) {
-                                  // Find the tour corresponding to the tapped waypoint
-                                  final selectedTour =
-                                      tourDataFiltered.firstWhere(
-                                    (tour) =>
-                                        tour.tourDetails.waypoints![0]
-                                                .latitude ==
-                                            p0.latitude &&
-                                        tour.tourDetails.waypoints![0]
-                                                .longitude ==
-                                            p0.longitude,
-                                  );
-                                  // Display the dialog with the tour details
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return TourDetailsDialog(
-                                          selectedTour: selectedTour);
+                            : tourDataFiltered.isEmpty
+                                ? _buildNoToursAvailable()
+                                : CustomMap(
+                                    organizerIcon: "",
+                                    waypoints: startLocations,
+                                    withTrail: false,
+                                    currentLocation: true,
+                                    onTapWaypoint: (LatLng p0) {
+                                      final selectedTour =
+                                          tourDataFiltered.firstWhere(
+                                        (tour) =>
+                                            tour.tourDetails.waypoints![0]
+                                                    .latitude ==
+                                                p0.latitude &&
+                                            tour.tourDetails.waypoints![0]
+                                                    .longitude ==
+                                                p0.longitude,
+                                      );
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return TourDetailsDialog(
+                                              selectedTour: selectedTour);
+                                        },
+                                      );
                                     },
-                                  );
-                                },
-                              ),
+                                  ),
                       ),
                     ),
                   ),
@@ -303,46 +232,110 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                           _selectedFilterValue = value;
                         });
                       },
+                      onChanged: (String? newValue) {},
                     ),
                   ),
-                  const SizedBox(width: 15),
-                  SizedBox(
-                    height: 450,
-                    child: tourDataFiltered.isEmpty
-                        ? const Center(child: CircularProgressIndicator())
-                        : ListView.builder(
-                            itemCount: tourDataFiltered.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              final tour = tourDataFiltered[index];
-                              return Padding(
-                                padding: const EdgeInsets.all(8),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // Navigate to a new page when the TourListItem is tapped
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => TourDetailsScreen(
-                                          tour: tour,
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : tourDataFiltered.isEmpty
+                          ? _buildNoToursAvailable()
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: tourDataFiltered.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                final tour = tourDataFiltered[index];
+                                return Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              TourDetailsScreen(tour: tour),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                  child: TourListItem(
-                                    tour: tour,
+                                      );
+                                    },
+                                    child: TourListItem(tour: tour),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                  ),
+                                );
+                              },
+                            ),
                 ],
               ),
             ),
           );
         }
-        return Container();
+        return const Center(child: CircularProgressIndicator());
       },
     );
+  }
+
+  Future<void> _navigateToSearchResultsScreen(
+      BuildContext context, List<Tour> filteredTours, String searchQuery) {
+    return Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Search Results for: $searchQuery',
+                style: TextStyle(
+                  fontFamily: poppinsFont.fontFamily,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            body: ListView.builder(
+              itemCount: filteredTours.length,
+              itemBuilder: (BuildContext context, int index) {
+                final tour = filteredTours[index];
+                return Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TourDetailsScreen(tour: tour),
+                        ),
+                      );
+                    },
+                    child: TourListItem(tour: tour),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildNoToursAvailable() {
+    return Container(
+      alignment: Alignment.center,
+      child: Text(
+        'No tours available',
+        style: TextStyle(
+          fontFamily: poppinsFont.fontFamily,
+          fontSize: 20,
+        ),
+      ),
+    );
+  }
+
+  void _waitIndicator() {
+    setState(() {
+      _isLoading = true;
+    });
+
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        _isLoading = false;
+        _showNoToursMessage = tourDataUnfiltered.isEmpty;
+      });
+    });
   }
 }
