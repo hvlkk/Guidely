@@ -20,7 +20,7 @@ class TourBloc {
 
   void startTour(Tour tour) async {
     String id = await SessionService.createSession(tour);
-    TourService.updateTourData(tour.uid, {'state': 'live', 'sessionId': id});
+    TourService.updateTourData(tour.uid, {'hasStarted': true, 'sessionId': id});
   }
 
   Future<void> cancelTour(Tour tour, String uid, BuildContext context) async {

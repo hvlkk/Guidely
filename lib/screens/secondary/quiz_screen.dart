@@ -52,14 +52,15 @@ class _QuizScreenState extends State<QuizScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-            'Question ${_currentQuestionIndex + 1}/${widget.quiz.quizItems.length} - $appBarText'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            Text(
+              'Question ${_currentQuestionIndex + 1}/${widget.quiz.quizItems.length} - $appBarText',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
             LinearProgressIndicator(
               value: (_currentQuestionIndex + 1) / widget.quiz.quizItems.length,
               backgroundColor: Colors.grey[300],

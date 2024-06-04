@@ -1,10 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/blocs/main/tours_bloc.dart' as toursBloc;
 import 'package:guidely/blocs/main/tours_bloc.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/quiz/quiz_item.dart';
-import 'package:guidely/models/entities/tour.dart' as toursModel;
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
@@ -76,7 +76,9 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.quiz),
-                  onPressed: () {},
+                  onPressed: () {
+                      _showQuizDialog(context, userData.organizedTours);
+                  },
                 ),
               ];
             }
@@ -280,7 +282,10 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
 
   List<Widget> _buildLiveActions(Tour tour) {
     final isAHoster = _userData?.organizedTours.contains(tour.uid) ?? false;
-    final tourHasStarted = tour.state == toursModel.TourState.live;
+    final tourHasStarted = tour.hasStarted;
+
+    print('isAHoster: $isAHoster');
+    print('tourHasStarted: $tourHasStarted');
 
     return [
       OutlinedButton(
@@ -306,7 +311,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                       onPressed: () {
                         _tourBloc.startTour(tour);
                         Navigator.pop(
-                            context); // Remove the previous route from the stack
+                            context); 
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => TourSessionScreen(
@@ -390,4 +395,88 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
       ),
     ];
   }
+
+  void _showQuizDialog(BuildContext context, List<String> organizedTours) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select a Tour'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: organizedTours.map((tourId) {
+                return FutureBuilder<Tour?>(
+                  future: _fetchTourDetails(tourId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const ListTile(
+                        title: Text('Loading...'),
+                      );
+                    } else if (snapshot.hasError) {
+                      return ListTile(
+                        title: Text('Error: ${snapshot.error}'),
+                      );
+                    } else if (!snapshot.hasData || snapshot.data == null) {
+                      return const ListTile(
+                        title: Text('Tour not found'),
+                      );
+                    } else {
+                      final tour = snapshot.data!;
+                      return ListTile(
+                        title: Text(tour.tourDetails.title),
+                        onTap: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => QuizCreatorScreen(
+                                tour: tour,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<Tour?> _fetchTourDetails(String tourId) async {
+    try {
+      // Fetch the document snapshot from Firestore
+      DocumentSnapshot tourDoc = await FirebaseFirestore.instance
+          .collection('tours')
+          .doc(tourId)
+          .get();
+
+      // Check if the document exists
+      if (tourDoc.exists) {
+        // Create a Tour object from the Firestore data
+        return Tour.fromMap(tourDoc.data() as Map<String, dynamic>);
+      } else {
+        // Log the error and return null if the document does not exist
+        print('Tour with ID $tourId not found.');
+        return null;
+      }
+    } catch (e) {
+      // Log any errors that occur during the fetch operation
+      print('Error fetching tour: $e');
+      return null;
+    }
+  }
+
 }

@@ -8,6 +8,7 @@ import 'package:guidely/models/utils/tour_category.dart';
 enum TourState {
   upcoming,
   live,
+  inSession,
   past,
 }
 
@@ -22,6 +23,7 @@ class Tour {
     this.categories = const [],
     this.registeredUsers = const [],
     this.quizzes = const [],
+    this.hasStarted = false,
   }) {
     state = determineTourState();
   }
@@ -34,6 +36,7 @@ class Tour {
   final List<Review> reviews;
   final List<TourCategory> categories;
   final List<Quiz> quizzes;
+  final bool hasStarted;
 
   TourState state;
 
@@ -82,6 +85,7 @@ class Tour {
       quizzes: List<Quiz>.from(
         map['quizzes']?.map((quiz) => Quiz.fromMap(quiz)) ?? [],
       ),
+      hasStarted: map['hasStarted'] ?? false,
     );
   }
 
@@ -107,6 +111,7 @@ class Tour {
       quizzes: List<Quiz>.from(
         data['quizzes']?.map((quiz) => Quiz.fromMap(quiz)) ?? [],
       ),
+      hasStarted: data['hasStarted'] ?? false,
     );
     return tour;
   }
