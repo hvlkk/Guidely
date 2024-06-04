@@ -310,6 +310,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                       child: const Text('Start'),
                       onPressed: () {
                         _tourBloc.startTour(tour);
+                        Navigator.pop(
+                            context); // Remove the previous route from the stack
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => TourSessionScreen(

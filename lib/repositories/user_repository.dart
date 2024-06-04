@@ -38,6 +38,7 @@ class UserRepository {
           ? DateTime.parse(data['dateOfBirth'])
           : null,
       phoneNumber: data['phoneNumber'],
+      isoCode: data['isoCode'],
       languages: List<Language>.from(
         (data['languages'] ?? []).map(
           (language) => Language.fromMap(language),
@@ -95,6 +96,7 @@ class UserRepository {
           ? DateTime.parse(data['dateOfBirth'])
           : null,
       phoneNumber: data['phoneNumber'],
+      isoCode: data['isoCode'],
       languages: List<Language>.from(
         (data['languages'] ?? []).map(
           (language) => Language.fromMap(language),

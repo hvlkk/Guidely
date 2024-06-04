@@ -26,6 +26,7 @@ class _PersonalInformationScreenState
   String? _lastName;
   DateTime? _dateOfBirth;
   PhoneNumber _phoneNumber = PhoneNumber(isoCode: 'GR');
+  String? _isoCode;
   final Set<Language> _selectedLanguages = {};
   final Set<TourCategory> _selectedCategories = {};
   late final String _uid;
@@ -39,15 +40,15 @@ class _PersonalInformationScreenState
   Future<void> _fetchUser() async {
     final user = ref.read(userDataProvider);
     user.whenData((userData) {
-      print(userData);
       setState(
         () {
           _uid = userData.uid;
           _firstName = userData.firstName;
           _lastName = userData.lastName;
           _dateOfBirth = userData.dateOfBirth;
+          _isoCode = userData.isoCode;
           _phoneNumber = userData.phoneNumber != null
-              ? PhoneNumber(phoneNumber: userData.phoneNumber)
+              ? PhoneNumber(phoneNumber: userData.phoneNumber, isoCode: _isoCode)
               : PhoneNumber(isoCode: 'GR');
           _selectedLanguages.addAll(userData.languages);
           _selectedCategories.addAll(userData.preferredTourCategories);
@@ -77,8 +78,9 @@ class _PersonalInformationScreenState
     return {
       'firstName': _firstName,
       'lastName': _lastName,
-      'dateOfBirth': _dateOfBirth,
+      'dateOfBirth': _dateOfBirth.toString(),
       'phoneNumber': _phoneNumber.phoneNumber,
+      'isoCode': _phoneNumber.isoCode,
       'languages':
           _selectedLanguages.map((language) => language.toMap()).toList(),
       'preferredTourCategories': _selectedCategories
@@ -94,17 +96,14 @@ class _PersonalInformationScreenState
     }
 
     _formKey.currentState!.save();
-    print(
-        'Form data: First name: $_firstName, Last name: $_lastName, Date of birth: $_dateOfBirth, Phone number: $_phoneNumber, $_selectedLanguages, $_selectedCategories');
-
+    
     final Map<String, dynamic> userData =
         await UserRepository().updateUserData(_uid, formToMap());
+
     if (userData.containsKey('error')) {
       print('Failed to update user data: ${userData['error']}');
       return;
     }
-
-    print('User data updated successfully.');
 
     // Show a snackbar to confirm the update
     ScaffoldMessenger.of(context).showSnackBar(
@@ -112,6 +111,10 @@ class _PersonalInformationScreenState
         content: Text('Personal information updated successfully.'),
       ),
     );
+
+    setState(() {
+      ref.refresh(userDataProvider);
+    });
 
     // Navigate back to the previous screen
     Navigator.of(context).pop();
@@ -245,6 +248,7 @@ class _PersonalInformationScreenState
                             fontWeight: FontWeight.w600,
                             color: const Color.fromARGB(255, 80, 80, 80),
                           ),
+                          initialValue: _phoneNumber,
                           onInputChanged: (value) {
                             _phoneNumber = value;
                           },
@@ -254,7 +258,6 @@ class _PersonalInformationScreenState
                           ),
                           ignoreBlank: false,
                           autoValidateMode: AutovalidateMode.disabled,
-                          initialValue: _phoneNumber,
                           keyboardType: const TextInputType.numberWithOptions(
                             signed: true,
                             decimal: true,
