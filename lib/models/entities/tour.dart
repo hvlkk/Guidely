@@ -126,7 +126,6 @@ class Tour {
     return 'Tour(tour, images: $images, organizer: $organizer, state: $state, rating: $rating, uid: $uid, registeredUsers: $registeredUsers, reviews: $reviews)';
   }
 
-  // todo: fix
   TourState determineTourState() {
     final now = DateTime.now();
     final startDateTime = DateTime(
@@ -137,13 +136,12 @@ class Tour {
       tourDetails.startTime.minute,
     );
 
-    if (startDateTime.isAfter(now.add(const Duration(minutes: 5))) &&
-        startDateTime.isBefore(now.add(const Duration(minutes: 1)))) {
+    if (startDateTime.isBefore(now.add(const Duration(minutes: 5))) &&
+        startDateTime.isAfter(now.subtract(const Duration(minutes: 5)))) {
       return TourState.live;
     } else if (startDateTime.isAfter(now.add(const Duration(minutes: 5)))) {
       return TourState.upcoming;
-    } else {
-      return TourState.past;
     }
+    return TourState.past;
   }
 }
