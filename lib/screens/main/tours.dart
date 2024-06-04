@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/blocs/main/tours_bloc.dart' as toursBloc;
@@ -41,13 +40,11 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   @override
   void dispose() {
     super.dispose();
-    _tourBloc.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final userDataAsync = ref.watch(userDataProvider);
-    final tourDataAsync = ref.watch(toursStreamProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -78,9 +75,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.quiz),
-                  onPressed: () {
-                    _showQuizDialog(context, userData.organizedTours);
-                  },
+                  onPressed: () {},
                 ),
               ];
             }
@@ -99,57 +94,44 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
           child: Text('Error: $error'),
         ),
         data: (userData) {
-          // Assign _userData when data is available
           _userData = userData;
-          return tourDataAsync.when(
-            data: (tours) {
-              _tourBloc.loadTours(userData, tours);
-              return StreamBuilder<toursBloc.TourState>(
-                stream: _tourBloc.state,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.active) {
-                    final state = snapshot.data;
-                    if (state is toursBloc.ToursLoaded) {
-                      return DefaultTabController(
-                        length: 3,
-                        child: Scaffold(
-                          appBar: const TabBar(
-                            tabs: [
-                              Tab(text: 'Past'),
-                              Tab(text: 'Live now'),
-                              Tab(text: 'Upcoming'),
-                            ],
-                          ),
-                          body: TabBarView(
-                            children: [
-                              _buildTourList(
-                                  state.pastTours, _buildPastActions, false),
-                              _buildTourList(
-                                  state.liveTours, _buildLiveActions, true),
-                              _buildTourList(state.upcomingTours,
-                                  _buildUpcomingActions, true),
-                            ],
-                          ),
-                        ),
-                      );
-                    } else if (state is toursBloc.TourError) {
-                      return Center(child: Text('Error: ${state.error}'));
-                    }
-                  }
-                  return const Center(child: CircularProgressIndicator());
-                },
-              );
-            },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stackTrace) => Center(
-              child: Text('Error: $error'),
+          final pastToursAsync = ref.watch(pastToursProvider);
+          final liveToursAsync = ref.watch(liveToursProvider);
+          final upcomingToursAsync = ref.watch(upcomingToursProvider);
+
+          return DefaultTabController(
+            length: 3,
+            child: Scaffold(
+              appBar: const TabBar(
+                tabs: [
+                  Tab(text: 'Past'),
+                  Tab(text: 'Live now'),
+                  Tab(text: 'Upcoming'),
+                ],
+              ),
+              body: TabBarView(
+                children: [
+                  _buildTourTab(pastToursAsync, _buildPastActions, false),
+                  _buildTourTab(liveToursAsync, _buildLiveActions, true),
+                  _buildTourTab(
+                      upcomingToursAsync, _buildUpcomingActions, true),
+                ],
+              ),
             ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildTourTab(AsyncValue<List<Tour>> toursAsync, actionBuilder,
+      bool displayRemainingTime) {
+    return toursAsync.when(
+      data: (tours) {
+        return _buildTourList(tours, actionBuilder, displayRemainingTime);
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) => Center(child: Text('Error: $error')),
     );
   }
 
@@ -212,7 +194,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         TextButton(
                           child: const Text('Cancel'),
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            _tourBloc.cancelTour(tour, _userData!.uid, context);
                           },
                         ),
                         TextButton(
@@ -263,7 +245,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         TextButton(
                           child: const Text('Cancel Tour'),
                           onPressed: () {
-                            _tourBloc.cancelTour(tour, context);
+                            _tourBloc.cancelTour(tour, _userData!.uid, context);
                             Navigator.of(context).pop();
                             setState(() {});
                           },
@@ -392,88 +374,5 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         ),
       ),
     ];
-  }
-
-  void _showQuizDialog(BuildContext context, List<String> organizedTours) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Select a Tour'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: organizedTours.map((tourId) {
-                return FutureBuilder<Tour?>(
-                  future: _fetchTourDetails(tourId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const ListTile(
-                        title: Text('Loading...'),
-                      );
-                    } else if (snapshot.hasError) {
-                      return ListTile(
-                        title: Text('Error: ${snapshot.error}'),
-                      );
-                    } else if (!snapshot.hasData || snapshot.data == null) {
-                      return const ListTile(
-                        title: Text('Tour not found'),
-                      );
-                    } else {
-                      final tour = snapshot.data!;
-                      return ListTile(
-                        title: Text(tour.tourDetails.title),
-                        onTap: () {
-                          Navigator.of(context).pop(); // Close the dialog
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => QuizCreatorScreen(
-                                tour: tour,
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<Tour?> _fetchTourDetails(String tourId) async {
-    try {
-      // Fetch the document snapshot from Firestore
-      DocumentSnapshot tourDoc = await FirebaseFirestore.instance
-          .collection('tours')
-          .doc(tourId)
-          .get();
-
-      // Check if the document exists
-      if (tourDoc.exists) {
-        // Create a Tour object from the Firestore data
-        return Tour.fromMap(tourDoc.data() as Map<String, dynamic>);
-      } else {
-        // Log the error and return null if the document does not exist
-        print('Tour with ID $tourId not found.');
-        return null;
-      }
-    } catch (e) {
-      // Log any errors that occur during the fetch operation
-      print('Error fetching tour: $e');
-      return null;
-    }
   }
 }

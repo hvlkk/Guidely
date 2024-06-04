@@ -16,6 +16,75 @@ const { getRecommendationScore } = require("./recommendation_system");
 
 admin.initializeApp();
 
+// CLOUD FUNCTION TRIGGERS
+
+exports.updateTourState = functions.pubsub
+  .schedule("every 5 minutes")
+  .onRun(async (context) => {
+    const now = admin.firestore.Timestamp.now();
+    const tenMinutesFromNow = admin.firestore.Timestamp.fromDate(
+      new Date(now.toDate().getTime() + 10 * 60 * 1000)
+    );
+    const tenMinutesAgo = admin.firestore.Timestamp.fromDate(
+      new Date(now.toDate().getTime() - 10 * 60 * 1000)
+    );
+
+    const upcomingToursSnapshot = await admin
+      .firestore()
+      .collection("tours")
+      .where("state", "==", "upcoming")
+      .get();
+
+    const liveToursSnapshot = await admin
+      .firestore()
+      .collection("tours")
+      .where("state", "==", "live")
+      .get();
+
+    const batch = admin.firestore().batch();
+
+    upcomingToursSnapshot.forEach((doc) => {
+      const tourData = doc.data();
+
+      console.log("Start date:", tourData.tourDetails.startDate);
+      const startDate = new Date(tourData.tourDetails.startDate);
+
+      const [hour, minute] = tourData.tourDetails.startTime.split(":");
+
+      const startDateTime = new Date(startDate);
+      startDateTime.setHours(parseInt(hour));
+      startDateTime.setMinutes(parseInt(minute));
+
+      console.log("Tour title:", tourData.tourDetails.title);
+      console.log("Start date:", startDateTime);
+      console.log("Ten minutes from now:", tenMinutesFromNow.toDate());
+
+      if (startDateTime <= tenMinutesFromNow.toDate()) {
+        batch.set(doc.ref, { state: "live" }, { merge: true });
+        console.log("Successfully updated tour state to live:", doc.id);
+      }
+    });
+
+    liveToursSnapshot.forEach((doc) => {
+      const tourData = doc.data();
+
+      const startDate = new Date(tourData.tourDetails.startDate);
+
+      const [hour, minute] = tourData.tourDetails.startTime.split(":");
+
+      const startDateTime = new Date(startDate);
+      startDateTime.setHours(parseInt(hour));
+      startDateTime.setMinutes(parseInt(minute));
+
+      if (startDateTime < tenMinutesAgo.toDate()) {
+        batch.set(doc.ref, { state: "past" }, { merge: true });
+      }
+    });
+
+    await batch.commit();
+    return null;
+  });
+
 // eslint-disable-line max-len
 exports.checkUsernameAvailability = functions.https.onCall(
   async (data, context) => {
@@ -38,6 +107,8 @@ exports.checkUsernameAvailability = functions.https.onCall(
     }
   }
 );
+
+// CLOUD FUNCTIONS LISTENERS
 
 exports.subscribeTourAndNotifyEntry = functions.firestore
   .document("tours/{tourId}")

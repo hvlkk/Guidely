@@ -16,6 +16,17 @@ class TourRepository {
     return _firestore.collection('tours').doc(tourId).snapshots();
   }
 
+  Stream<List<Tour>> getFilteredToursStream(TourState state) {
+    return _firestore
+        .collection('tours')
+        .where('state', isEqualTo: state.toString().split('.').last)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Tour.fromFirestore(doc)).toList(),
+        );
+  }
+
   Future<void> updateTourData(String uid, Map<String, dynamic> data) async {
     try {
       await _firestore.collection('tours').doc(uid).set(

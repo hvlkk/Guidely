@@ -8,3 +8,18 @@ final toursStreamProvider = StreamProvider.autoDispose<List<Tour>>((ref) {
   final repository = ref.read(tourRepositoryProvider);
   return repository.getToursStream();
 });
+
+final pastToursProvider = StreamProvider.autoDispose<List<Tour>>((ref) {
+  final repository = ref.read(tourRepositoryProvider);
+  return repository.getFilteredToursStream(TourState.past);
+});
+
+final liveToursProvider = StreamProvider.autoDispose<List<Tour>>((ref) {
+  final repository = ref.read(tourRepositoryProvider);
+  return repository.getFilteredToursStream(TourState.live);
+});
+
+final upcomingToursProvider = StreamProvider.autoDispose<List<Tour>>((ref) {
+  final repository = ref.read(tourRepositoryProvider);
+  return repository.getFilteredToursStream(TourState.upcoming);
+});

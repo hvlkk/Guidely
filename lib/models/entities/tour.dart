@@ -22,7 +22,9 @@ class Tour {
     this.categories = const [],
     this.registeredUsers = const [],
     this.quizzes = const [],
-  });
+  }) {
+    state = determineTourState();
+  }
 
   final TourCreationData tourDetails;
   final List<String> images;
@@ -33,7 +35,7 @@ class Tour {
   final List<TourCategory> categories;
   final List<Quiz> quizzes;
 
-  TourState state = TourState.upcoming;
+  TourState state;
 
   get country => tourDetails.waypoints![0].address.split(',').last;
   get location => tourDetails.waypoints![0].address.split(',').first;
@@ -122,5 +124,26 @@ class Tour {
   @override
   String toString() {
     return 'Tour(tour, images: $images, organizer: $organizer, state: $state, rating: $rating, uid: $uid, registeredUsers: $registeredUsers, reviews: $reviews)';
+  }
+
+  // todo: fix
+  TourState determineTourState() {
+    final now = DateTime.now();
+    final startDateTime = DateTime(
+      tourDetails.startDate.year,
+      tourDetails.startDate.month,
+      tourDetails.startDate.day,
+      tourDetails.startTime.hour,
+      tourDetails.startTime.minute,
+    );
+
+    if (startDateTime.isAfter(now.add(const Duration(minutes: 5))) &&
+        startDateTime.isBefore(now.add(const Duration(minutes: 1)))) {
+      return TourState.live;
+    } else if (startDateTime.isAfter(now.add(const Duration(minutes: 5)))) {
+      return TourState.upcoming;
+    } else {
+      return TourState.past;
+    }
   }
 }

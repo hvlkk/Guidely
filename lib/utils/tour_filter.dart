@@ -29,21 +29,46 @@ class TourFilter {
     }).toList();
   }
 
-  static filterTourType(TourType tourType, List<Tour> tours) {
-    if (tourType == TourType.upcoming) {
-      return tours.where((tour) {
-        return tour.tourDetails.startDate.isAfter(DateTime.now());
-      }).toList();
-    } else if (tourType == TourType.past) {
-      return tours.where((tour) {
-        final yesterday = DateTime.now().subtract(const Duration(days: 1));
-        return tour.tourDetails.startDate.isBefore(yesterday);
-      }).toList();
+  static List<Tour> filterTourType(TourType tourType, List<Tour> tours) {
+    final now = DateTime.now();
+    return tours.where((tour) {
+      final startDateTime = DateTime(
+        tour.tourDetails.startDate.year,
+        tour.tourDetails.startDate.month,
+        tour.tourDetails.startDate.day,
+        tour.tourDetails.startTime.hour,
+        tour.tourDetails.startTime.minute,
+      );
+
+      if (tourType == TourType.upcoming) {
+        return startDateTime.isAfter(now.add(const Duration(minutes: 5)));
+      } else if (tourType == TourType.past) {
+        return startDateTime.isBefore(now.subtract(const Duration(minutes: 1)));
+      } else {
+        return startDateTime
+                .isAfter(now.subtract(const Duration(minutes: 5))) &&
+            startDateTime.isBefore(now.add(const Duration(minutes: 1)));
+      }
+    }).toList();
+  }
+
+  static TourState determineTourState(Tour tour) {
+    final now = DateTime.now();
+    final startDateTime = DateTime(
+      tour.tourDetails.startDate.year,
+      tour.tourDetails.startDate.month,
+      tour.tourDetails.startDate.day,
+      tour.tourDetails.startTime.hour,
+      tour.tourDetails.startTime.minute,
+    );
+
+    if (startDateTime.isAfter(now.add(const Duration(minutes: 5)))) {
+      return TourState.upcoming;
+    } else if (startDateTime
+        .isBefore(now.subtract(const Duration(minutes: 1)))) {
+      return TourState.past;
     } else {
-      // live tours
-      return tours.where((tour) {
-        return _isSameDay(tour.tourDetails.startDate, DateTime.now());
-      }).toList();
+      return TourState.live;
     }
   }
 
