@@ -68,6 +68,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                       MaterialPageRoute(
                         builder: (context) => const TourCreatorScreen(),
                       ),
+                      // append the tour to the list of tours
                     );
                     // re-render the screen after the user has created a tour
                     setState(() {});
@@ -128,6 +129,13 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
       bool displayRemainingTime) {
     return toursAsync.when(
       data: (tours) {
+        // filter out tours that are not created
+        // by the user or not booked by the user
+        tours = tours
+            .where((tour) =>
+                _userData!.organizedTours.contains(tour.uid) ||
+                _userData!.bookedTours.contains(tour.uid))
+            .toList();
         return _buildTourList(tours, actionBuilder, displayRemainingTime);
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -167,7 +175,12 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
   }
 
   List<Widget> _buildUpcomingActions(Tour tour) {
+    print("User data is $_userData");
+    print("Organized tours are ${_userData?.organizedTours}");
+    print("Tour uid is ${tour.uid}");
+
     final isAHoster = _userData?.organizedTours.contains(tour.uid) ?? false;
+    print('isAHoster: $isAHoster');
 
     return [
       isAHoster
