@@ -57,6 +57,13 @@ def submit_user_data():
     requests_data.append(new_request)
     write_requests(requests_data)
 
+    # change auth state in Firestore
+    try:
+        user_ref = db.collection('users').document(uid)
+        user_ref.update({'authState': 1})
+    except Exception as e:
+        return jsonify({'error': f'Failed to update Firestore: {e}'}), 500
+
     return jsonify({'message': 'User data received successfully'})
 
 @app.route('/reject-request', methods=['POST'])
@@ -172,4 +179,4 @@ def send_static(path):
     return send_file(os.path.join('static', path))
 
 if __name__ == '__main__':
-    app.run(debug=True, host='192.168.17.241', port=5000)
+    app.run(debug=True, host='192.168.194.61', port=5000)

@@ -46,7 +46,6 @@ class TourListItem extends StatelessWidget {
                 ),
             ],
           ),
-          // const SizedBox(width: 10),
           Column(
             children: [
               Container(

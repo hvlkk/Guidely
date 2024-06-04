@@ -2,7 +2,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/data/activity.dart';
 import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/models/entities/notification.dart' as myNoti;
@@ -52,12 +51,12 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
     ];
   }
 
-  void addCustomActivity(String name) {
-    // this will need to update to allow for custom activity names
-    setState(() {
-      widget.activities.add(Activity(name: name));
-    });
-  }
+  // void addCustomActivity(String name) {
+  //   // this will need to update to allow for custom activity names
+  //   setState(() {
+  //     widget.activities.add(Activity(name: name));
+  //   });
+  // }
 
   @override
   void initState() {
@@ -102,17 +101,17 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
                 );
               },
             ),
-          TextButton(
-            onPressed: () {
-              addCustomActivity('New Activity');
-            },
-            child: Text(
-              'Add a new activity',
-              style: poppinsFont.copyWith(
-                color: MainColors.accent,
-              ),
-            ),
-          ),
+          // TextButton(
+          //   onPressed: () {
+          //     addCustomActivity('New Activity');
+          //   },
+          //   child: Text(
+          //     'Add a new activity',
+          //     style: poppinsFont.copyWith(
+          //       color: MainColors.accent,
+          //     ),
+          //   ),
+          // ),
           const SizedBox(height: 10),
           const Center(
             child: Text(
@@ -205,6 +204,12 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
                 ?.map((item) => myNoti.Notification.fromMap(item)) ??
             [],
       ),
+      dateJoined: userData?['dateJoined'] != null
+          ? DateTime.parse(userData?['dateJoined'])
+          : null,
+      dateOfBirth: userData?['dateOfBirth'] != null
+          ? DateTime.parse(userData?['dateOfBirth'])
+          : null,
     );
 
     if (currentUser == null) {

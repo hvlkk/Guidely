@@ -61,9 +61,6 @@ class _TourGuideRegistrationScreenSecondState
       selectedImageFirebaseUrl = imageURL;
     });
 
-    // Call fetchImage function to fetch the image using the received imageURL
-    // fetchImage(imageURL);
-
     // Perform other actions with the imageURL
   } catch (error) {
     // Handle errors here
@@ -87,15 +84,11 @@ class _TourGuideRegistrationScreenSecondState
     );
 
     try {
-      print('Registration data: ');
-      print(registrationData.toJson());
-
       await FirebaseFirestore.instance
           .collection('users')
           .doc(updatedUser.uid)
           .set(
         {
-          'authState': TourGuideAuthState.pending.index,
           'registrationData': registrationData.toJson(),
         },
         SetOptions(merge: true), // Merge with existing data

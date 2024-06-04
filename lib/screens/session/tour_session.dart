@@ -20,8 +20,6 @@ class TourSessionScreen extends ConsumerStatefulWidget {
 
   final Tour tour;
 
-  var isGuide;
-
   @override
   _TourSessionScreenState createState() => _TourSessionScreenState();
 }
@@ -30,12 +28,14 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
   final LiveLocationService _locationService = LiveLocationService();
   late Timer _timer;
 
+  bool isGuide = false;
+
   @override
   void initState() {
     super.initState();
-    // Start periodic location updates
-    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      _locationService.updateLocation(widget.tour.organizer.uid);
+    isGuide = widget.tour.isTourGuide(FirebaseAuth.instance.currentUser!.uid);
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _locationService.updateLocation(widget.tour.organizer.uid, isGuide);
     });
   }
 
@@ -47,8 +47,6 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    widget.isGuide =
-        widget.tour.isTourGuide(FirebaseAuth.instance.currentUser!.uid);
     final userDataAsync = ref.watch(userDataProvider);
 
     return userDataAsync.when(
@@ -71,7 +69,7 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                   MaterialPageRoute(
                     builder: (context) => VoiceChatSection(
                       sessionId: widget.tour.sessionId,
-                      isTourGuide: widget.isGuide,
+                      isTourGuide: isGuide,
                       hostIconURL: widget.tour.organizer.imageUrl,
                     ),
                   ),
@@ -129,7 +127,7 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
-                        if (widget.isGuide)
+                        if (isGuide)
                           ElevatedButton(
                             onPressed: () {
                               // Navigate to the quiz screen

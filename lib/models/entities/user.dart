@@ -1,8 +1,8 @@
 import 'package:guidely/models/data/registration_data.dart';
-import 'package:guidely/models/utils/language.dart';
-import 'package:guidely/models/utils/tour_category.dart';
 import 'package:guidely/models/entities/notification.dart';
 import 'package:guidely/models/enums/tour_guide_auth_state.dart';
+import 'package:guidely/models/utils/language.dart';
+import 'package:guidely/models/utils/tour_category.dart';
 
 // TODO: Decompose the personal information of the user into a separate entity
 

@@ -5,8 +5,8 @@ import 'package:guidely/models/utils/language.dart';
 import 'package:guidely/models/utils/tour_category.dart';
 import 'package:guidely/providers/user_data_provider.dart';
 import 'package:guidely/repositories/user_repository.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:intl/intl.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 final _formatter = DateFormat.yMMMd();
 
@@ -105,6 +105,16 @@ class _PersonalInformationScreenState
     }
 
     print('User data updated successfully.');
+
+    // Show a snackbar to confirm the update
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Personal information updated successfully.'),
+      ),
+    );
+
+    // Navigate back to the previous screen
+    Navigator.of(context).pop();
   }
 
   @override

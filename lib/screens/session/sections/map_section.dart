@@ -51,6 +51,7 @@ class _MapSectionState extends State<MapSection> {
                 double longitude = locationData['longitude'];
 
                 return CustomMap(
+                  organizerIcon: widget.tour.organizer.imageUrl,
                   waypoints: [
                     // Guide's current location
                     Waypoint(

@@ -1,4 +1,8 @@
+import 'package:geolocator/geolocator.dart';
+import 'package:guidely/models/data/activity.dart';
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/models/utils/tour_category.dart';
+import 'package:guidely/utils/location_finder.dart';
 
 enum TourType {
   live,
@@ -43,28 +47,46 @@ class TourFilter {
     }
   }
 
-  static filterTours(List<Tour> tours, String filterBy) {
-    switch (filterBy) {
-      case 'Activities':
-        // TO DO
-        return tours;
+  static List<Tour> filterTours({
+    required List<Tour> tours,
+    required String selectedFilterValue,
+    required Position? currentPosition,
+  }) {
+    switch (selectedFilterValue) {
+      case 'Nearby':
+        if (currentPosition != null) {
+          return LocationFinder.findClosestToursToPosition(
+            tours,
+            currentPosition,
+            8,
+          );
+        }
+        break;
       case 'Highest Rated':
-        print('sorting by rating');
-        return sortByRating(tours);
+        return TourFilter.sortByRating(tours);
+      case 'Activities':
+        return TourFilter.filterByActivities([TourCategory.family], tours);
       case 'Starting Soon':
-        return filterByStartingSoon(tours);
+        return TourFilter.filterByStartingSoon(tours);
       default:
-        return tours;
+        break;
     }
+    return [];
   }
 
   // filter by user's favorite activities
-  static filterByActivities(List<String> activities, List<Tour> tours) {
+  static List<Tour> filterByActivities(
+      List<TourCategory> activities, List<Tour> tours) {
     return tours.where((tour) {
-      return tour.tourDetails.activities.map((activity) {
-        return activities.contains(activity.name);
-      }).contains(true);
-    }).toList();
+      for (var activity in tour.tourDetails.activities) {
+        for (var userActivity in Activity.mapActivityToTourCategory(activity)) {
+          if (activities.contains(userActivity)) {
+            return true;
+          }
+        }
+      }
+      return false; // Return false if no matching activities are found
+    }).toList(); // Convert the filtered Iterable back to a List
   }
 
   // tours that are starting soon (within 3 days)
@@ -73,7 +95,9 @@ class TourFilter {
 
     return tours.where((tour) {
       bool isToday = _isSameDay(tour.tourDetails.startDate, DateTime.now());
-      return isToday || (tour.tourDetails.startDate.isAfter(DateTime.now()) && tour.tourDetails.startDate.isBefore(threeDaysAgo));
+      return isToday ||
+          (tour.tourDetails.startDate.isAfter(DateTime.now()) &&
+              tour.tourDetails.startDate.isBefore(threeDaysAgo));
     }).toList();
   }
 

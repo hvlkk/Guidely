@@ -1,3 +1,5 @@
+import 'package:guidely/models/utils/tour_category.dart';
+
 class Activity {
   final String name;
   final String description;
@@ -21,6 +23,31 @@ class Activity {
       'description': description,
       'isSelected': isSelected,
     };
+  }
+
+  static List<TourCategory> mapActivityToTourCategory(Activity activity) {
+    switch (activity.name) {
+      case 'Walking tour':
+        return [TourCategory.history, TourCategory.architecture];
+      case 'Museum tour':
+        return [TourCategory.history, TourCategory.art];
+      case "Children's tour":
+        return [TourCategory.family];
+      case "Cycling tour":
+        return [TourCategory.adventure, TourCategory.sports];
+      case 'Hiking':
+        return [TourCategory.nature, TourCategory.adventure];
+      case 'City sightseeing':
+        return [
+          TourCategory.history,
+          TourCategory.architecture,
+          TourCategory.culture
+        ];
+      case 'Nature walk':
+        return [TourCategory.nature];
+      default:
+        return [];
+    }
   }
 
   @override

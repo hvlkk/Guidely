@@ -19,15 +19,15 @@ class UserProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userSpecificDataAsync = ref.watch(userSpecificDataProvider(user.uid));
+    final userSpecificDataAsync =
+        ref.watch(userSpecificDataProvider(user.uid));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),   
+        title: const Text('Profile'),
       ),
       body: userSpecificDataAsync.when(
         data: (userData) {
-          print(userData.imageUrl);
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Center(
@@ -48,14 +48,14 @@ class UserProfileScreen extends ConsumerWidget {
                   if (userData.authState == TourGuideAuthState.authenticated) ...[
                     const Text(
                       'Tour Guide',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
-                    const Text(
-                      'Member since 2020',
-                      style:
-                          TextStyle(fontSize: 16, color: MainColors.textHint),
+                    Text(
+                      'Member since ${userData.dateJoined?.year}',
+                      style: const TextStyle(
+                          fontSize: 16, color: MainColors.textHint),
                     ),
                     const SizedBox(height: 150),
                     if (reviews.isNotEmpty) ...[
@@ -81,8 +81,8 @@ class UserProfileScreen extends ConsumerWidget {
                     ] else
                       const Text(
                         'No Reviews yet',
-                        style:
-                            TextStyle(fontSize: 16, color: MainColors.textHint),
+                        style: TextStyle(
+                            fontSize: 16, color: MainColors.textHint),
                       ),
                   ],
                 ],
@@ -97,6 +97,21 @@ class UserProfileScreen extends ConsumerWidget {
           child: Text('An error occurred: $error'),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Handle the review button press here
+        },
+        child: Icon(Icons.rate_review),
+        backgroundColor: MainColors.primary,
+        elevation: 4, // Add elevation for a shadow effect
+        // splashColor: MainColors.primaryLight, // Set the splash color
+        foregroundColor: Colors.white, // Set the color of the icon
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10), // Rounded button shape
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
+

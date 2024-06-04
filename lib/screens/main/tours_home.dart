@@ -14,7 +14,6 @@ import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
 import 'package:guidely/screens/util/tour_details_dialog.dart';
 import 'package:guidely/screens/util/tour_filter_dropdown.dart';
-import 'package:guidely/utils/location_finder.dart';
 import 'package:guidely/utils/tour_filter.dart';
 import 'package:guidely/widgets/customs/custom_map.dart';
 import 'package:guidely/widgets/customs/custom_notification_icon.dart';
@@ -112,35 +111,18 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
 
     late List<Tour> tourDataUnfiltered;
 
-    // TODO: We could separate the filtering logic into a separate component
-    // WILL REPLACE CONDITIONAL LOGIC WITH TOUR FILTER.FILTERTOURS FUNCTION
-    final tourDataFiltered = tourDataAsyncUnfiltered.when(
-      data: (tours) {
+    final tourDataFiltered = tourDataAsyncUnfiltered.when<List<Tour>>(
+      data: (List<Tour> tours) {
+        // Explicitly specify the type of tours
         tourDataUnfiltered = tours;
-        if (_selectedFilterValue == 'Nearby' && _currentPosition != null) {
-          final closestTours = LocationFinder.findClosestToursToPosition(
-            tours,
-            _currentPosition!,
-            8,
-          );
-          return closestTours;
-        } else if (_selectedFilterValue == 'Highest Rated') {
-          print("Highest Rated");
-          List<Tour> highRatedTours = TourFilter.sortByRating(tours);
-          return highRatedTours;
-        } else if (_selectedFilterValue == 'Matched') {
-          // final matchedTours = TourFilter.filterByActivities(, tours);
-          // return matchedTours;
-          return <Tour>[];
-        } else if (_selectedFilterValue == 'Starting Soon') {
-          List<Tour> startingSoonTours = TourFilter.filterByStartingSoon(tours);
-          return startingSoonTours;
-        } else {
-          return <Tour>[];
-        }
+        return TourFilter.filterTours(
+          tours: tours,
+          selectedFilterValue: _selectedFilterValue,
+          currentPosition: _currentPosition,
+        );
       },
-      loading: () => List<Tour>.empty(),
-      error: (error, stackTrace) => List<Tour>.empty(),
+      loading: () => [],
+      error: (error, stackTrace) => [],
     );
 
     final startLocations =
@@ -284,6 +266,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                         child: tourDataFiltered.isEmpty
                             ? const Center(child: CircularProgressIndicator())
                             : CustomMap(
+                                organizerIcon: "",
                                 waypoints: startLocations,
                                 withTrail: false,
                                 currentLocation: true,

@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 typedef void StreamStateCallback(MediaStream stream);
 
@@ -82,7 +83,10 @@ class Signaling {
     print("created offer: ${offer.sdp}");
 
     // storing the offer in the room document
-    var roomWithOffer = {'offer': offer.toMap()};
+    // var roomWithOffer = {'offer': offer.toMap()};
+    Map<String, dynamic> roomWithOffer = {
+      'offer': {'type': offer.type}
+    };
     await roomRef.set(roomWithOffer);
     var roomId = roomRef.id;
 
@@ -95,7 +99,7 @@ class Signaling {
     };
 
     // listens for changes in the room document
-    roomRef.snapshots().listen((event) {
+    roomRef.snapshots().listen((event) async {
       Map<String, dynamic> data = event.data() as Map<String, dynamic>;
 
       if (peerConnection?.getRemoteDescription() != null &&
@@ -105,7 +109,7 @@ class Signaling {
           data['answer']['type'],
         );
         print("Someone tried to connect");
-        peerConnection!.setRemoteDescription(answer);
+        await peerConnection!.setRemoteDescription(answer);
       }
     });
 

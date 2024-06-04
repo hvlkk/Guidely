@@ -12,7 +12,7 @@ class LiveLocationService {
     );
   }
 
-  Future<void> updateLocation(String organizerId) async {
+  Future<void> updateLocation(String organizerId, bool isGuide) async {
     if (!(await _location.serviceEnabled() &&
         await _location.requestService())) {
       return;
@@ -24,6 +24,8 @@ class LiveLocationService {
         return; // Return early if permission was not granted
       }
     }
+
+    if (!isGuide) return; // Only update location if user is a guide
     LocationData locationData = await _location.getLocation();
     await _firestore.collection('locations').doc(organizerId).set({
       'latitude': locationData.latitude,

@@ -61,15 +61,52 @@ class ProfileScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 5),
               if (userData.authState == TourGuideAuthState.authenticated) ...[
-                Text(
-                  'Thank you for being a tour guide! (to be removed)',
-                  style: poppinsFont.copyWith(
-                    fontSize: 12,
-                    color: MainColors.primary,
-                    fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 96, 94, 94)
+                          .withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          color: Colors.green,
+                          size: 24,
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Thank you for being a tour guide!',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: MainColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Start organizing your tours now',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: MainColors.textHint,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 12),
               ] else if (userData.authState ==
                   TourGuideAuthState.unauthenticated) ...[
                 Padding(

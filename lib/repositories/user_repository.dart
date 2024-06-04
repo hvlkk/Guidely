@@ -31,8 +31,11 @@ class UserRepository {
       fcmToken: data['fcmToken'] ?? '',
       firstName: data['firstName'] ?? '',
       lastName: data['lastName'] ?? '',
+      dateJoined: data['dateJoined'] != null
+          ? DateTime.parse(data['dateJoined'])
+          : null,
       dateOfBirth: data['dateOfBirth'] != null
-          ? (data['dateOfBirth'] as Timestamp).toDate()
+          ? DateTime.parse(data['dateOfBirth'])
           : null,
       phoneNumber: data['phoneNumber'],
       languages: List<Language>.from(
@@ -85,8 +88,11 @@ class UserRepository {
       fcmToken: data['fcmToken'] ?? '',
       firstName: data['firstName'] ?? '',
       lastName: data['lastName'] ?? '',
+      dateJoined: data['dateJoined'] != null
+          ? DateTime.parse(data['dateJoined'])
+          : null,
       dateOfBirth: data['dateOfBirth'] != null
-          ? (data['dateOfBirth'] as Timestamp).toDate()
+          ? DateTime.parse(data['dateOfBirth'])
           : null,
       phoneNumber: data['phoneNumber'],
       languages: List<Language>.from(

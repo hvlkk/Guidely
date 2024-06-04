@@ -372,6 +372,7 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                 child: SizedBox(
                   height: 300,
                   child: CustomMap(
+                    organizerIcon: "",
                     waypoints: tour.tourDetails.waypoints!,
                     withTrail: true,
                     onTapWaypoint: (latLng) {},
