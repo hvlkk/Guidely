@@ -21,7 +21,7 @@ class TourListItem extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 185, 
+            width: 185,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

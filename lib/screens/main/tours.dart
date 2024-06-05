@@ -174,6 +174,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: actionBuilder(tour),
                       ),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
