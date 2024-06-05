@@ -4,6 +4,7 @@ import 'package:guidely/models/data/tour_creation_data.dart';
 import 'package:guidely/models/entities/review.dart';
 import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/models/utils/tour_category.dart';
+import 'package:guidely/services/business_layer/tour_service.dart';
 
 enum TourState {
   upcoming,
@@ -26,9 +27,7 @@ class Tour {
     this.quizzes = const [],
     this.hasStarted = false,
   }) {
-    print("I just got created");
     state = determineTourState();
-    print("The state is $state");
   }
 
   final TourCreationData tourDetails;
@@ -140,6 +139,11 @@ class Tour {
   }
 
   TourState determineTourState() {
+    if (state == TourState.past) {
+      return TourState.past;
+    }
+
+    DateTime now = DateTime.now();
     final startDateTime = DateTime(
       tourDetails.startDate.year,
       tourDetails.startDate.month,
@@ -147,14 +151,21 @@ class Tour {
       tourDetails.startTime.hour,
       tourDetails.startTime.minute,
     );
-    if (startDateTime.isBefore(creationDate.add(const Duration(minutes: 5))) &&
+    // todo : fix
+    var durationInMinutes =
+        tourDetails.duration.hour * 60 + tourDetails.duration.minute + 5;
+
+    if (startDateTime.isBefore(now.add(const Duration(minutes: 5))) &&
         startDateTime
-            .isAfter(creationDate.subtract(const Duration(minutes: 5)))) {
+            .isAfter(now.subtract(Duration(minutes: durationInMinutes)))) {
+      TourService.updateTourData(uid, {'state': 'live'});
       return TourState.live;
     } else if (startDateTime
-        .isAfter(creationDate.add(const Duration(minutes: 5)))) {
+        .isAfter(now.subtract(const Duration(minutes: 5)))) {
+      TourService.updateTourData(uid, {'state': 'upcoming'});
       return TourState.upcoming;
     }
+    TourService.updateTourData(uid, {'state': 'past'});
     return TourState.past;
   }
 }

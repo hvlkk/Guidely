@@ -158,6 +158,8 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
             itemCount: tours.length,
             itemBuilder: (BuildContext context, int index) {
               final tour = tours[index];
+              print("Tour name: ${tour.tourDetails.title}");
+              print("Tour status: ${tour.state}");
               return Padding(
                 padding: const EdgeInsets.all(8),
                 child: Column(
