@@ -12,7 +12,7 @@ class CustomSwitch extends StatefulWidget {
 }
 
 class _CustomSwitchState extends State<CustomSwitch> {
-  bool _isOn = false;
+  bool _isOn = true;
 
   void _toggleSwitch(bool value) {
     setState(() {

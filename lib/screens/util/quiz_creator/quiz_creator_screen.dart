@@ -11,7 +11,7 @@ import 'package:guidely/widgets/customs/custom_switch.dart';
 import 'package:image_picker/image_picker.dart';
 
 class QuizCreatorScreen extends StatefulWidget {
-  QuizCreatorScreen({
+  const QuizCreatorScreen({
     super.key,
     required this.tour,
   });
@@ -23,13 +23,13 @@ class QuizCreatorScreen extends StatefulWidget {
 }
 
 class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
-  FirebaseStorageService _storageService = FirebaseStorageService();
+  final FirebaseStorageService _storageService = FirebaseStorageService();
   var selectedImage;
   final _tourTitleController = TextEditingController();
-  bool _isMultipleChoice = false;
+  bool _isMultipleChoice = true;
   List<String> answers = [];
   String answerLimitMessage = '';
-  bool isTrueCorrect = false;
+  bool isTrueCorrect = true;
   bool isFalseCorrect = false;
   int correctAnswerIndex = -1;
   var imageUrl;
@@ -145,7 +145,6 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
     }
 
     _getImageUrl();
-    print("Image URL: " + imageUrl);
 
     QuizItem newQuizItem = QuizItem(
       question: question,
@@ -213,146 +212,152 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
       appBar: AppBar(
         title: const Text("Create a Quiz"),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Text(
-              widget.tour.tourDetails.title,
-              style: const TextStyle(fontSize: 20),
-            ),
-            // Image input
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: selectedImage == null
-                  ? GestureDetector(
-                      child: const Card(
-                        child: Padding(
-                          padding: EdgeInsets.all(25.0),
-                          child: Text(
-                            'Upload an image to be shown to the quiz',
-                            style: TextStyle(color: Colors.grey),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Text(
+                  widget.tour.tourDetails.title,
+                  style: const TextStyle(fontSize: 20),
+                ),
+                // Image input
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: selectedImage == null
+                      ? GestureDetector(
+                          child: const Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(25.0),
+                              child: Text(
+                                'Upload an image to be shown to the quiz',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                          onTap: _pickImage,
+                        )
+                      : Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                Image.file(
+                                  File(selectedImage.path),
+                                  width: 250,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                ),
+                                const SizedBox(height: 10),
+                                const Text(
+                                  'Uploaded Image',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      onTap: _pickImage,
-                    )
-                  : Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: 'Question',
+                      hintText: 'Enter the question',
+                      border: OutlineInputBorder(),
+                    ),
+                    controller: _tourTitleController,
+                  ),
+                ),
+                // Format input
+                CustomSwitch(onChanged: _handleSwitchChange),
+                // Show add answer button only for multiple-choice questions
+                if (_isMultipleChoice && answers.length < 4)
+                  ElevatedButton(
+                    onPressed: _addCustomAnswer,
+                    child: const Text('Add Answer'),
+                  ),
+                if (answerLimitMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      answerLimitMessage,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                // Displaying the answers
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: answers.length,
+                  itemBuilder: (context, index) {
+                    if (!_isMultipleChoice) {
+                      return ListTile(
+                        title: Row(
                           children: [
-                            Image.file(
-                              File(selectedImage.path),
-                              width: 250,
-                              height: 150,
-                              fit: BoxFit.cover,
+                            Radio(
+                              value: index,
+                              groupValue: isTrueCorrect ? 0 : 1,
+                              onChanged: (value) {
+                                setState(() {
+                                  if (value == 0) {
+                                    isTrueCorrect = true;
+                                    isFalseCorrect = false;
+                                    correctAnswerIndex = 0;
+                                  } else {
+                                    isTrueCorrect = false;
+                                    isFalseCorrect = true;
+                                    correctAnswerIndex = 1;
+                                  }
+                                });
+                              },
                             ),
-                            const SizedBox(height: 10),
-                            const Text(
-                              'Uploaded Image',
-                              style: TextStyle(color: Colors.grey),
-                            ),
+                            Text(answers[index]),
                           ],
                         ),
-                      ),
+                      );
+                    } else {
+                      return ListTile(
+                        title: Row(
+                          children: [
+                            Radio(
+                              value: index,
+                              groupValue: correctAnswerIndex,
+                              onChanged: (value) {
+                                setState(() {
+                                  correctAnswerIndex = value as int;
+                                });
+                              },
+                            ),
+                            Text(answers[index]),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                ),
+                // Show message for adding answers
+                if (_isMultipleChoice && answers.length < 4)
+                  const SizedBox(height: 10),
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'You can add up to 4 possible answers.',
+                      style: TextStyle(color: Colors.grey),
                     ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Question',
-                  hintText: 'Enter the question',
-                  border: OutlineInputBorder(),
+                  ),
+                // Next button
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: _handleNext,
+                    child: const Text('Next'),
+                  ),
                 ),
-                controller: _tourTitleController,
-              ),
+              ],
             ),
-            // Format input
-            CustomSwitch(onChanged: _handleSwitchChange),
-            // Show add answer button only for multiple-choice questions
-            if (_isMultipleChoice && answers.length < 4)
-              ElevatedButton(
-                onPressed: _addCustomAnswer,
-                child: const Text('Add Answer'),
-              ),
-            if (answerLimitMessage.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  answerLimitMessage,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              ),
-            // Displaying the answers
-            Expanded(
-              child: ListView.builder(
-                itemCount: answers.length,
-                itemBuilder: (context, index) {
-                  if (!_isMultipleChoice) {
-                    return ListTile(
-                      title: Row(
-                        children: [
-                          Radio(
-                            value: index,
-                            groupValue: isTrueCorrect ? 0 : 1,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == 0) {
-                                  isTrueCorrect = true;
-                                  isFalseCorrect = false;
-                                  correctAnswerIndex = 0;
-                                } else {
-                                  isTrueCorrect = false;
-                                  isFalseCorrect = true;
-                                  correctAnswerIndex = 1;
-                                }
-                              });
-                            },
-                          ),
-                          Text(answers[index]),
-                        ],
-                      ),
-                    );
-                  } else {
-                    return ListTile(
-                      title: Row(
-                        children: [
-                          Radio(
-                            value: index,
-                            groupValue: correctAnswerIndex,
-                            onChanged: (value) {
-                              setState(() {
-                                correctAnswerIndex = value as int;
-                              });
-                            },
-                          ),
-                          Text(answers[index]),
-                        ],
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
-            // Show message for adding answers
-            if (_isMultipleChoice && answers.length < 4)
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'You can add up to 4 possible answers.',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-            // Next button
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: _handleNext,
-                child: const Text('Next'),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

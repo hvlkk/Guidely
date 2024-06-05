@@ -16,6 +16,7 @@ class _QuizScreenState extends State<QuizScreen> {
   String? _selectedOption;
   String? _correctOption;
   bool? _isCorrect;
+  int correctAnswers = 0;
 
   void _nextQuestion() {
     setState(() {
@@ -25,7 +26,20 @@ class _QuizScreenState extends State<QuizScreen> {
         _correctOption = null;
         _isCorrect = null;
       } else {
+        String result = 'You have scored $correctAnswers points.';
+        if (correctAnswers == 1) {
+          result = 'You have scored $correctAnswers point.';
+        }
+        
         // Handle end of quiz
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result),
+          ),
+        );
+
+        Future.delayed(const Duration(seconds: 1));
+
         Navigator.of(context).pop();
       }
     });
@@ -54,7 +68,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
         child: Column(
           children: [
             Text(
@@ -171,8 +185,12 @@ class _QuizScreenState extends State<QuizScreen> {
                   isCorrect = _selectedOption == correctOption;
                 } else {
                   isCorrect = (_selectedOption == 'True' &&
-                          correctOption == 'true') ||
-                      (_selectedOption == 'False' && correctOption == 'false');
+                          correctOption == 'True') ||
+                      (_selectedOption == 'False' && correctOption == 'False');
+                }
+
+                if (isCorrect) {
+                  correctAnswers++;
                 }
 
                 // Update correctness state and correct option

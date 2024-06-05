@@ -78,7 +78,7 @@ class _PersonalInformationScreenState
     return {
       'firstName': _firstName,
       'lastName': _lastName,
-      'dateOfBirth': _dateOfBirth.toString(),
+      'dateOfBirth': _dateOfBirth?.toString(),
       'phoneNumber': _phoneNumber.phoneNumber,
       'isoCode': _phoneNumber.isoCode,
       'languages':
