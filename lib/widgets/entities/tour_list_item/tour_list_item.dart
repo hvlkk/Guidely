@@ -19,10 +19,9 @@ class TourListItem extends StatelessWidget {
     return TourListItemTemplate(
       tour: tour,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Container(
-            width: 175, // Set your desired fixed width here
+          SizedBox(
+            width: 185, 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -33,8 +32,6 @@ class TourListItem extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(
-                    height: 10), // Change to height for vertical spacing
                 Text(
                   tour.location ?? 'Unknown area',
                   style: const TextStyle(
