@@ -42,3 +42,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /lib/web_server/confidential
+/lib/screens/util/profile/personal_information_placeholder.dart
+/lib/models/entities/user_placeholder.dart
+lib/widgets/entities/tour_list_item/tour_list_item_placeholder.dart
+/.flutter-plugins*
