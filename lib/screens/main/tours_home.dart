@@ -50,8 +50,10 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final tourDataAsyncUnfiltered = ref.watch(toursStreamProvider);
+    print("After watch toursStreamProvider");
     final tourDataFiltered = tourDataAsyncUnfiltered.when<List<Tour>>(
       data: (List<Tour> tours) {
+        print("Tours are $tours");
         tourDataUnfiltered = tours;
         return _toursHomeBloc.filterTours(
           tours,

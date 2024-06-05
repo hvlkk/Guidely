@@ -32,6 +32,16 @@ class TourBloc {
         'organizedTours': FieldValue.arrayRemove([tour.uid]),
       },
     );
+    List<String> registeredUsersIds = tour.registeredUsers;
+    registeredUsersIds.forEach((userId) async {
+      await UserService.updateData(
+        context,
+        userId,
+        {
+          'bookedTours': FieldValue.arrayRemove([tour.uid]),
+        },
+      );
+    });
     await TourService.deleteTour(tour.uid);
   }
 
