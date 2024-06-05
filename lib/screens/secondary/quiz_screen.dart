@@ -3,7 +3,7 @@ import 'package:guidely/models/data/quiz/quiz.dart';
 import 'package:guidely/models/data/quiz/quiz_item.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({Key? key, required this.quiz}) : super(key: key);
+  const QuizScreen({super.key, required this.quiz});
 
   final Quiz quiz;
 
@@ -30,7 +30,7 @@ class _QuizScreenState extends State<QuizScreen> {
         if (correctAnswers == 1) {
           result = 'You have scored $correctAnswers point.';
         }
-        
+
         // Handle end of quiz
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -11,7 +11,7 @@ class VoiceChatBloc {
   }
 
   Future<void> joinRoom(String roomId, String sessionId) async {
-    signaling.joinRoom(sessionId, roomId);
+    await signaling.joinRoom(sessionId, roomId);
   }
 
   void hangUp(String sessionId, String roomId, {bool deleteRoom = false}) {

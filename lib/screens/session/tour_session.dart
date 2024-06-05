@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:guidely/blocs/main/session_bloc.dart';
 import 'package:guidely/models/entities/session.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/user_data_provider.dart';
-import 'package:guidely/screens/main/tours_home.dart';
 import 'package:guidely/screens/secondary/quiz_screen.dart';
 import 'package:guidely/screens/session/sections/chat_section.dart';
 import 'package:guidely/screens/session/sections/map_section.dart';
@@ -26,6 +26,7 @@ class TourSessionScreen extends ConsumerStatefulWidget {
 }
 
 class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
+  final SessionBloc _sessionBloc = SessionBloc();
   final LiveLocationService _locationService = LiveLocationService();
   late Timer _timer;
 
@@ -96,33 +97,16 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
               Session session = Session.fromMap(sessionData);
 
               if (session.status == SessionStatus.completed) {
-                showDialog(
-                  context: context,
-                  barrierDismissible:
-                      false, // this prevents the user from dismissing
-                  // the dialog by tapping outside it
-                  builder: (BuildContext context) {
-                    return const AlertDialog(
-                      title: Text('Session has ended'),
-                      content: Text('Thank you for joining!'),
-                    );
-                  },
-                ).then((value) {
-                  Future.delayed(const Duration(seconds: 5), () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ToursHomeScreen(),
-                      ),
-                    );
-                  });
-                });
+                return const Center(
+                  child: Text('Session has ended'),
+                );
               }
               if (session.status == SessionStatus.inQuiz) {
-                return Center(
-                  child: QuizScreen(quiz: widget.tour.quizzes[0]),
-                );
+                if (!isGuide) {
+                  return Center(
+                    child: QuizScreen(quiz: widget.tour.quizzes.first),
+                  );
+                }
               }
               return Column(
                 children: [
@@ -165,44 +149,74 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                         if (isGuide)
                           ElevatedButton(
                             onPressed: () {
-                              // this will need to be shown only if the tour has a quiz
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text('Give Quiz?'),
-                                    content: const Text(
-                                      'Would you like to give the quiz?',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          // end session
-                                          session.status =
-                                              SessionStatus.completed;
-                                          SessionService().updateSession(
-                                              session.sessionId, {
-                                            "status": session.status.toString(),
-                                          });
-                                        },
-                                        child: const Text('No'),
+                              if (widget.tour.quizzes.isNotEmpty) {
+                                // Show the dialog to the user
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('Give Quiz?'),
+                                      content: const Text(
+                                        'Would you like to give the quiz?',
                                       ),
-                                      TextButton(
-                                        onPressed: () {
-                                          session.status = SessionStatus.inQuiz;
-                                          SessionService().updateSession(
-                                              session.sessionId, {
-                                            "status": session.status.toString(),
-                                          });
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text('Yes'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            session.status =
+                                                SessionStatus.completed;
+                                            _sessionBloc
+                                                .endSession(session.sessionId);
+                                          },
+                                          child: const Text('No'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            session.status =
+                                                SessionStatus.inQuiz;
+                                            _sessionBloc.updateSession(
+                                                session.sessionId,
+                                                session.status);
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('Yes'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              } else {
+                                // ask the user if they want to end the session
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text('End Session?'),
+                                      content: const Text(
+                                        'Would you like to end the session?',
                                       ),
-                                    ],
-                                  );
-                                },
-                              );
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('No'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            session.status =
+                                                SessionStatus.completed;
+                                            _sessionBloc
+                                                .endSession(session.sessionId);
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('Yes'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red),

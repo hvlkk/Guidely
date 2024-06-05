@@ -7,17 +7,13 @@ typedef StreamStateCallback = void Function(MediaStream stream);
 
 class Signaling {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final Map<String, dynamic> configuration = {
+  Map<String, dynamic> configuration = {
     'iceServers': [
-      {'urls': 'stun:stun.l.google.com:19302'},
-      {'urls': 'stun:stun1.l.google.com:19302'},
-      {'urls': 'stun:stun2.l.google.com:19302'},
-      {'urls': 'stun:stun3.l.google.com:19302'},
-      {'urls': 'stun:stun4.l.google.com:19302'},
       {
-        'urls': 'turn:turn.anyfirewall.com:443?transport=tcp',
-        'username': 'webrtc',
-        'credential': 'webrtc'
+        'urls': [
+          'stun:stun1.l.google.com:19302',
+          'stun:stun2.l.google.com:19302'
+        ]
       }
     ]
   };
@@ -148,7 +144,7 @@ class Signaling {
         peerConnection?.addTrack(track, localStream!);
       });
 
-      var calleeCandidatesCollection;
+      CollectionReference<Map<String, dynamic>> calleeCandidatesCollection;
 
       try {
         calleeCandidatesCollection = roomRef.collection('calleeCandidates');
