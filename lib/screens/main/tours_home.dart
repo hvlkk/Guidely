@@ -88,9 +88,7 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final jsonDataMap = Map<String, dynamic>.fromEntries(finalJsonData);
           final username = jsonDataMap['username'];
           final imageUrl = jsonDataMap['imageUrl'];
-          print("jsonDataMap is $jsonDataMap");
           final userCategories = jsonDataMap['preferredTourCategories'];
-          print("userCategories is $userCategories");
 
           // todo refactor this
           List<TourCategory> userCategoriesEnum = [];
@@ -103,9 +101,13 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           _toursHomeBloc.setUserCategories(userCategoriesEnum);
 
           final List<my_noti.Notification> notifications =
-              List<my_noti.Notification>.from(jsonDataMap['notifications'].map(
-                  (data) => my_noti.Notification.fromMap(
-                      Map<String, dynamic>.from(data))));
+              List<my_noti.Notification>.from(
+            jsonDataMap['notifications'].map(
+              (data) => my_noti.Notification.fromMap(
+                Map<String, dynamic>.from(data),
+              ),
+            ),
+          );
 
           return Scaffold(
             appBar: AppBar(
