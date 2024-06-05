@@ -64,7 +64,7 @@ class _MediaCarouselState extends State<MediaCarousel> {
                             Text(
                               'No media available yet. \nUpload a picture!',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black54,
                               ),

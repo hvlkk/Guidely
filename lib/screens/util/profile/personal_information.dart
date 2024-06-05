@@ -48,7 +48,8 @@ class _PersonalInformationScreenState
           _dateOfBirth = userData.dateOfBirth;
           _isoCode = userData.isoCode;
           _phoneNumber = userData.phoneNumber != null
-              ? PhoneNumber(phoneNumber: userData.phoneNumber, isoCode: _isoCode)
+              ? PhoneNumber(
+                  phoneNumber: userData.phoneNumber, isoCode: _isoCode)
               : PhoneNumber(isoCode: 'GR');
           _selectedLanguages.addAll(userData.languages);
           _selectedCategories.addAll(userData.preferredTourCategories);
@@ -96,7 +97,7 @@ class _PersonalInformationScreenState
     }
 
     _formKey.currentState!.save();
-    
+
     final Map<String, dynamic> userData =
         await UserRepository().updateUserData(_uid, formToMap());
 

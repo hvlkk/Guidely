@@ -120,119 +120,129 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                     color: Colors.grey.withOpacity(0.5),
                     thickness: 1,
                   ),
-                  MediaCarousel(
-                    mediaUrlsStream: Stream.value(session.mediaUrls),
-                    sessionId: widget.tour.sessionId,
-                  ),
-                  Divider(
-                    color: Colors.grey.withOpacity(0.5),
-                    thickness: 1,
-                  ),
-                  Expanded(
-                    child: ChatSection(
-                      chatMessagesStream: Stream.value(session.chatMessages),
-                      sessionId: widget.tour.sessionId,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey),
-                          child: const Text(
-                            'Back to Main',
-                            style: TextStyle(color: Colors.white),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          MediaCarousel(
+                            mediaUrlsStream: Stream.value(session.mediaUrls),
+                            sessionId: widget.tour.sessionId,
                           ),
-                        ),
-                        if (isGuide)
-                          ElevatedButton(
-                            onPressed: () {
-                              if (widget.tour.quizzes.isNotEmpty) {
-                                // Show the dialog to the user
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('Give Quiz?'),
-                                      content: const Text(
-                                        'Would you like to give the quiz?',
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                            session.status =
-                                                SessionStatus.completed;
-                                            _sessionBloc.endSession(
-                                                session.sessionId,
-                                                widget.tour.uid);
-                                          },
-                                          child: const Text('No'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            session.status =
-                                                SessionStatus.inQuiz;
-                                            _sessionBloc.updateSession(
-                                                session.sessionId,
-                                                session.status);
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Yes'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              } else {
-                                // ask the user if they want to end the session
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('End Session?'),
-                                      content: const Text(
-                                        'Would you like to end the session?',
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('No'),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            session.status =
-                                                SessionStatus.completed;
-                                            _sessionBloc.endSession(
-                                              session.sessionId,
-                                              widget.tour.uid,
-                                            );
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Yes'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red),
-                            child: const Text(
-                              'End Session',
-                              style: TextStyle(color: Colors.white),
+                          Divider(
+                            color: Colors.grey.withOpacity(0.5),
+                            thickness: 1,
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            child: ChatSection(
+                              chatMessagesStream:
+                                  Stream.value(session.chatMessages),
+                              sessionId: widget.tour.sessionId,
                             ),
                           ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey),
+                                  child: const Text(
+                                    'Back to Main',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                                if (isGuide)
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      if (widget.tour.quizzes.isNotEmpty) {
+                                        // Show the dialog to the user
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: const Text('Give Quiz?'),
+                                              content: const Text(
+                                                'Would you like to give the quiz?',
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                    session.status =
+                                                        SessionStatus.completed;
+                                                    _sessionBloc.endSession(
+                                                        session.sessionId,
+                                                        widget.tour.uid);
+                                                  },
+                                                  child: const Text('No'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    session.status =
+                                                        SessionStatus.inQuiz;
+                                                    _sessionBloc.updateSession(
+                                                        session.sessionId,
+                                                        session.status);
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text('Yes'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      } else {
+                                        // ask the user if they want to end the session
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: const Text('End Session?'),
+                                              content: const Text(
+                                                'Would you like to end the session?',
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text('No'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    session.status =
+                                                        SessionStatus.completed;
+                                                    _sessionBloc.endSession(
+                                                      session.sessionId,
+                                                      widget.tour.uid,
+                                                    );
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text('Yes'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red),
+                                    child: const Text(
+                                      'End Session',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
