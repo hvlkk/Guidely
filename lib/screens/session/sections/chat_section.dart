@@ -1,15 +1,22 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as chat_types;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:guidely/models/entities/user.dart';
 import 'package:guidely/providers/user_data_provider.dart';
+import 'package:guidely/repositories/session_repository.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatSection extends ConsumerStatefulWidget {
   final Stream<List<Map<String, dynamic>>> chatMessagesStream;
+  final String sessionId;
 
-  const ChatSection({super.key, required this.chatMessagesStream});
+  const ChatSection({
+    super.key,
+    required this.chatMessagesStream,
+    required this.sessionId,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ChatSectionState();
@@ -47,6 +54,10 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
       id: uuid.v4(),
       text: message.text,
     );
+
+    SessionRepository().updateSession(widget.sessionId, {
+      'chatMessages': FieldValue.arrayUnion([textMessage.toJson()]),
+    });
   }
 
   @override
@@ -59,8 +70,11 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
           return const CircularProgressIndicator();
         }
         final List<Map<String, dynamic>> messageJsons = snapshot.data!;
-        final List<chat_types.Message> messages =
-            messageJsons.map((e) => chat_types.Message.fromJson(e)).toList();
+        final List<chat_types.Message> messages = messageJsons
+            .map((messageJson) => chat_types.Message.fromJson(messageJson))
+            .toList()
+            .reversed
+            .toList();
 
         return Directionality(
           textDirection: TextDirection.ltr,

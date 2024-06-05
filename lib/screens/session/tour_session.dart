@@ -128,6 +128,7 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                   Expanded(
                     child: ChatSection(
                       chatMessagesStream: Stream.value(session.chatMessages),
+                      sessionId: widget.tour.sessionId,
                     ),
                   ),
                   Padding(
