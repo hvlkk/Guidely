@@ -162,16 +162,24 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
               print("Tour status: ${tour.state}");
               return Padding(
                 padding: const EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    TourListItem(
-                      tour: tour,
-                      displayRemainingTime: displayRemainingTime,
-                    ),
-                    Row(
-                      children: actionBuilder(tour),
-                    ),
-                  ],
+                child: Card(
+                  color: Colors.white.withAlpha(235),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      TourListItem(
+                        tour: tour,
+                        displayRemainingTime: displayRemainingTime,
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: actionBuilder(tour),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -225,7 +233,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
               child: const Text('Announce'),
             )
           : const SizedBox(),
-      const SizedBox(width: 5),
+      const SizedBox(width: 25),
       OutlinedButton(
         onPressed: () {
           Navigator.of(context).push(
@@ -236,7 +244,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         },
         child: const Text('Get Info'),
       ),
-      const SizedBox(width: 5),
+      const SizedBox(width: 25),
       isAHoster
           ? TextButton(
               onPressed: () {
@@ -333,7 +341,7 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
         },
         child: Text(isAHoster ? 'Start Session' : 'Join Now'),
       ),
-      const SizedBox(width: 5),
+      const SizedBox(width: 30),
       OutlinedButton(
         onPressed: () {
           final startingLocationWaypoints = tour.tourDetails.startingLocation;
