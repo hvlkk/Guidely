@@ -102,7 +102,7 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                 );
               }
               if (session.status == SessionStatus.inQuiz) {
-                if (isGuide) {
+                if (!isGuide) {
                   return Center(
                     child: QuizScreen(
                       quiz: widget.tour.quizzes.first,

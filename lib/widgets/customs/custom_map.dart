@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:guidely/models/data/waypoint.dart';
 import 'package:guidely/utils/location_finder.dart';
-import 'package:http/http.dart' as http;
 
 class CustomMap extends StatefulWidget {
   final String organizerIcon;
@@ -32,8 +31,9 @@ class CustomMap extends StatefulWidget {
 
 class _CustomMapState extends State<CustomMap> {
   LatLng? _userLocation;
-  Marker? _organizerMarker;
   Timer? _locationTimer;
+
+  BitmapDescriptor organizerIcon = BitmapDescriptor.defaultMarker;
 
   @override
   void initState() {
@@ -44,13 +44,34 @@ class _CustomMapState extends State<CustomMap> {
         _updateUserLocation();
       });
     }
-    _loadOrganizerMarker();
+    setCustomeMarkerIcon();
   }
 
   @override
   void dispose() {
     _locationTimer?.cancel();
     super.dispose();
+  }
+
+  Future<BitmapDescriptor> createCustomMarkerBitmap(String imagePath, int width) async {
+  final ByteData imageData = await rootBundle.load(imagePath);
+  final ui.Codec codec = await ui.instantiateImageCodec(
+    imageData.buffer.asUint8List(),
+    targetWidth: width,
+  );
+  final ui.FrameInfo frameInfo = await codec.getNextFrame();
+  final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
+  final Uint8List resizedImageData = byteData!.buffer.asUint8List();
+
+  return BitmapDescriptor.fromBytes(resizedImageData);
+}
+
+  void setCustomeMarkerIcon() {
+    createCustomMarkerBitmap('assets/images/organizerIcon.png', 150).then((icon) {
+  setState(() {
+    organizerIcon = icon;
+  });
+});
   }
 
   Future<void> _updateUserLocation() async {
@@ -60,108 +81,19 @@ class _CustomMapState extends State<CustomMap> {
     });
   }
 
-  Future<void> _loadOrganizerMarker() async {
-    try {
-      final marker = await _buildCustomOrganizerMarker(widget.organizerIcon);
-      setState(() {
-        _organizerMarker = marker;
-      });
-      print("Organizer marker loaded and set");
-    } catch (e) {
-      print("Error loading organizer marker: $e");
-    }
-  }
-
-  Future<Uint8List> _getBytesFromNetworkImage(String url) async {
-    final http.Response response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      final Uint8List bytes = response.bodyBytes;
-      print("Image downloaded, byte length: ${bytes.length}");
-      return bytes;
-    } else {
-      throw Exception('Failed to load image');
-    }
-  }
-
-  Future<Uint8List> _getCircularImageWithBorder(Uint8List bytes,
-      {double size = 175, double borderWidth = 10}) async {
-    final Completer<ui.Image> completer = Completer();
-    ui.decodeImageFromList(bytes, (ui.Image img) {
-      return completer.complete(img);
-    });
-    final ui.Image image = await completer.future;
-    print("Image processed to ui.Image");
-
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint()..isAntiAlias = true;
-
-    // Draw the border
-    final double radius = size / 2;
-    canvas.drawCircle(
-      Offset(radius, radius),
-      radius,
-      paint,
-    );
-
-    // Draw the circular image
-    paint.imageFilter = ui.ImageFilter.blur(sigmaX: 0.1, sigmaY: 0.1);
-    paint.shader = ImageShader(
-        image, TileMode.clamp, TileMode.clamp, Matrix4.identity().storage);
-    canvas.drawCircle(
-      Offset(radius, radius),
-      radius - borderWidth,
-      paint,
-    );
-
-    // Get the image bytes
-    final ui.Image finalImage = await pictureRecorder
-        .endRecording()
-        .toImage(size.toInt(), size.toInt());
-    final ByteData? byteData =
-        await finalImage.toByteData(format: ui.ImageByteFormat.png);
-    print("Circular image with border processed");
-    return byteData!.buffer.asUint8List();
-  }
-
-  Future<Marker> _buildCustomOrganizerMarker(String organizerIcon) async {
-    // Get the organizer's icon as a Uint8List
-    final Uint8List markerIconBytes =
-        await _getBytesFromNetworkImage(organizerIcon);
-    print("Organizer icon downloaded");
-
-    // Process the image to make it circular with a border
-    final Uint8List circularMarkerIcon =
-        await _getCircularImageWithBorder(markerIconBytes);
-    print("Organizer icon processed to circular image");
-
-    // Create a BitmapDescriptor from the Uint8List
-    final BitmapDescriptor organizerMarkerIcon =
-        BitmapDescriptor.fromBytes(circularMarkerIcon);
-    print("BitmapDescriptor created");
-
-    // Return the custom marker
-    return Marker(
-      markerId: const MarkerId('organizer'),
-      position:
-          LatLng(widget.waypoints[0].latitude, widget.waypoints[0].longitude),
-      icon: organizerMarkerIcon, // Use the BitmapDescriptor
-      infoWindow: const InfoWindow(title: 'Organizer'),
-      anchor: Offset(0.5, 1.65), // Position the icon at the top of the marker
-    );
-  }
-
   Marker _buildCustomMarker(
     String markerId,
     LatLng position,
     BitmapDescriptor icon,
     String title,
+    Offset? anchor,
   ) {
     return Marker(
       markerId: MarkerId(markerId),
       position: position,
       icon: icon,
       infoWindow: InfoWindow(title: title),
+      anchor: anchor ?? const Offset(0.5, 1.0),
     );
   }
 
@@ -263,17 +195,26 @@ class _CustomMapState extends State<CustomMap> {
                     BitmapDescriptor.hueBlue,
                   ),
                   "Your Location",
+                  null,
                 ),
               if (widget.onTourSession) ...{
-                if (_organizerMarker != null) _organizerMarker!,
+                _buildCustomMarker(
+                  "tourOrganizer",
+                  LatLng(widget.waypoints[0].latitude,
+                      widget.waypoints[0].longitude),
+                  organizerIcon,
+                  "Tour Organizer",
+                  const Offset(0.5, 1.65),
+                ),
                 _buildCustomMarker(
                   "tourStartingPoint",
                   LatLng(widget.waypoints[1].latitude,
                       widget.waypoints[1].longitude),
                   BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueRed,
+                    BitmapDescriptor.hueGreen,
                   ),
                   "Tour Starting Point",
+                  null,
                 ),
                 _buildCustomMarker(
                   "tourEndingPoint",
@@ -283,6 +224,7 @@ class _CustomMapState extends State<CustomMap> {
                     BitmapDescriptor.hueBlue,
                   ),
                   "Tour Ending Point",
+                  null,
                 ),
               }
             },
