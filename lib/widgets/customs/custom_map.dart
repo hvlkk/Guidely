@@ -40,7 +40,7 @@ class _CustomMapState extends State<CustomMap> {
     super.initState();
     if (widget.currentLocation) {
       _updateUserLocation();
-      _locationTimer = Timer.periodic(Duration(seconds: 3), (timer) {
+      _locationTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
         _updateUserLocation();
       });
     }

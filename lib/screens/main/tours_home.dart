@@ -8,6 +8,7 @@ import 'package:guidely/blocs/main/tours_home_bloc.dart';
 import 'package:guidely/misc/common.dart';
 import 'package:guidely/models/entities/notification.dart' as my_noti;
 import 'package:guidely/models/entities/tour.dart';
+import 'package:guidely/models/utils/tour_category.dart';
 import 'package:guidely/providers/tours_provider.dart';
 import 'package:guidely/screens/secondary/tour_details.dart';
 import 'package:guidely/screens/util/notifications.dart';
@@ -30,9 +31,9 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
   String _selectedFilterValue = 'Nearby';
   late List<Tour> tourDataUnfiltered;
   final TextEditingController _searchController = TextEditingController();
+  var _showNoToursMessage = false;
 
   bool _isLoading = true;
-  bool _showNoToursMessage = false;
 
   @override
   void initState() {
@@ -62,6 +63,9 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
       error: (error, stackTrace) => [],
     );
 
+    // keep tours that are not past
+    tourDataFiltered.removeWhere((tour) => tour.state == TourState.past);
+
     final startLocations =
         tourDataFiltered.map((tour) => tour.tourDetails.waypoints![0]).toList();
 
@@ -82,6 +86,20 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
           final jsonDataMap = Map<String, dynamic>.fromEntries(finalJsonData);
           final username = jsonDataMap['username'];
           final imageUrl = jsonDataMap['imageUrl'];
+          print("jsonDataMap is $jsonDataMap");
+          final userCategories = jsonDataMap['preferredTourCategories'];
+          print("userCategories is $userCategories");
+
+          // todo refactor this
+          List<TourCategory> userCategoriesEnum = [];
+
+          for (var i = 0; i < userCategories.length; i++) {
+            // take their TourCategory enum value with and make them enum with the fromString method
+            userCategoriesEnum.add(tourCategoryFromString[userCategories[i]]!);
+          }
+
+          _toursHomeBloc.setUserCategories(userCategoriesEnum);
+
           final List<my_noti.Notification> notifications =
               List<my_noti.Notification>.from(jsonDataMap['notifications'].map(
                   (data) => my_noti.Notification.fromMap(
@@ -235,32 +253,36 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                       onChanged: (String? newValue) {},
                     ),
                   ),
-                  _isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : tourDataFiltered.isEmpty
-                          ? _buildNoToursAvailable()
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: tourDataFiltered.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                final tour = tourDataFiltered[index];
-                                return Padding(
-                                  padding: const EdgeInsets.all(8),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              TourDetailsScreen(tour: tour),
-                                        ),
-                                      );
-                                    },
-                                    child: TourListItem(tour: tour),
-                                  ),
-                                );
-                              },
-                            ),
+                  const SizedBox(width: 15),
+                  SizedBox(
+                    height: 450,
+                    child: _isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : tourDataFiltered.isEmpty
+                            ? _buildNoToursAvailable()
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: tourDataFiltered.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final tour = tourDataFiltered[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.all(8),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                TourDetailsScreen(tour: tour),
+                                          ),
+                                        );
+                                      },
+                                      child: TourListItem(tour: tour),
+                                    ),
+                                  );
+                                },
+                              ),
+                  ),
                 ],
               ),
             ),

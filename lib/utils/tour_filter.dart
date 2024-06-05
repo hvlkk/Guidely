@@ -76,6 +76,7 @@ class TourFilter {
     required List<Tour> tours,
     required String selectedFilterValue,
     required Position? currentPosition,
+    required List<TourCategory> userCategories,
   }) {
     switch (selectedFilterValue) {
       case 'Nearby':
@@ -90,7 +91,7 @@ class TourFilter {
       case 'Highest Rated':
         return TourFilter.sortByRating(tours);
       case 'Activities':
-        return TourFilter.filterByActivities([TourCategory.religion], tours);
+        return TourFilter.filterByActivities(userCategories, tours);
       case 'Starting Soon':
         return TourFilter.filterByStartingSoon(tours);
       default:

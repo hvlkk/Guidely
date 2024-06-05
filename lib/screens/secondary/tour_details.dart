@@ -313,12 +313,6 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                     )
                   : ElevatedButton(
                       onPressed: () {
-                        showDatePicker(
-                          context: context,
-                          initialDate: tour.tourDetails.startDate,
-                          firstDate: tour.tourDetails.startDate,
-                          lastDate: tour.tourDetails.startDate,
-                        );
                         _uploadBooking(context);
                       },
                       style: ElevatedButton.styleFrom(

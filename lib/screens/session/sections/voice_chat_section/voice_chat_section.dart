@@ -98,10 +98,6 @@ class _VoiceChatSectionState extends State<VoiceChatSection> {
                   style: TextStyle(color: Colors.red),
                 ),
               ),
-              ElevatedButton(
-                onPressed: _toggleMic,
-                child: const Text("Toggle Mic"),
-              ),
             ],
           ),
           Row(

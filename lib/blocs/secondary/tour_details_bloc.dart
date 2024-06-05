@@ -32,6 +32,14 @@ class TourDetailsBloc {
 
   Future<void> uploadBooking(BuildContext context) async {
     final user = _ref.watch(userDataProvider);
+    if (tour.state == TourState.past) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You cannot book a past tour!'),
+        ),
+      );
+      return;
+    }
     user.when(
       data: (userData) async {
         if (userData.organizedTours.contains(tour.uid)) {

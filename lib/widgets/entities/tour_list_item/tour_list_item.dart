@@ -19,7 +19,6 @@ class TourListItem extends StatelessWidget {
     return TourListItemTemplate(
       tour: tour,
       child: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
