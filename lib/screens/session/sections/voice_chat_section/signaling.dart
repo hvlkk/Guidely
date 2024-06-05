@@ -80,9 +80,12 @@ class Signaling {
 
     // storing the offer in the room document
     // var roomWithOffer = {'offer': offer.toMap()};
-    Map<String, dynamic> roomWithOffer = {
-      'offer': {'type': offer.type}
-    };
+    // Map<String, dynamic> roomWithOffer = {
+    //   'offer': {'type': offer.type}
+    // };
+
+    Map<String, dynamic> roomWithOffer = {'offer': offer.toMap()};
+
     await roomRef.set(roomWithOffer);
     var roomId = roomRef.id;
 
@@ -131,31 +134,45 @@ class Signaling {
 
   // joins an existing room with the given session ID and room ID.
   Future<void> joinRoom(String sessionId, String roomId) async {
+    print("Joining room $roomId in session $sessionId");
     DocumentReference sessionRef =
         _firestore.collection('sessions').doc(sessionId);
+    print("Session ref: $sessionRef");
     DocumentReference roomRef = sessionRef.collection('rooms').doc(roomId);
+    print("Room ref: $roomRef");
     var roomSnapshot = await roomRef.get();
+    print("Room snapshot: $roomSnapshot");
 
     if (roomSnapshot.exists) {
+      print("Creating peer connection");
       peerConnection = await createPeerConnection(configuration);
+      print("Peer connection created");
       _registerPeerConnectionListeners();
 
       localStream?.getTracks().forEach((track) {
+        print("Adding track to peer connection");
         peerConnection?.addTrack(track, localStream!);
       });
 
+
       CollectionReference<Map<String, dynamic>> calleeCandidatesCollection;
 
-      try {
+      // try {
+        print("Creating calleeCandidatesCollection");
         calleeCandidatesCollection = roomRef.collection('calleeCandidates');
-      } catch (e) {
-        print(
-            "Error, failed to create calleeCandidatesCollection because of $e\n");
-        rethrow;
-      }
+        print("calleeCandidatesCollection created");
+      // } catch (e) {
+      //   print(
+      //       "Error, failed to create calleeCandidatesCollection because of $e\n");
+      //   rethrow;
+      // }
 
       peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
         print("Sending ICE candidate: ${candidate}");
+         if (candidate == null) {
+          print('onIceCandidate: complete!');
+          return;
+        }
         calleeCandidatesCollection.add(candidate.toMap());
       };
 

@@ -11,6 +11,9 @@ class VoiceChatBloc {
   }
 
   Future<void> joinRoom(String roomId, String sessionId) async {
+    print('joining room');
+    print("room id: $roomId");
+    print("session id: $sessionId");
     await signaling.joinRoom(sessionId, roomId);
   }
 
