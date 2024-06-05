@@ -205,7 +205,7 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
 
     ImageRetrievalService imageRetrievalService = ImageRetrievalService();
 
-    final imageUrl = await imageRetrievalService.fetchCityImagesList(
+    final fetchedImages = await imageRetrievalService.fetchCityImagesList(
       finalData.title,
     );
 
@@ -213,7 +213,7 @@ class _TourCreatorThirdScreenState extends State<TourCreatorThirdScreen> {
       uid: const Uuid().v4(),
       tourDetails: finalData,
       organizer: user,
-      images: imageUrl,
+      images: fetchedImages,
       reviews: [],
       state: TourState.upcoming,
       registeredUsers: [],

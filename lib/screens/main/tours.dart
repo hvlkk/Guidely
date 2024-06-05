@@ -221,6 +221,12 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                           onPressed: () {
                             _tourBloc.announceTour(
                                 tour, announcementController.text);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Announcement published successfully.'),
+                              ),
+                            );
                             Navigator.of(context).pop();
                           },
                         ),
