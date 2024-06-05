@@ -32,6 +32,8 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
   void initState() {
     super.initState();
     _bloc = TourDetailsBloc(ref, tour);
+    print('TourDetailsScreen: ${tour.tourDetails.title}');
+    print("Tour state: ${tour.state}");
   }
 
   @override

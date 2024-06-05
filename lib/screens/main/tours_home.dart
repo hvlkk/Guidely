@@ -192,6 +192,8 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
                               _searchController.text,
                               tourDataUnfiltered,
                             );
+                            print("Filtered tours are :");
+                            print(filteredTours[0].state);
                             _navigateToSearchResultsScreen(
                               context,
                               filteredTours,

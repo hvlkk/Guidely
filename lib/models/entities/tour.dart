@@ -19,13 +19,16 @@ class Tour {
     required this.organizer,
     required this.reviews,
     required this.state,
+    required this.creationDate,
     this.images = const [],
     this.categories = const [],
     this.registeredUsers = const [],
     this.quizzes = const [],
     this.hasStarted = false,
   }) {
+    print("I just got created");
     state = determineTourState();
+    print("The state is $state");
   }
 
   final TourCreationData tourDetails;
@@ -37,6 +40,8 @@ class Tour {
   final List<TourCategory> categories;
   final List<Quiz> quizzes;
   final bool hasStarted;
+
+  final DateTime creationDate;
 
   TourState state;
 
@@ -61,6 +66,7 @@ class Tour {
           categories.map((category) => tourCategoryToString[category]).toList(),
       'registeredUsers': registeredUsers,
       'quizzes': quizzes.map((quiz) => quiz.toMap()).toList(),
+      'creationDate': DateTime.now(),
     };
   }
 
@@ -86,6 +92,7 @@ class Tour {
         map['quizzes']?.map((quiz) => Quiz.fromMap(quiz)) ?? [],
       ),
       hasStarted: map['hasStarted'] ?? false,
+      creationDate: map['creationDate'].toDate(),
     );
   }
 
@@ -112,6 +119,7 @@ class Tour {
         data['quizzes']?.map((quiz) => Quiz.fromMap(quiz)) ?? [],
       ),
       hasStarted: data['hasStarted'] ?? false,
+      creationDate: data['creationDate'].toDate(),
     );
     return tour;
   }
@@ -132,7 +140,6 @@ class Tour {
   }
 
   TourState determineTourState() {
-    final now = DateTime.now();
     final startDateTime = DateTime(
       tourDetails.startDate.year,
       tourDetails.startDate.month,
@@ -140,11 +147,12 @@ class Tour {
       tourDetails.startTime.hour,
       tourDetails.startTime.minute,
     );
-
-    if (startDateTime.isBefore(now.add(const Duration(minutes: 5))) &&
-        startDateTime.isAfter(now.subtract(const Duration(minutes: 5)))) {
+    if (startDateTime.isBefore(creationDate.add(const Duration(minutes: 5))) &&
+        startDateTime
+            .isAfter(creationDate.subtract(const Duration(minutes: 5)))) {
       return TourState.live;
-    } else if (startDateTime.isAfter(now.add(const Duration(minutes: 5)))) {
+    } else if (startDateTime
+        .isAfter(creationDate.add(const Duration(minutes: 5)))) {
       return TourState.upcoming;
     }
     return TourState.past;
