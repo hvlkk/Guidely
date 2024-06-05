@@ -1,11 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:guidely/models/data/quiz/quiz.dart';
 import 'package:guidely/models/data/quiz/quiz_item.dart';
+import 'package:guidely/screens/secondary/quiz/components/quiz_results_screen.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key, required this.quiz});
+  const QuizScreen({super.key, required this.quiz, required this.sessionId});
 
   final Quiz quiz;
+  final String sessionId;
 
   @override
   _QuizScreenState createState() => _QuizScreenState();
@@ -17,42 +21,106 @@ class _QuizScreenState extends State<QuizScreen> {
   String? _correctOption;
   bool? _isCorrect;
   int correctAnswers = 0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeQuizProgress();
+  }
+
+  Future<void> _initializeQuizProgress() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    DocumentReference<Map<String, dynamic>> quizDocRef = FirebaseFirestore
+        .instance
+        .collection('sessions')
+        .doc(widget.sessionId)
+        .collection('quizzes')
+        .doc(userId);
+
+    final snapshot = await quizDocRef.get();
+
+    if (snapshot.exists) {
+      final data = snapshot.data()!;
+      setState(() {
+        _currentQuestionIndex = data['currentQuestionIndex'];
+        correctAnswers = data['correctAnswers'];
+      });
+      if (_currentQuestionIndex >= widget.quiz.quizItems.length) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => QuizResultScreen(
+              correctAnswers: correctAnswers,
+              totalQuestions: widget.quiz.quizItems.length,
+            ),
+          ),
+        );
+      }
+    } else {
+      await quizDocRef.set({
+        'userId': userId,
+        'correctAnswers': 0,
+        'currentQuestionIndex': 0,
+        'totalQuestions': widget.quiz.quizItems.length,
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _updateQuizProgress() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final quizDocRef = FirebaseFirestore.instance
+        .collection('sessions')
+        .doc(widget.sessionId)
+        .collection('quizzes')
+        .doc(userId);
+
+    _currentQuestionIndex++;
+    await quizDocRef.update({
+      'correctAnswers': correctAnswers,
+      'currentQuestionIndex': _currentQuestionIndex,
+    });
+  }
 
   void _nextQuestion() {
     setState(() {
       if (_currentQuestionIndex < widget.quiz.quizItems.length - 1) {
-        _currentQuestionIndex++;
         _selectedOption = null;
         _correctOption = null;
         _isCorrect = null;
+        _updateQuizProgress();
       } else {
-        String result = 'You have scored $correctAnswers points.';
-        if (correctAnswers == 1) {
-          result = 'You have scored $correctAnswers point.';
-        }
-
-        // Handle end of quiz
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result),
+        // update for the last question
+        _updateQuizProgress();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => QuizResultScreen(
+              correctAnswers: correctAnswers,
+              totalQuestions: widget.quiz.quizItems.length,
+            ),
           ),
         );
-
-        Future.delayed(const Duration(seconds: 1));
-
-        Navigator.of(context).pop();
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final QuizItem currentQuizItem =
         widget.quiz.quizItems[_currentQuestionIndex];
     final String appBarText =
         currentQuizItem.isTrueOrFalse ? "True/False" : "Multiple Choice";
 
-    Color _getButtonColor(String option) {
+    Color getButtonColor(String option) {
       if (_isCorrect == null && _selectedOption == option) {
         return Colors.orange; // Selected option before pressing "Continue"
       }
@@ -108,7 +176,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _getButtonColor(option),
+                          backgroundColor: getButtonColor(option),
                           foregroundColor: Colors.black,
                           side:
                               const BorderSide(color: Colors.orange, width: 2),
@@ -130,7 +198,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _getButtonColor('False'),
+                        backgroundColor: getButtonColor('False'),
                         foregroundColor: Colors.black,
                         side: const BorderSide(color: Colors.orange, width: 2),
                         minimumSize: const Size(100, 250),
@@ -150,7 +218,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _getButtonColor('True'),
+                        backgroundColor: getButtonColor('True'),
                         foregroundColor: Colors.black,
                         side: const BorderSide(color: Colors.orange, width: 2),
                         minimumSize: const Size(100, 250),
@@ -176,7 +244,6 @@ class _QuizScreenState extends State<QuizScreen> {
                 minimumSize: const Size(double.infinity, 50),
               ),
               onPressed: () {
-                // Compare selected option with correct answer
                 bool isCorrect = false;
                 String correctOption =
                     currentQuizItem.options[currentQuizItem.correctAnswer];
