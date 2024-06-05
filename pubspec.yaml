@@ -17,6 +17,8 @@ dependencies:
   firebase_storage: ^11.7.2
   flutter:
     sdk: flutter
+  flutter_chat_types: ^3.6.2
+  flutter_chat_ui: ^1.6.13
   flutter_downloader: ^1.11.7
   flutter_local_notifications: ^17.1.2
   flutter_rating_bar: ^4.0.1

@@ -14,8 +14,9 @@ class Session {
   final List<User>
       participants; // List of participants at the session != registered users
   final List<String>
-      mediaUrls; // List of media files (images) at are associated with the session // save to storage
-  final List<String> chatMessages;
+      mediaUrls; // List of media files (images) that are associated with the session - save to storage
+  final List<Map<String, dynamic>>
+      chatMessages; // will contain chat messages in json form
 
   SessionStatus status = SessionStatus.active;
   bool voiceChatEnabled = false;
@@ -60,7 +61,8 @@ class Session {
           .map((e) => User.fromMap(e))
           .toList(),
       mediaUrls: List<String>.from(sessionData['mediaUrls']),
-      chatMessages: List<String>.from(sessionData['chatMessages']),
+      chatMessages:
+          List<Map<String, dynamic>>.from(sessionData['chatMessages']),
       status: SessionStatus.values
           .firstWhere((e) => e.toString() == sessionData['status']),
     );
