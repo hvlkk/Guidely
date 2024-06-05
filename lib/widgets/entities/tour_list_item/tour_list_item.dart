@@ -19,35 +19,41 @@ class TourListItem extends StatelessWidget {
     return TourListItemTemplate(
       tour: tour,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                tour.tourDetails.title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                tour.location ?? 'Unknown area',
-                style: const TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-              if (displayRemainingTime)
+          Container(
+            width: 175, // Set your desired fixed width here
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  _getRemainingTimeText(tour.tourDetails.startTime,
-                      tour.tourDetails.startDate, tour),
+                  tour.tourDetails.title,
                   style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.green,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-            ],
+                const SizedBox(
+                    height: 10), // Change to height for vertical spacing
+                Text(
+                  tour.location ?? 'Unknown area',
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+                if (displayRemainingTime)
+                  Text(
+                    _getRemainingTimeText(tour.tourDetails.startTime,
+                        tour.tourDetails.startDate, tour),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.green,
+                    ),
+                  ),
+              ],
+            ),
           ),
+          const SizedBox(width: 10),
           Column(
             children: [
               Container(
