@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:guidely/models/entities/notification.dart' as myNoti;
 import 'package:guidely/screens/util/notifications.dart';
 
-// TODO: Change the class name to something more descriptive maybe
 class CustomNotificationIcon extends StatelessWidget {
   final List<myNoti.Notification> notifications;
 
@@ -12,7 +11,6 @@ class CustomNotificationIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     notifications.sort((a, b) => b.date.compareTo(a.date));
 
-    // Get the newest 10 notifications
     final newestNotifications = notifications.take(10).toList();
 
     final unreadCount = (newestNotifications

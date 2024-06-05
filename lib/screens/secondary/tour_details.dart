@@ -305,8 +305,13 @@ class _TourDetailsScreenState extends ConsumerState<TourDetailsScreen> {
                   ? ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 12, 168, 59),
+                        backgroundColor: Colors.green,
                         padding: const EdgeInsets.all(15),
+                        textStyle: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       child: const Text(
                         'Booked',

@@ -189,28 +189,30 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
       isAHoster
           ? OutlinedButton(
               onPressed: () {
-                // define a controller for the announcement
                 final announcementController = TextEditingController();
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: const Text('Announce Tour'),
-                      content: Column(
-                        children: [
-                          const Text('You can announce the tour here:'),
-                          const SizedBox(height: 10),
-                          CustomTextField(
-                            controller: announcementController,
-                            header: 'Announcement',
-                          ),
-                        ],
+                      content: SizedBox(
+                        height: 200,
+                        child: Column(
+                          children: [
+                            const Text('You can announce the tour here:'),
+                            const SizedBox(height: 10),
+                            CustomTextField(
+                              controller: announcementController,
+                              header: 'Announcement',
+                            ),
+                          ],
+                        ),
                       ),
                       actions: <Widget>[
                         TextButton(
                           child: const Text('Cancel'),
                           onPressed: () {
-                            _tourBloc.cancelTour(tour, _userData!.uid, context);
+                            Navigator.of(context).pop();
                           },
                         ),
                         TextButton(
@@ -388,6 +390,18 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                 : Colors.black,
           ),
         ),
+      ),
+      // add a tour details button
+      const SizedBox(width: 25),
+      OutlinedButton(
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => TourDetailsScreen(tour: tour),
+            ),
+          );
+        },
+        child: const Text('Get Info'),
       ),
     ];
   }

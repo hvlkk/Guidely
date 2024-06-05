@@ -47,7 +47,6 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
     super.dispose();
   }
 
-// todo: do we need to pass the streams to the sections?
   @override
   Widget build(BuildContext context) {
     final userDataAsync = ref.watch(userDataProvider);
@@ -102,7 +101,7 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                 );
               }
               if (session.status == SessionStatus.inQuiz) {
-                if (isGuide) {
+                if (!isGuide) {
                   return Center(
                     child: QuizScreen(
                       quiz: widget.tour.quizzes.first,
