@@ -151,7 +151,6 @@ class Tour {
       tourDetails.startTime.hour,
       tourDetails.startTime.minute,
     );
-    // todo : fix
     var durationInMinutes =
         tourDetails.duration.hour * 60 + tourDetails.duration.minute + 5;
 

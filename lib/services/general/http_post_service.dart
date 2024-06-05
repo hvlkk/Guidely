@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class HttpPostService {
-  final String _baseUrl = 'http://192.168.17.241:5000/';
+  final String _baseUrl = 'http://192.168.83.61:5000/';
 
   Future<void> postUserData(
       String endpoint, Map<String, dynamic> requestBody) async {

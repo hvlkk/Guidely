@@ -131,8 +131,6 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
       bool displayRemainingTime) {
     return toursAsync.when(
       data: (tours) {
-        // filter out tours that are not created
-        // by the user or not booked by the user
         tours = tours
             .where((tour) =>
                 _userData!.organizedTours.contains(tour.uid) ||
@@ -158,8 +156,6 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
             itemCount: tours.length,
             itemBuilder: (BuildContext context, int index) {
               final tour = tours[index];
-              print("Tour name: ${tour.tourDetails.title}");
-              print("Tour status: ${tour.state}");
               return Padding(
                 padding: const EdgeInsets.all(8),
                 child: Card(
@@ -195,7 +191,6 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
               onPressed: () {
                 // define a controller for the announcement
                 final announcementController = TextEditingController();
-                // ask user to announce the tour
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -206,8 +201,9 @@ class _ToursScreenState extends ConsumerState<ToursScreen> {
                           const Text('You can announce the tour here:'),
                           const SizedBox(height: 10),
                           CustomTextField(
-                              controller: announcementController,
-                              header: 'Announcement'),
+                            controller: announcementController,
+                            header: 'Announcement',
+                          ),
                         ],
                       ),
                       actions: <Widget>[

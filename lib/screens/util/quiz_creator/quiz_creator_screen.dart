@@ -340,13 +340,13 @@ class _QuizCreatorScreenState extends State<QuizCreatorScreen> {
                 // Show message for adding answers
                 if (_isMultipleChoice && answers.length < 4)
                   const SizedBox(height: 10),
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'You can add up to 4 possible answers.',
-                      style: TextStyle(color: Colors.grey),
-                    ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'You can add up to 4 possible answers.',
+                    style: TextStyle(color: Colors.grey),
                   ),
+                ),
                 // Next button
                 Padding(
                   padding: const EdgeInsets.all(8.0),

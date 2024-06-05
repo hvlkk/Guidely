@@ -8,7 +8,7 @@ import 'package:guidely/blocs/main/session_bloc.dart';
 import 'package:guidely/models/entities/session.dart';
 import 'package:guidely/models/entities/tour.dart';
 import 'package:guidely/providers/user_data_provider.dart';
-import 'package:guidely/screens/secondary/quiz_screen.dart';
+import 'package:guidely/screens/secondary/quiz/quiz_screen.dart';
 import 'package:guidely/screens/session/sections/chat_section.dart';
 import 'package:guidely/screens/session/sections/map_section.dart';
 import 'package:guidely/screens/session/sections/media_carousel_section.dart';
@@ -102,9 +102,13 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                 );
               }
               if (session.status == SessionStatus.inQuiz) {
-                if (!isGuide) {
+                if (isGuide) {
                   return Center(
-                    child: QuizScreen(quiz: widget.tour.quizzes.first),
+                    child: QuizScreen(
+                      quiz: widget.tour.quizzes.first,
+                      sessionId:
+                          widget.tour.sessionId, // Pass the sessionId here
+                    ),
                   );
                 }
               }
@@ -166,8 +170,9 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                                             Navigator.of(context).pop();
                                             session.status =
                                                 SessionStatus.completed;
-                                            _sessionBloc
-                                                .endSession(session.sessionId);
+                                            _sessionBloc.endSession(
+                                                session.sessionId,
+                                                widget.tour.uid);
                                           },
                                           child: const Text('No'),
                                         ),
@@ -207,8 +212,10 @@ class _TourSessionScreenState extends ConsumerState<TourSessionScreen> {
                                           onPressed: () {
                                             session.status =
                                                 SessionStatus.completed;
-                                            _sessionBloc
-                                                .endSession(session.sessionId);
+                                            _sessionBloc.endSession(
+                                              session.sessionId,
+                                              widget.tour.uid,
+                                            );
                                             Navigator.of(context).pop();
                                           },
                                           child: const Text('Yes'),
