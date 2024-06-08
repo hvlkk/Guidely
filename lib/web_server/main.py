@@ -109,7 +109,7 @@ def reject_request():
         return jsonify({'error': 'Missing user ID'}), 400
 
 @app.route('/accept-request', methods=['POST'])
-def aveppro_request():
+def approve_request():
     """Endpoint to accept a request."""
     data = request.json
     user_id = data.get('userId')  # Retrieve user_id from the request data

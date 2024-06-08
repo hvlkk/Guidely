@@ -114,7 +114,7 @@ class _PersonalInformationScreenState
     );
 
     setState(() {
-      ref.refresh(userDataProvider);
+      ref.invalidate(userDataProvider);
     });
 
     // Navigate back to the previous screen

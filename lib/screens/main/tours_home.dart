@@ -31,7 +31,6 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
   String _selectedFilterValue = 'Nearby';
   late List<Tour> tourDataUnfiltered;
   final TextEditingController _searchController = TextEditingController();
-  var _showNoToursMessage = false;
 
   bool _isLoading = true;
 
@@ -362,7 +361,6 @@ class _ToursHomeScreenState extends ConsumerState<ToursHomeScreen> {
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         _isLoading = false;
-        _showNoToursMessage = tourDataUnfiltered.isEmpty;
       });
     });
   }

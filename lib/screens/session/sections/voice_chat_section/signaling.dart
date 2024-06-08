@@ -154,13 +154,12 @@ class Signaling {
         peerConnection?.addTrack(track, localStream!);
       });
 
-
       CollectionReference<Map<String, dynamic>> calleeCandidatesCollection;
 
       // try {
-        print("Creating calleeCandidatesCollection");
-        calleeCandidatesCollection = roomRef.collection('calleeCandidates');
-        print("calleeCandidatesCollection created");
+      print("Creating calleeCandidatesCollection");
+      calleeCandidatesCollection = roomRef.collection('calleeCandidates');
+      print("calleeCandidatesCollection created");
       // } catch (e) {
       //   print(
       //       "Error, failed to create calleeCandidatesCollection because of $e\n");
@@ -169,10 +168,6 @@ class Signaling {
 
       peerConnection!.onIceCandidate = (RTCIceCandidate candidate) {
         print("Sending ICE candidate: ${candidate}");
-         if (candidate == null) {
-          print('onIceCandidate: complete!');
-          return;
-        }
         calleeCandidatesCollection.add(candidate.toMap());
       };
 
