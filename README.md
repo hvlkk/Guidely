@@ -1,6 +1,9 @@
 # Guidely
 
+## Table of Contents
+
 - [Guidely](#guidely)
+  - [Table of Contents](#table-of-contents)
   - [Description](#description)
   - [Features](#features)
   - [Installation](#installation)
