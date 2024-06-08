@@ -36,7 +36,7 @@ Notable features include:
 
 ## Directory Structure
 
-The code is hosted inside the [lib folder](https://github.com/hvlkk/Guidely/tree/main/lib). Brief directory descriptions follow:
+The source code is hosted inside the [lib folder](https://github.com/hvlkk/Guidely/tree/main/lib). Brief directory descriptions follow:
 
 - _bloc_: Business logic components used throughout the project.
 - _configs & misc_: Contain a single file each for the app config and global variables respectively.
@@ -46,7 +46,7 @@ The code is hosted inside the [lib folder](https://github.com/hvlkk/Guidely/tree
 - _screens_: Screen widgets.
 - _services_: Services used throughout the project.
 - _utils_: Utility files used throughout the project.
-- _web_server_: Projects setting up the web server for tour guide application approvals and rejections.
+- _web_server_: Contains the code necessary to run the web server for tour guide application approvals and rejections.
 - _widgets_: Non-screen widgets used across the project.
 
 ## Contributors
